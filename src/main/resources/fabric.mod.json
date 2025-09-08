@@ -1,11 +1,11 @@
 {
 	"schemaVersion": 1,
-	"id": "modid",
+	"id": "ptr",
 	"version": "${version}",
-	"name": "Example mod",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Projectiles Trajectory Prediction",
+	"description": "Shows the trajectory of projectiles like arrows, snowballs, eggs, tridents and ender pearls.",
 	"authors": [
-		"Me!"
+		"maDU59_"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+			"com.example.ptp"
 		],
 		"client": [
-			"com.example.ExampleModClient"
+			"com.example.ptpClient"
 		]
 	},
 	"mixins": [
