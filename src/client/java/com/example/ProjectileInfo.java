@@ -116,7 +116,7 @@ public class ProjectileInfo {
             return new ProjectileInfo(gravity, drag, vel, true, offset);
             
         } else {
-            ptrClient.LOGGER.info("Other Item");
+            ptpClient.LOGGER.info("Other Item");
         }
 
         return new ProjectileInfo(0.0, 0.0, new Vec3d(0.0, 0.0, 0.0), false, new Vec3d(0.0, 0.0, 0.0));
