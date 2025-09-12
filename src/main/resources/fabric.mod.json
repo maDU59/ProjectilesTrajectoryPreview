@@ -16,13 +16,13 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ptp"
+			"com.maDU59_.ptp"
 		],
 		"client": [
-			"com.example.ptpClient"
+			"com.maDU59_.ptpClient"
 		],
 		"modmenu": [ 
-			"com.example.config.configScreen.ModMenuApiImpl" 
+			"com.maDU59_.config.configScreen.ModMenuApiImpl" 
 		]
 	},
 	"mixins": [

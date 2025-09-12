@@ -1,10 +1,12 @@
-package com.example.config.configScreen;
+package com.maDU59_.config.configScreen;
 
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+
+import com.maDU59_.config.SettingsManager;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import com.example.config.SettingsManager;
 
 public class ptpConfigScreen extends Screen {
     private MyConfigListWidget list;
@@ -23,8 +25,6 @@ public class ptpConfigScreen extends Screen {
         super.init();
         // Create the scrolling list
         this.list = new MyConfigListWidget(this.client, this.width, this.height - 80, 40, 26);
-        this.addSelectableChild(this.list);
-
 
         // Example: Add categories + buttons
         list.addCategory("TRAJECTORY PREVISUALIZATION");
@@ -65,7 +65,8 @@ public class ptpConfigScreen extends Screen {
             this.client.setScreen(this.parent);
             SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
         }).dimensions(this.width / 2 - 50, this.height - 30, 100, 20).build();
-        // Done button
+
+        this.addDrawableChild(this.list);
         this.addDrawableChild(doneButton);
     }
 

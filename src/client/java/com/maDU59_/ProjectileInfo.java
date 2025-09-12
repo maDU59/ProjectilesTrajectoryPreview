@@ -1,4 +1,4 @@
-package com.example;
+package com.maDU59_;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BowItem;

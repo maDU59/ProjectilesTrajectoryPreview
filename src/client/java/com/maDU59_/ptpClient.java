@@ -1,4 +1,4 @@
-package com.example;
+package com.maDU59_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
+
+import com.maDU59_.config.SettingsManager;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -26,7 +28,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-import com.example.config.SettingsManager;
 
 public class ptpClient implements ClientModInitializer {
     private static final MinecraftClient client = MinecraftClient.getInstance();

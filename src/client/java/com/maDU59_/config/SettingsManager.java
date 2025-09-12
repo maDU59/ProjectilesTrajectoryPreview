@@ -1,4 +1,4 @@
-package com.example.config;
+package com.maDU59_.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -32,8 +32,8 @@ public class SettingsManager {
         "TRAJECTORY_COLOR",
         "Color",
         "Select the color of the trajectory line.",
-        "Red",
-        "Red",
+        "Green",
+        "Green",
         COLOR_OPTION_VALUES
     );
 
@@ -59,8 +59,8 @@ public class SettingsManager {
             "OUTLINE_TARGETS",
             "Outline Targets",
             "Toggle outlining of potential targets.",
-            false,
-            false,
+            true,
+            true,
             ENABLING_OPTION_VALUES
     );
 
@@ -68,8 +68,8 @@ public class SettingsManager {
             "OUTLINE_COLOR",
             "Color",
             "Select the color for outlining targets.",
-            "Red",
-            "Red",
+            "Green",
+            "Green",
             COLOR_OPTION_VALUES
     );
 
@@ -86,8 +86,8 @@ public class SettingsManager {
             "HIGHLIGHT_TARGETS",
             "Highlight Targets",
             "Toggle highlightning of potential targets.",
-            false,
-            false,
+            true,
+            true,
             ENABLING_OPTION_VALUES
     );
 
@@ -95,8 +95,8 @@ public class SettingsManager {
             "HIGHLIGHT_COLOR",
             "Color",
             "Select the color for highlighting targets.",
-            "Red",
-            "Red",
+            "Green",
+            "Green",
             COLOR_OPTION_VALUES
     );
 
@@ -104,8 +104,8 @@ public class SettingsManager {
             "HIGHLIGHT_OPACITY",
             "Opacity",
             "Set the opacity level of the highlight.",
-            "Opaque",
-            "Opaque",
+            "Transparent",
+            "Transparent",
             OPACITY_OPTION_VALUES
     );
 
