@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"com.example.ptpClient"
+		],
+		"modmenu": [ 
+			"com.example.config.configScreen.ModMenuApiImpl" 
 		]
 	},
 	"mixins": [
@@ -31,11 +34,11 @@
 	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.8",
+		"minecraft": "~1.21.4",
 		"java": ">=21",
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"modmenu": "*"
 	}
 }
