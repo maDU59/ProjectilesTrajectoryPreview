@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
 
+import com.maDU59_.config.ClientCommands;
 import com.maDU59_.config.SettingsManager;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -36,6 +37,8 @@ public class ptpClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ClientCommands.register();
+
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             PlayerEntity player = client.player;
             if (player == null) return;

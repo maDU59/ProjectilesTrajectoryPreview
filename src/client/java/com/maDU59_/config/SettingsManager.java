@@ -9,6 +9,7 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SettingsManager {
 
@@ -47,67 +48,103 @@ public class SettingsManager {
     );
 
     public static Option TRAJECTORY_STYLE = loadOptionWithDefaults(
-            "TRAJECTORY_STYLE",
-            "Style",
-            "Choose the style of the trajectory line.",
-            "Solid",
-            "Solid",
-            List.of("Solid", "Dashed", "Dotted")
+        "TRAJECTORY_STYLE",
+        "Style",
+        "Choose the style of the trajectory line.",
+        "Solid",
+        "Solid",
+        List.of("Solid", "Dashed", "Dotted")
     );
 
     public static Option OUTLINE_TARGETS = loadOptionWithDefaults(
-            "OUTLINE_TARGETS",
-            "Outline Targets",
-            "Toggle outlining of potential targets.",
-            true,
-            true,
-            ENABLING_OPTION_VALUES
+        "OUTLINE_TARGETS",
+        "Outline Targets",
+        "Toggle outlining of potential targets.",
+        true,
+        true,
+        ENABLING_OPTION_VALUES
     );
 
     public static Option OUTLINE_COLOR = loadOptionWithDefaults(
-            "OUTLINE_COLOR",
-            "Color",
-            "Select the color for outlining targets.",
-            "Green",
-            "Green",
-            COLOR_OPTION_VALUES
+        "OUTLINE_COLOR",
+        "Color",
+        "Select the color for outlining targets.",
+        "Green",
+        "Green",
+        COLOR_OPTION_VALUES
     );
 
     public static Option OUTLINE_OPACITY = loadOptionWithDefaults(
-            "OUTLINE_OPACITY",
-            "Opacity",
-            "Set the opacity level of the outline.",
-            "Opaque",
-            "Opaque",
-            OPACITY_OPTION_VALUES
+        "OUTLINE_OPACITY",
+        "Opacity",
+        "Set the opacity level of the outline.",
+        "Opaque",
+        "Opaque",
+        OPACITY_OPTION_VALUES
     );
 
     public static Option HIGHLIGHT_TARGETS = loadOptionWithDefaults(
-            "HIGHLIGHT_TARGETS",
-            "Highlight Targets",
-            "Toggle highlightning of potential targets.",
-            true,
-            true,
-            ENABLING_OPTION_VALUES
+        "HIGHLIGHT_TARGETS",
+        "Highlight Targets",
+        "Toggle highlightning of potential targets.",
+        true,
+        true,
+        ENABLING_OPTION_VALUES
     );
 
     public static Option HIGHLIGHT_COLOR = loadOptionWithDefaults(
-            "HIGHLIGHT_COLOR",
-            "Color",
-            "Select the color for highlighting targets.",
-            "Green",
-            "Green",
-            COLOR_OPTION_VALUES
+        "HIGHLIGHT_COLOR",
+        "Color",
+        "Select the color for highlighting targets.",
+        "Green",
+        "Green",
+        COLOR_OPTION_VALUES
     );
 
     public static Option HIGHLIGHT_OPACITY = loadOptionWithDefaults(
-            "HIGHLIGHT_OPACITY",
-            "Opacity",
-            "Set the opacity level of the highlight.",
-            "Transparent",
-            "Transparent",
-            OPACITY_OPTION_VALUES
+        "HIGHLIGHT_OPACITY",
+        "Opacity",
+        "Set the opacity level of the highlight.",
+        "Transparent",
+        "Transparent",
+        OPACITY_OPTION_VALUES
     );
+
+    public static List<String> getAllOptionsId(){
+        List<String> list = new ArrayList<>();
+        for (Option option : ALL_OPTIONS){
+            list.add(option.getId());
+            }
+        return list;
+    }
+
+    public static boolean setOptionValue(String optionId, Object value){
+        for (Option option : ALL_OPTIONS){
+            System.out.println(optionId + ": " + option.getId() + ", " + option.getId().equalsIgnoreCase(optionId));
+            System.out.println(value + ": " + option.getPossibleValues() + ", " + option.getPossibleValues().contains(value));
+            if(option.getId().equalsIgnoreCase(optionId)){
+                int index = option.getPossibleValues().stream().map(Object::toString).collect(Collectors.toList()).indexOf((String) value);
+                if (option.getPossibleValues().contains(value)){
+                    option.setValue(value);
+                    return true;
+                }
+                else if(index != -1){
+                    option.setValue(option.getPossibleValues().get(index));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static List<String> getOptionPossibleValues(String optionId){
+        for (Option option : ALL_OPTIONS){
+            if (option.getId().equalsIgnoreCase(optionId)){
+                return option.getPossibleValues().stream().map(Object::toString).collect(Collectors.toList());
+            }
+        }
+        return null;
+    }
 
     public static int getARGBColorFromSetting(String colorName, String opacitySetting) {
         int[] colors = getColorFromSetting(colorName);

@@ -44,6 +44,10 @@ public class Option {
         return this.description;
     }
 
+    public List<Object> getPossibleValues(){
+        return this.possibleValues;
+    }
+
     public String getValueAsString() {
         if( value instanceof Boolean) {
             return (Boolean) value ? "Enabled" : "Disabled";
