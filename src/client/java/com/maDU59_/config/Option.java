@@ -49,8 +49,8 @@ public class Option {
     }
 
     public String getValueAsString() {
-        if( value instanceof Boolean) {
-            return (Boolean) value ? "Enabled" : "Disabled";
+        if( value instanceof Boolean boolValue) {
+            return boolValue ? "Enabled" : "Disabled";
         }
         return this.value.toString();
     }
