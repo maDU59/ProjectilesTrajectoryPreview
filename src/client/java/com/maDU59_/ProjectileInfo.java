@@ -90,9 +90,6 @@ public class ProjectileInfo {
             
         } else if (item instanceof ThrowablePotionItem) {
 
-            gravity = 0.05;
-            drag = 0.99;
-
             Vec3d dir = player.getRotationVec(1.0F).add(0, 0.1, 0);
             dir = dir.normalize();
 
