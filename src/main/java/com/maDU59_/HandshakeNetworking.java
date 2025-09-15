@@ -13,13 +13,6 @@ public class HandshakeNetworking {
     public record HANDSHAKE_C2SPayload(String message) implements CustomPayload {
         public static final CustomPayload.Id<HANDSHAKE_C2SPayload> ID = new CustomPayload.Id<>(HANDSHAKE_C2S);
         public static final PacketCodec<RegistryByteBuf, HANDSHAKE_C2SPayload> CODEC = PacketCodec.tuple(PacketCodecs.STRING, HANDSHAKE_C2SPayload::message, HANDSHAKE_C2SPayload::new);
-        // should you need to send more data, add the appropriate record parameters and change your codec:
-        // public static final PacketCodec<RegistryByteBuf, BlockHighlightPayload> CODEC = PacketCodec.tuple(
-        //         BlockPos.PACKET_CODEC, BlockHighlightPayload::blockPos,
-        //         PacketCodecs.INTEGER, BlockHighlightPayload::myInt,
-        //         Uuids.PACKET_CODEC, BlockHighlightPayload::myUuid,
-        //         BlockHighlightPayload::new
-        // );
     
         @Override
         public CustomPayload.Id<? extends CustomPayload> getId() {
@@ -28,15 +21,8 @@ public class HandshakeNetworking {
     }
 
     public record HANDSHAKE_S2CPayload(String message) implements CustomPayload {
-        public static final CustomPayload.Id<HANDSHAKE_C2SPayload> ID = new CustomPayload.Id<>(HANDSHAKE_C2S);
-        public static final PacketCodec<RegistryByteBuf, HANDSHAKE_C2SPayload> CODEC = PacketCodec.tuple(PacketCodecs.STRING, HANDSHAKE_C2SPayload::message, HANDSHAKE_C2SPayload::new);
-        // should you need to send more data, add the appropriate record parameters and change your codec:
-        // public static final PacketCodec<RegistryByteBuf, BlockHighlightPayload> CODEC = PacketCodec.tuple(
-        //         BlockPos.PACKET_CODEC, BlockHighlightPayload::blockPos,
-        //         PacketCodecs.INTEGER, BlockHighlightPayload::myInt,
-        //         Uuids.PACKET_CODEC, BlockHighlightPayload::myUuid,
-        //         BlockHighlightPayload::new
-        // );
+        public static final CustomPayload.Id<HANDSHAKE_S2CPayload> ID = new CustomPayload.Id<>(HANDSHAKE_C2S);
+        public static final PacketCodec<RegistryByteBuf, HANDSHAKE_S2CPayload> CODEC = PacketCodec.tuple(PacketCodecs.STRING, HANDSHAKE_S2CPayload::message, HANDSHAKE_S2CPayload::new);
     
         @Override
         public CustomPayload.Id<? extends CustomPayload> getId() {

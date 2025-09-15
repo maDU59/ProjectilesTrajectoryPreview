@@ -30,6 +30,7 @@ public class ptp implements ModInitializer {
             (payload, context) -> {
                 // Send back a reply packet
                 ServerPlayNetworking.send(context.player(), new HANDSHAKE_S2CPayload("Is installed on server"));
+				System.out.println("[PTP] Sending handshake to player...");
             });
 
 		LOGGER.info("Hello Fabric world!");

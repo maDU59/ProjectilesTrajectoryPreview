@@ -59,11 +59,13 @@ public class ptpClient implements ClientModInitializer {
 
             // Send handshake to server
             ClientPlayNetworking.send(new HANDSHAKE_C2SPayload("Check if is installed on server"));
+            System.out.println("[PTP] Sending handshake to server...");
         });
 
         // Receive handshake reply
         ClientPlayNetworking.registerGlobalReceiver(HANDSHAKE_S2CPayload.ID,
             (payload, context) -> {
+                System.out.println("[PTP] Received handshake from server...");
                 serverHasMod = true;
         });
 
