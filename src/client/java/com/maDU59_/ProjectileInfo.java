@@ -15,14 +15,13 @@ import net.minecraft.item.FireChargeItem;
 import net.minecraft.util.math.Vec3d;
 
 public class ProjectileInfo {
-    // Fields
+
     public double gravity;
     public double drag;
     public Vec3d initialVelocity;
     public boolean isReadyToShoot;
     public Vec3d offset;
 
-    // Constructor
     public ProjectileInfo(double gravity, double drag, Vec3d initialVelocity, boolean isReadyToShoot, Vec3d offset) {
         this.gravity = gravity;
         this.drag = drag;

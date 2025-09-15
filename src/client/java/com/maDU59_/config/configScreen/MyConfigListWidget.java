@@ -36,11 +36,11 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
     }
 
     public void addButton(String name, ButtonWidget.PressAction onPress) {
-        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(name), onPress).dimensions(0, 0, 100, 20).build()));
+        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(name), onPress).dimensions(0, 0, 100, 20).build(), null, ""));
     }
 
     public void addButton(Option option, ButtonWidget.PressAction onPress) {
-        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(option.getValueAsString()), onPress).dimensions(0, 0, 100, 20).build(), option));
+        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(option.getValueAsString()), onPress).dimensions(0, 0, 100, 20).build(), option, ""));
     }
 
     public void addButton(Option option, ButtonWidget.PressAction onPress, String indent) {
@@ -86,31 +86,12 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         private final String indent;
         private final Option option;
 
-        public ButtonEntry(ButtonWidget button) {
-            this.button = button;
-            this.name = button.getMessage().getString();
-            this.description = null;
-            this.indent = "";
-            this.option = null;
-            System.out.println("Created button with name: " + this.name);
-        }
-
-        public ButtonEntry(ButtonWidget button, Option option) {
-            this.button = button;
-            this.name = option.getName();
-            this.description = option.getDescription();
-            this.indent = "";
-            this.option = option;
-            System.out.println("Created button with name: " + this.name);
-        }
-
         public ButtonEntry(ButtonWidget button, Option option, String indent) {
             this.button = button;
             this.name = option.getName();
             this.description = option.getDescription();
             this.indent = indent;
             this.option = option;
-            System.out.println("Created button with name: " + this.name);
         }
 
         @Override
