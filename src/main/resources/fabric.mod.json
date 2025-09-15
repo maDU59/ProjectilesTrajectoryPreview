@@ -25,13 +25,6 @@
 			"com.maDU59_.config.configScreen.ModMenuApiImpl" 
 		]
 	},
-	"mixins": [
-		"modid.mixins.json",
-		{
-			"config": "modid.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
 		"minecraft": "~1.21.4",
