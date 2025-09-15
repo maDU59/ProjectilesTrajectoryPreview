@@ -8,12 +8,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
 
+import com.maDU59_.HandshakeNetworking.HANDSHAKE_C2SPayload;
+import com.maDU59_.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.maDU59_.config.ClientCommands;
 import com.maDU59_.config.SettingsManager;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -33,15 +38,38 @@ import net.minecraft.world.RaycastContext;
 public class ptpClient implements ClientModInitializer {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     public static final Logger LOGGER = LogManager.getLogger("ptpClient");
+    private static boolean serverHasMod = false;
 
 
     @Override
     public void onInitializeClient() {
         ClientCommands.register();
 
+        PayloadTypeRegistry.playS2C().register(HANDSHAKE_S2CPayload.ID, HANDSHAKE_S2CPayload.CODEC);
+
+        // Reset handshake state on join
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+            serverHasMod = false;
+
+            // Always enabled in singleplayer
+            if (client.isIntegratedServerRunning()) {
+                serverHasMod = true;
+                return;
+            }
+
+            // Send handshake to server
+            ClientPlayNetworking.send(new HANDSHAKE_C2SPayload("Check if is installed on server"));
+        });
+
+        // Receive handshake reply
+        ClientPlayNetworking.registerGlobalReceiver(HANDSHAKE_S2CPayload.ID,
+            (payload, context) -> {
+                serverHasMod = true;
+        });
+
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             PlayerEntity player = client.player;
-            if (player == null) return;
+            if (player == null || !isEnabled()) return;
 
             Item item = player.getMainHandStack().getItem();
 
@@ -224,5 +252,10 @@ public class ptpClient implements ClientModInitializer {
         VertexRendering.drawBox(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         matrices.pop();
+    }
+
+    public static boolean isEnabled() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        return client.isIntegratedServerRunning() || serverHasMod;
     }
 }

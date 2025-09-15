@@ -1,9 +1,14 @@
 package com.maDU59_;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.maDU59_.HandshakeNetworking.HANDSHAKE_C2SPayload;
+import com.maDU59_.HandshakeNetworking.HANDSHAKE_S2CPayload;
 
 public class ptp implements ModInitializer {
 	public static final String MOD_ID = "ptp";
@@ -18,6 +23,14 @@ public class ptp implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
+
+		PayloadTypeRegistry.playC2S().register(HANDSHAKE_C2SPayload.ID, HANDSHAKE_C2SPayload.CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(HANDSHAKE_C2SPayload.ID,
+            (payload, context) -> {
+                // Send back a reply packet
+                ServerPlayNetworking.send(context.player(), new HANDSHAKE_S2CPayload("Is installed on server"));
+            });
 
 		LOGGER.info("Hello Fabric world!");
 	}
