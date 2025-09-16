@@ -2,13 +2,9 @@
   <img src="https://raw.githubusercontent.com/maDU59/ProjectilesTrajectoryPreview/1.21/src/main/resources/assets/ptp/icon.png" width="150">
   <h1>Projectile Trajectory Preview</h1>
 
-  <a href="https://modrinth.com/mod/immediatelyfast"><img src="https://img.shields.io/badge/dynamic/json?color=158000&label=downloads&prefix=+%20&query=downloads&url=https://api.modrinth.com/v2/project/5ZwdcRci&logo=modrinth"></a>
-  <a href="https://curseforge.com/minecraft/mc-mods/immediatelyfast"><img src="https://cf.way2muchnoise.eu/full_686911_downloads.svg"></a>
-
-  <p>ImmediatelyFast is an open source Minecraft mod which improves the immediate mode rendering performance of the client.
-  <br />It is designed to be lightweight and compatible with other mods.</p>
+  <a href="https://modrinth.com/mod/ptp"><img src="https://img.shields.io/badge/dynamic/json?color=158000&label=downloads&prefix=+%20&query=downloads&url=https://api.modrinth.com/v2/project/5ZwdcRci&logo=modrinth"></a>
+  <a href="https://curseforge.com/minecraft/mc-mods/ptp"><img src="https://cf.way2muchnoise.eu/full_686911_downloads.svg"></a>
 </div>
-# Projectile Trajectory Preview
 
 Ever wondered where your arrow, snowball, or potion will land? This mod gives you a visual preview of projectile trajectories and highlights the target impact zone—perfect for planning shots with precision.
 
