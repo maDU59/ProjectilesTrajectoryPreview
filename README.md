@@ -2,6 +2,8 @@
 
 Ever wondered where your arrow, snowball, or potion will land? This mod gives you a visual preview of projectile trajectories and highlights the target impact zone—perfect for planning shots with precision.
 
+Latest version can be downloaded on [Modrinth](https://modrinth.com/mod/ptp)
+
 ## 🔎 Features
 
 - Trajectory Visualization: See the path your projectile will follow before you launch it.
