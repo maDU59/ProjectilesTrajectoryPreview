@@ -198,9 +198,9 @@ public class SettingsManager {
         if(colorName.equals("Depends on target")){
             if(entity == null){colorName = "White";}
             else if(entity instanceof  PlayerEntity){colorName = "Blue";}
+            else if(entity instanceof  Angerable){colorName = "Yellow";}
             else if(entity instanceof  PassiveEntity){colorName = "Green";}
             else if(entity instanceof  HostileEntity){colorName = "Red";}
-            else if(entity instanceof  Angerable){colorName = "Yellow";}
             else if(entity instanceof  MobEntity){colorName = "Purple";}
             else if(entity instanceof  LivingEntity){colorName = "Cyan";}
             else{colorName = "Magenta";}
