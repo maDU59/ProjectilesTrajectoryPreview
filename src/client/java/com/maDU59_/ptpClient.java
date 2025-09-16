@@ -25,6 +25,7 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.Item;
@@ -98,7 +99,7 @@ public class ptpClient implements ClientModInitializer {
 
                 Box box = new Box(prevPos, pos).expand(1.0);
 
-                List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity));
+                List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity) && !(e instanceof EnderDragonEntity));
 
                 Entity closest = null;
                 double closestDistance = 99999.0;
@@ -138,6 +139,7 @@ public class ptpClient implements ClientModInitializer {
                     pos = entityHitPos;
                     trajectoryPoints.add(pos);
                     hasHit = true;
+                    System.out.println(entityImpact);
                     break;
                 }
 
@@ -153,7 +155,7 @@ public class ptpClient implements ClientModInitializer {
                 }
                 else if(entityImpact != null) {
                     Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
-                    renderFilled(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                    renderFilled(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
                 }
             }
 
@@ -164,7 +166,7 @@ public class ptpClient implements ClientModInitializer {
                 }
                 else if(entityImpact != null) {
                     Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
-                    renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
+                    renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
                 }
             }
 
@@ -178,7 +180,7 @@ public class ptpClient implements ClientModInitializer {
                     Vec3d lerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
                     Vec3d nextLerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
                     pos = trajectoryPoints.get(i).add(lerpedDelta);
-                    int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue());
+                    int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
                     Vec3d dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
                     if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dashed"){
                         dir = dir.multiply(0.5);

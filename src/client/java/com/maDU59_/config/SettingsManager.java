@@ -12,6 +12,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.Angerable;
+import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class SettingsManager {
 
@@ -19,7 +26,7 @@ public class SettingsManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("ptp.json");
     public static List<Object> ENABLING_OPTION_VALUES = List.of(true, false);
-    public static List<Object> COLOR_OPTION_VALUES = List.of("Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Black");
+    public static List<Object> COLOR_OPTION_VALUES = List.of("Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Purple", "Black", "Depends on target");
     public static List<Object> OPACITY_OPTION_VALUES = List.of("Opaque", "Transparent", "Pulsing");
 
     public static Option SHOW_TRAJECTORY = loadOptionWithDefaults(
@@ -148,8 +155,8 @@ public class SettingsManager {
         return null;
     }
 
-    public static int getARGBColorFromSetting(String colorName, String opacitySetting) {
-        int[] colors = getColorFromSetting(colorName);
+    public static int getARGBColorFromSetting(String colorName, String opacitySetting, Entity entity) {
+        int[] colors = getColorFromSetting(colorName, entity);
         return colors[2] + colors[1] * 256 + colors[0] * 256 * 256 + getAlphaFromSetting(opacitySetting) * 256 * 256 *256;
     }
 
@@ -184,6 +191,20 @@ public class SettingsManager {
     }
 
     public static int[] getColorFromSetting(String colorName) {
+        return getColorFromSetting(colorName, null);
+    }
+
+    public static int[] getColorFromSetting(String colorName, Entity entity) {
+        if(colorName.equals("Depends on target")){
+            if(entity == null){colorName = "White";}
+            else if(entity instanceof  PlayerEntity){colorName = "Blue";}
+            else if(entity instanceof  PassiveEntity){colorName = "Green";}
+            else if(entity instanceof  HostileEntity){colorName = "Red";}
+            else if(entity instanceof  Angerable){colorName = "Yellow";}
+            else if(entity instanceof  MobEntity){colorName = "Purple";}
+            else if(entity instanceof  LivingEntity){colorName = "Cyan";}
+            else{colorName = "Magenta";}
+        }
         int red = 0, green = 0, blue = 0;
         switch (colorName) {
             case "Red":
@@ -216,6 +237,11 @@ public class SettingsManager {
                 red = 0;
                 green = 0;
                 blue = 0;
+                break;
+            case "Purple":
+                red = 128;
+                green = 0;
+                blue = 128;
                 break;
             default:
                 red = 255; // Default to red if unknown
@@ -268,6 +294,7 @@ public class SettingsManager {
                     possibleValues
             );
         } else {
+            loadedOption.setPossibleValues(possibleValues);
             SettingsManager.ALL_OPTIONS.add(loadedOption);
             return loadedOption;
         }
