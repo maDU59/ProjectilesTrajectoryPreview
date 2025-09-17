@@ -83,9 +83,16 @@ public class ptpClient implements ClientModInitializer {
 
             Vec3d vel = projectileInfo.initialVelocity.add(player.getVelocity());
 
-            Vec3d pos = eye;
+            Vec3d pos;
+
+            if(projectileInfo.position == null){
+                pos = eye;
+            }
+            else{
+                pos = projectileInfo.position;
+            }
             Vec3d prevPos = pos;
-            Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context);
+            Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos);
             HitResult impact = null;
             Entity entityImpact = null;
             boolean hasHit = false;
@@ -119,12 +126,21 @@ public class ptpClient implements ClientModInitializer {
                     }
                 }
 
-                // collision
-                HitResult hit = player.getWorld().raycast(
+                HitResult hit;
+                if(projectileInfo.hasWaterCollision){
+                    hit = player.getWorld().raycast(
+                    new RaycastContext(prevPos, pos,
+                        RaycastContext.ShapeType.COLLIDER,
+                        RaycastContext.FluidHandling.WATER,
+                        player));
+                }
+                else{
+                    hit = player.getWorld().raycast(
                     new RaycastContext(prevPos, pos,
                         RaycastContext.ShapeType.COLLIDER,
                         RaycastContext.FluidHandling.NONE,
                         player));
+                }
 
                 if (hit.getType() != HitResult.Type.MISS && prevPos.squaredDistanceTo(hit.getPos()) < closestDistance) {
                     impact = hit;
@@ -218,7 +234,7 @@ public class ptpClient implements ClientModInitializer {
         });
     }
 
-    private Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context) {
+    private Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos) {
 
         float yaw = (float) Math.toRadians(-player.getYaw(1.0F));
         float pitch = (float) Math.toRadians(-player.getPitch(1.0F));
@@ -227,7 +243,7 @@ public class ptpClient implements ClientModInitializer {
         Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3d right = forward.crossProduct(up).normalize();
 
-        return right.multiply(offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(context.camera().getPos().subtract(player.getEyePos()));
+        return right.multiply(offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(context.camera().getPos().subtract(startPos));
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
