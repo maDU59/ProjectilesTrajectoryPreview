@@ -31,7 +31,7 @@ public class SettingsManager {
 
     public static Option SHOW_TRAJECTORY = loadOptionWithDefaults(
         "SHOW_TRAJECTORY",
-        "Trajectory Preview Visualization",
+        "ptp.config.show_trajectory",
         "Toggle the visibility of projectile trajectories.",
         true,
         true,
@@ -40,8 +40,8 @@ public class SettingsManager {
 
     public static Option TRAJECTORY_COLOR = loadOptionWithDefaults(
         "TRAJECTORY_COLOR",
-        "Color",
-        "Select the color of the trajectory line.",
+        "ptp.config.trajectory_color",
+        "ptp.config.trajectory_color_desc",
         "Green",
         "Green",
         COLOR_OPTION_VALUES
@@ -49,8 +49,8 @@ public class SettingsManager {
 
     public static Option TRAJECTORY_OPACITY = loadOptionWithDefaults(
         "TRAJECTORY_OPACITY",
-        "Opacity",
-        "Set the opacity level of the trajectory line.",
+        "ptp.config.trajectory_opacity",
+        "ptp.config.trajectory_opacity_desc",
         "Opaque",
         "Opaque",
         OPACITY_OPTION_VALUES
@@ -58,8 +58,8 @@ public class SettingsManager {
 
     public static Option TRAJECTORY_STYLE = loadOptionWithDefaults(
         "TRAJECTORY_STYLE",
-        "Style",
-        "Choose the style of the trajectory line.",
+        "ptp.config.trajectory_style",
+        "ptp.config.trajectory_style_desc",
         "Solid",
         "Solid",
         List.of("Solid", "Dashed", "Dotted")
@@ -67,8 +67,8 @@ public class SettingsManager {
 
     public static Option OUTLINE_TARGETS = loadOptionWithDefaults(
         "OUTLINE_TARGETS",
-        "Outline Targets",
-        "Toggle outlining of potential targets.",
+        "ptp.config.outline_targets",
+        "ptp.config.outline_targets_desc",
         true,
         true,
         ENABLING_OPTION_VALUES
@@ -76,8 +76,8 @@ public class SettingsManager {
 
     public static Option OUTLINE_COLOR = loadOptionWithDefaults(
         "OUTLINE_COLOR",
-        "Color",
-        "Select the color for outlining targets.",
+        "ptp.config.outline_color",
+        "ptp.config.outline_color_desc",
         "Green",
         "Green",
         COLOR_OPTION_VALUES
@@ -85,8 +85,8 @@ public class SettingsManager {
 
     public static Option OUTLINE_OPACITY = loadOptionWithDefaults(
         "OUTLINE_OPACITY",
-        "Opacity",
-        "Set the opacity level of the outline.",
+        "ptp.config.outline_opacity",
+        "ptp.config.outline_opacity_desc",
         "Opaque",
         "Opaque",
         OPACITY_OPTION_VALUES
@@ -94,8 +94,8 @@ public class SettingsManager {
 
     public static Option HIGHLIGHT_TARGETS = loadOptionWithDefaults(
         "HIGHLIGHT_TARGETS",
-        "Highlight Targets",
-        "Toggle highlightning of potential targets.",
+        "ptp.config.highlight_targets",
+        "ptp.config.highlight_targets_desc",
         true,
         true,
         ENABLING_OPTION_VALUES
@@ -103,8 +103,8 @@ public class SettingsManager {
 
     public static Option HIGHLIGHT_COLOR = loadOptionWithDefaults(
         "HIGHLIGHT_COLOR",
-        "Color",
-        "Select the color for highlighting targets.",
+        "ptp.config.highlight_color",
+        "ptp.config.highlight_color_desc",
         "Green",
         "Green",
         COLOR_OPTION_VALUES
@@ -112,8 +112,8 @@ public class SettingsManager {
 
     public static Option HIGHLIGHT_OPACITY = loadOptionWithDefaults(
         "HIGHLIGHT_OPACITY",
-        "Opacity",
-        "Set the opacity level of the highlight.",
+        "ptp.config.highlight_opacity",
+        "ptp.config.highlight_opacity_desc",
         "Transparent",
         "Transparent",
         OPACITY_OPTION_VALUES
@@ -295,6 +295,8 @@ public class SettingsManager {
             );
         } else {
             loadedOption.setPossibleValues(possibleValues);
+            loadedOption.setName(name);
+            loadedOption.setDescription(description);
             SettingsManager.ALL_OPTIONS.add(loadedOption);
             return loadedOption;
         }

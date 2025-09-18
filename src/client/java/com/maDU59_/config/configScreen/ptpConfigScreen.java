@@ -27,7 +27,7 @@ public class ptpConfigScreen extends Screen {
         this.list = new MyConfigListWidget(this.client, this.width, this.height - 80, 40, 26);
 
         // Example: Add categories + buttons
-        list.addCategory("TRAJECTORY PREVISUALIZATION");
+        list.addCategory("ptp.config.trajectory-previsualization");
         list.addButton(SettingsManager.SHOW_TRAJECTORY, btn -> {
             SettingsManager.SHOW_TRAJECTORY.setToNextValue();
         });
@@ -40,7 +40,7 @@ public class ptpConfigScreen extends Screen {
         list.addButton(SettingsManager.TRAJECTORY_STYLE, btn -> {
             SettingsManager.TRAJECTORY_STYLE.setToNextValue();
         }, INDENT);
-        list.addCategory("TARGET OUTLINING");
+        list.addCategory("ptp.config.target-outlining");
         list.addButton(SettingsManager.OUTLINE_TARGETS, btn -> {
             SettingsManager.OUTLINE_TARGETS.setToNextValue();
         });
@@ -50,7 +50,7 @@ public class ptpConfigScreen extends Screen {
         list.addButton(SettingsManager.OUTLINE_OPACITY, btn -> {
             SettingsManager.OUTLINE_OPACITY.setToNextValue();
         }, INDENT);
-        list.addCategory("TARGET HIGHLIGHTING");
+        list.addCategory("ptp.config.target-highlighting");
         list.addButton(SettingsManager.HIGHLIGHT_TARGETS, btn -> {
             SettingsManager.HIGHLIGHT_TARGETS.setToNextValue();
         });

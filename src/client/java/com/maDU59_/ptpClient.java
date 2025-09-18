@@ -155,7 +155,6 @@ public class ptpClient implements ClientModInitializer {
                     pos = entityHitPos;
                     trajectoryPoints.add(pos);
                     hasHit = true;
-                    System.out.println(entityImpact);
                     break;
                 }
 

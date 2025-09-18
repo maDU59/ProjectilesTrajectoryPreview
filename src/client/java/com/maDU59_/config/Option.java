@@ -2,6 +2,8 @@ package com.maDU59_.config;
 
 import java.util.List;
 
+import net.minecraft.client.resource.language.I18n;
+
 public class Option {
     public String id;
     public String name;
@@ -37,11 +39,11 @@ public class Option {
     }
 
     public String getName() {
-        return this.name;
+        return I18n.translate(this.name);
     }
 
     public String getDescription() {
-        return this.description;
+        return I18n.translate(this.description);
     }
 
     public List<Object> getPossibleValues(){
@@ -50,9 +52,9 @@ public class Option {
 
     public String getValueAsString() {
         if( value instanceof Boolean boolValue) {
-            return boolValue ? "Enabled" : "Disabled";
+            return boolValue ? I18n.translate("ptp.config.enabled") : I18n.translate("ptp.config.disabled");
         }
-        return this.value.toString();
+        return I18n.translate(this.value.toString());
     }
 
     public void setToNextValue() {
@@ -65,5 +67,11 @@ public class Option {
 
     public void setPossibleValues(List<Object> possibleValues){
         this.possibleValues = possibleValues;
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+    public void setDescription(String description){
+        this.description = description;
     }
 }
