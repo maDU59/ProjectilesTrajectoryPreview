@@ -56,7 +56,6 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
 
         public CategoryEntry(String name) {
             this.name = name;
-            System.out.println("Created category with name: " + this.name);
         }
 
         @Override
