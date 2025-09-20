@@ -21,7 +21,7 @@ public class HandshakeNetworking {
     }
 
     public record HANDSHAKE_S2CPayload(String message) implements CustomPayload {
-        public static final CustomPayload.Id<HANDSHAKE_S2CPayload> ID = new CustomPayload.Id<>(HANDSHAKE_C2S);
+        public static final CustomPayload.Id<HANDSHAKE_S2CPayload> ID = new CustomPayload.Id<>(HANDSHAKE_S2C);
         public static final PacketCodec<RegistryByteBuf, HANDSHAKE_S2CPayload> CODEC = PacketCodec.tuple(PacketCodecs.STRING, HANDSHAKE_S2CPayload::message, HANDSHAKE_S2CPayload::new);
     
         @Override

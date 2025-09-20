@@ -1,8 +1,10 @@
 package com.maDU59_;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ public class ptp implements ModInitializer {
 		// Proceed with mild caution.
 
 		PayloadTypeRegistry.playC2S().register(HANDSHAKE_C2SPayload.ID, HANDSHAKE_C2SPayload.CODEC);
+		PayloadTypeRegistry.playS2C().register(HANDSHAKE_S2CPayload.ID, HANDSHAKE_S2CPayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(HANDSHAKE_C2SPayload.ID,
             (payload, context) -> {
