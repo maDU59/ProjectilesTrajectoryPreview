@@ -163,8 +163,9 @@ public class ptpClient implements ClientModInitializer {
 
             Vec3d cam = context.camera().getPos();
 
-            if((boolean) SettingsManager.HIGHLIGHT_TARGETS.getValue()){
-                if(impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
+            Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
+            if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
+                if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
                     renderFilled(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
                 }
@@ -174,8 +175,9 @@ public class ptpClient implements ClientModInitializer {
                 }
             }
 
-            if((boolean) SettingsManager.OUTLINE_TARGETS.getValue()){
-                if(impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
+            value = SettingsManager.OUTLINE_TARGETS.getValue();
+            if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
+                if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
                     renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
                 }
@@ -188,7 +190,8 @@ public class ptpClient implements ClientModInitializer {
             MatrixStack matrices = context.matrixStack();
             VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLines());
 
-            if ((boolean) SettingsManager.SHOW_TRAJECTORY.getValue()) {
+            value = SettingsManager.SHOW_TRAJECTORY.getValue();
+            if (("TargetIsEntity".equals(value) && entityImpact!=null) || Boolean.TRUE.equals(value)) {
                 matrices.push();
                 matrices.translate(-cam.x, -cam.y, -cam.z);
                 for (int i = 0; i < trajectoryPoints.size()-1; i++) {

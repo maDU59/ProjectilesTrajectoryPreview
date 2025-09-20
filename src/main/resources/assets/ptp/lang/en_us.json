@@ -40,5 +40,6 @@
   "Pulsing": "Pulsing",
   "Solid": "Solid",
   "Dashed": "Dashed",
-  "Dotted": "Dotted"
+  "Dotted": "Dotted",
+  "TargetIsEntity": "Only if the target is an entity"
 }

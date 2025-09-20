@@ -40,5 +40,6 @@
   "Pulsing": "깜박임",
   "Solid": "실선",
   "Dashed": "대시선",
-  "Dotted": "점선"
+  "Dotted": "점선",
+  "TargetIsEntity": "대상이 엔티티일 경우에만"
 }

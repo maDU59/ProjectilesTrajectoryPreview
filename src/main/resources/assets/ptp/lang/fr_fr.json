@@ -40,5 +40,6 @@
   "Pulsing": "Clignotant",
   "Solid": "Pleine",
   "Dashed": "Tiretée",
-  "Dotted": "Pointillée"
+  "Dotted": "Pointillée",
+  "TargetIsEntity": "Seulement si la cible est une entité"
 }
