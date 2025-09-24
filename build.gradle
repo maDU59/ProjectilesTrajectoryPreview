@@ -11,10 +11,10 @@ base {
 }
 
 repositories {
-  maven {
-    name = "Terraformers"
-    url = "https://maven.terraformersmc.com/"
-  }
+  	maven {
+    	name = "Terraformers"
+    	url = "https://maven.terraformersmc.com/"
+  	}
 }
 
 loom {

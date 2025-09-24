@@ -102,7 +102,7 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
             if(this.description == null) return;
 
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            context.drawTextWithShadow(textRenderer, Text.literal(indent + this.name), 10, y + (entryHeight - textRenderer.fontHeight) / 2, 0xFFFFFFFF);
+            context.drawText(textRenderer, Text.literal(indent + this.name), 10, y + (entryHeight - textRenderer.fontHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override
