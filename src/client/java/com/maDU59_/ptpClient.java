@@ -125,14 +125,14 @@ public class ptpClient implements ClientModInitializer {
 
                 HitResult hit;
                 if(projectileInfo.hasWaterCollision){
-                    hit = player.getWorld().raycast(
+                    hit = player.getEntityWorld().raycast(
                     new RaycastContext(prevPos, pos,
                         RaycastContext.ShapeType.COLLIDER,
                         RaycastContext.FluidHandling.WATER,
                         player));
                 }
                 else{
-                    hit = player.getWorld().raycast(
+                    hit = player.getEntityWorld().raycast(
                     new RaycastContext(prevPos, pos,
                         RaycastContext.ShapeType.COLLIDER,
                         RaycastContext.FluidHandling.NONE,
@@ -268,7 +268,7 @@ public class ptpClient implements ClientModInitializer {
 
         VertexConsumer quadConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
 
-        VertexRendering.drawBox(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        VertexRendering.drawBox(matrices.peek(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         matrices.pop();
     }
