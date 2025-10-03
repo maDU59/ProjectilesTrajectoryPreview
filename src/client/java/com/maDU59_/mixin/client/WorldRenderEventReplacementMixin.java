@@ -41,7 +41,7 @@ public class WorldRenderEventReplacementMixin {
     */
 
     @Inject(method = "render", at = @At("TAIL"))
-    private void afterRenderMain(FrameGraphBuilder frameGraphBuilder, Frustum frustum, Matrix4f posMatrix, GpuBufferSlice fogBuffer, boolean renderBlockOutline, WorldRenderState state, RenderTickCounter tickCounter, Profiler profiler, CallbackInfo ci) {
-        ptpClient.renderOverlay(new WorldRenderContext(posMatrix));
+    private void afterRenderMain(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci) {
+        ptpClient.renderOverlay(new WorldRenderContext(positionMatrix));
     }
 }
