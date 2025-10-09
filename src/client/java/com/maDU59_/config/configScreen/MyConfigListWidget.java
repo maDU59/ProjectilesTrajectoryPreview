@@ -119,7 +119,6 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         @Override
         public boolean mouseClicked(Click click, boolean doubleClick) {
             if (this.button.mouseClicked(click, doubleClick)) {
-                System.out.println(this.name + " clicked");
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 if(this.option != null){
                     this.button.setMessage(Text.literal(this.option.getValueAsString()));

@@ -129,8 +129,6 @@ public class SettingsManager {
 
     public static boolean setOptionValue(String optionId, Object value){
         for (Option option : ALL_OPTIONS){
-            System.out.println(optionId + ": " + option.getId() + ", " + option.getId().equalsIgnoreCase(optionId));
-            System.out.println(value + ": " + option.getPossibleValues() + ", " + option.getPossibleValues().contains(value));
             if(option.getId().equalsIgnoreCase(optionId)){
                 int index = option.getPossibleValues().stream().map(Object::toString).collect(Collectors.toList()).indexOf((String) value);
                 if (option.getPossibleValues().contains(value)){
@@ -283,7 +281,6 @@ public class SettingsManager {
 
     private static Option loadOptionWithDefaults(String id, String name, String description, Object value, Object defaultValue, List<Object> possibleValues) {
         Option loadedOption = loadOption(id);
-        System.out.println("Loaded option for " + id + ": " + (loadedOption == null ? "null" : loadedOption.getValueAsString()));
         if (loadedOption == null) {
             return new Option(
                     id,
