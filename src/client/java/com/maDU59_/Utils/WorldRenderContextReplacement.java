@@ -7,13 +7,13 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class WorldRenderContext {
+public class WorldRenderContextReplacement {
 
     public final Matrix4f positionMatrix;
     public final Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
     public MatrixStack matrixStack = new MatrixStack();
 
-    public WorldRenderContext(Matrix4f positionMatrix) {
+    public WorldRenderContextReplacement(Matrix4f positionMatrix) {
         this.positionMatrix = positionMatrix;
         this.matrixStack.multiplyPositionMatrix(positionMatrix);
     }
@@ -22,7 +22,7 @@ public class WorldRenderContext {
         return camera;
     }
 
-    public MatrixStack matrixStack() {
+    public MatrixStack matrices() {
         return matrixStack;
     }
 

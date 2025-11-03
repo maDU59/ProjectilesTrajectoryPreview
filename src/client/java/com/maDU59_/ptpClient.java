@@ -16,6 +16,8 @@ import com.maDU59_.config.SettingsManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -33,7 +35,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
-import com.maDU59_.Utils.WorldRenderContext;
+import com.maDU59_.Utils.WorldRenderContextReplacement;
 
 public class ptpClient implements ClientModInitializer {
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -66,12 +68,10 @@ public class ptpClient implements ClientModInitializer {
                 System.out.println("[PTP] Received handshake from server...");
                 serverHasMod = true;
         });
-
-        /* Pre 1.21.9
+        
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             renderOverlay(context);
         });
-        */
     }
 
     public static void renderOverlay(WorldRenderContext context) {
@@ -165,7 +165,7 @@ public class ptpClient implements ClientModInitializer {
             prevPos = pos;
         }
 
-        Vec3d cam = context.camera().getPos();
+        Vec3d cam = client.gameRenderer.getCamera().getPos();
 
         Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
         if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
@@ -191,8 +191,8 @@ public class ptpClient implements ClientModInitializer {
             }
         }
 
-        MatrixStack matrices = context.matrixStack();
-        VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLines());
+        MatrixStack matrices = context.matrices();
+        VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
 
         value = SettingsManager.SHOW_TRAJECTORY.getValue();
         if (("TargetIsEntity".equals(value) && entityImpact!=null) || Boolean.TRUE.equals(value)) {
@@ -211,6 +211,7 @@ public class ptpClient implements ClientModInitializer {
                     dir = dir.multiply(0.15);
                 }
                 Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
+
                 VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
             }
             matrices.pop();
@@ -248,12 +249,12 @@ public class ptpClient implements ClientModInitializer {
         Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3d right = forward.crossProduct(up).normalize();
 
-        return right.multiply(offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(context.camera().getPos().subtract(startPos));
+        return right.multiply(offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(client.gameRenderer.getCamera().getPos().subtract(startPos));
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        MatrixStack matrices = context.matrixStack();
-        Vec3d camera = context.camera().getPos();
+        MatrixStack matrices = context.matrices();
+        Vec3d camera = client.gameRenderer.getCamera().getPos();
 
         matrices.push();
         matrices.translate(-camera.x, -camera.y, -camera.z);
@@ -266,8 +267,8 @@ public class ptpClient implements ClientModInitializer {
     }
 
     private static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        MatrixStack matrices = context.matrixStack();
-        Vec3d camera = context.camera().getPos();
+        MatrixStack matrices = context.matrices();
+        Vec3d camera = client.gameRenderer.getCamera().getPos();
 
         matrices.push();
         matrices.translate(-camera.x, -camera.y, -camera.z);
