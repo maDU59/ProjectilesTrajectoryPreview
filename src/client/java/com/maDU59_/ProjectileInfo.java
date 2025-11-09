@@ -84,7 +84,7 @@ public class ProjectileInfo {
 
             gravity = 0.03;
 
-            Vec3d vel = player.getRotationVec(1.0F).multiply(SnowballItem.POWER);
+            Vec3d vel = player.getRotationVec(1.0F).multiply(1.5F);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
             return new ProjectileInfo(gravity, drag, vel, true, offset, null, false);

@@ -3,7 +3,6 @@
 	"package": "com.maDU59_.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"WorldRenderEventReplacementMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

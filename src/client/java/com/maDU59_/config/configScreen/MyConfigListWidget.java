@@ -6,7 +6,6 @@ import com.maDU59_.config.Option;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
@@ -60,10 +59,10 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            int textX = getContentX() + getContentWidth() / 2;
-            int textY = getContentY() + (getContentHeight() - textRenderer.fontHeight) / 2;
+            int textX = x + entryWidth / 2;
+            int textY = y + (entryHeight - textRenderer.fontHeight) / 2;
             context.drawCenteredTextWithShadow(textRenderer, Text.translatable(this.name), textX, textY, 0xFFFFFFFF);
         }  
 
@@ -95,15 +94,15 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
-            this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.button.setY(y + (entryHeight - this.button.getHeight()) / 2);
+            this.button.setX(entryWidth - this.button.getWidth() - 10);
             this.button.render(context, mouseX, mouseY, tickDelta);
 
             if(this.description == null) return;
 
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            context.drawText(textRenderer, Text.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.fontHeight) / 2, 0xFFFFFFFF, true);
+            context.drawText(textRenderer, Text.literal(indent + this.name), 10, y + (entryHeight - textRenderer.fontHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override
@@ -117,8 +116,8 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         }
 
         @Override
-        public boolean mouseClicked(Click click, boolean doubleClick) {
-            if (this.button.mouseClicked(click, doubleClick)) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (this.button.mouseClicked(mouseX, mouseY, button)) {
                 MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 if(this.option != null){
                     this.button.setMessage(Text.literal(this.option.getValueAsString()));

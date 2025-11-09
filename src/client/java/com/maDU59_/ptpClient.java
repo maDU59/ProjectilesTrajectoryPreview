@@ -16,12 +16,12 @@ import com.maDU59_.config.SettingsManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexRendering;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
@@ -35,13 +35,10 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
-import com.maDU59_.Utils.WorldRenderContextReplacement;
-
 public class ptpClient implements ClientModInitializer {
     private static final MinecraftClient client = MinecraftClient.getInstance();
     public static final Logger LOGGER = LogManager.getLogger("ptpClient");
     private static boolean serverHasMod = false;
-
 
     @Override
     public void onInitializeClient() {
@@ -191,7 +188,7 @@ public class ptpClient implements ClientModInitializer {
             }
         }
 
-        MatrixStack matrices = context.matrices();
+        MatrixStack matrices = context.matrixStack();
         VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
 
         value = SettingsManager.SHOW_TRAJECTORY.getValue();
@@ -212,7 +209,7 @@ public class ptpClient implements ClientModInitializer {
                 }
                 Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
-                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                drawVector(matrices, lineConsumer, floatPos, dir, color);
             }
             matrices.pop();
         }
@@ -253,7 +250,7 @@ public class ptpClient implements ClientModInitializer {
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        MatrixStack matrices = context.matrices();
+        MatrixStack matrices = context.matrixStack();
         Vec3d camera = client.gameRenderer.getCamera().getPos();
 
         matrices.push();
@@ -261,13 +258,13 @@ public class ptpClient implements ClientModInitializer {
 
         VertexConsumer quadConsumer = context.consumers().getBuffer(RenderLayer.getDebugFilledBox());
 
-        VertexRendering.drawFilledBox(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        WorldRenderer.renderFilledBox(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         matrices.pop();
     }
 
     private static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        MatrixStack matrices = context.matrices();
+        MatrixStack matrices = context.matrixStack();
         Vec3d camera = client.gameRenderer.getCamera().getPos();
 
         matrices.push();
@@ -275,9 +272,15 @@ public class ptpClient implements ClientModInitializer {
 
         VertexConsumer quadConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
 
-        VertexRendering.drawBox(matrices.peek(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        WorldRenderer.drawBox(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         matrices.pop();
+    }
+
+    private static void drawVector(MatrixStack matrices, VertexConsumer vertexConsumers, Vector3f offset, Vec3d vec, int color) {
+        MatrixStack.Entry entry = matrices.peek();
+        vertexConsumers.vertex(entry, offset).color(color).normal(entry, (float)vec.x, (float)vec.y, (float)vec.z);
+        vertexConsumers.vertex(entry, (float)((double)offset.x() + vec.x), (float)((double)offset.y() + vec.y), (float)((double)offset.z() + vec.z)).color(color).normal(entry, (float)vec.x, (float)vec.y, (float)vec.z);
     }
 
     public static boolean isEnabled() {
