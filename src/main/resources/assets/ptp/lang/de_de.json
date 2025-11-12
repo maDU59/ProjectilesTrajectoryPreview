@@ -19,6 +19,8 @@
   "ptp.config.highlight_color_desc": "Wähle die Farbe für das Hervorheben von Zielen.",
   "ptp.config.highlight_opacity": "Transparenz",
   "ptp.config.highlight_opacity_desc": "Lege den Transparenzgrad der Hervorhebung fest.",
+  "ptp.config.enable_offhand": "Flugbahn für die Nebenhand aktivieren",
+  "ptp.config.enable_offhand_desc": "Anzeige der Flugbahn von Projektilen in der Nebenhand aktivieren",
   "ptp.config.trajectory-previsualization": "TRAJEKTORIENVORSCHAU",
   "ptp.config.target-outlining": "ZIELUMRANDUNG",
   "ptp.config.target-highlighting": "ZIELHERVORHEBUNG",

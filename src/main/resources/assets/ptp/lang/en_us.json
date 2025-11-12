@@ -19,6 +19,8 @@
   "ptp.config.highlight_color_desc": "Select the color for highlighting targets.",
   "ptp.config.highlight_opacity": "Opacity",
   "ptp.config.highlight_opacity_desc": "Set the opacity level of the highlight.",
+  "ptp.config.enable_offhand":"Enable offhand trajectory",
+  "ptp.config.enable_offhand_desc":"Toggle trajectory visibility for offhand projectiles",
   "ptp.config.trajectory-previsualization": "TRAJECTORY PREVISUALIZATION",
   "ptp.config.target-outlining":"TARGET OUTLINING",
   "ptp.config.target-highlighting":"TARGET HIGHLIGHTING",

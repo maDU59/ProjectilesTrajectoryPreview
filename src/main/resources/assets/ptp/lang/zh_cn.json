@@ -19,6 +19,8 @@
   "ptp.config.highlight_color_desc": "选择用于高亮目标的颜色。",
   "ptp.config.highlight_opacity": "不透明度",
   "ptp.config.highlight_opacity_desc": "设置高亮的不透明度。",
+  "ptp.config.enable_offhand": "启用副手弹道",
+  "ptp.config.enable_offhand_desc": "启用副手中投射物的弹道显示",
   "ptp.config.trajectory-previsualization": "轨迹预览可视化",
   "ptp.config.target-outlining": "绘制目标边框",
   "ptp.config.target-highlighting": "目标高亮",

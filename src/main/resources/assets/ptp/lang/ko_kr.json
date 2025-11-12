@@ -19,6 +19,8 @@
   "ptp.config.highlight_color_desc": "대상 강조 표시의 색상을 선택하세요.",
   "ptp.config.highlight_opacity": "투명도",
   "ptp.config.highlight_opacity_desc": "강조 표시의 투명도 수준을 설정하세요.",
+  "ptp.config.enable_offhand": "보조 손 궤적 표시 활성화",
+  "ptp.config.enable_offhand_desc": "보조 손에 들고 있는 투사체의 궤적 표시를 활성화합니다",
   "ptp.config.trajectory-previsualization": "투사체 경로 미리보기",
   "ptp.config.target-outlining": "대상 윤곽 표시",
   "ptp.config.target-highlighting": "대상 강조 표시",

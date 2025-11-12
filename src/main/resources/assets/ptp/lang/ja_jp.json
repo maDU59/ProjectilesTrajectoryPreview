@@ -19,6 +19,8 @@
   "ptp.config.highlight_color_desc": "ターゲットのハイライトに使用する色を選択します。",
   "ptp.config.highlight_opacity": "不透明度",
   "ptp.config.highlight_opacity_desc": "ハイライトの不透明度を設定します。",
+  "ptp.config.enable_offhand": "オフハンドの軌道を有効にする",
+  "ptp.config.enable_offhand_desc": "セカンドハンドで持っている発射物の軌道表示を有効にします",
   "ptp.config.trajectory-previsualization": "軌道プレビューの可視化",
   "ptp.config.target-outlining": "ターゲットの枠線描画",
   "ptp.config.target-highlighting": "ターゲットのハイライト",

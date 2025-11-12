@@ -119,6 +119,15 @@ public class SettingsManager {
         OPACITY_OPTION_VALUES
     );
 
+    public static Option ENABLE_OFFHAND = loadOptionWithDefaults(
+        "ENABLE_OFFHAND",
+        "ptp.config.enable_offhand",
+        "ptp.config.enable_offhand_desc",
+        false,
+        false,
+        List.of(true, false)
+    );
+
     public static List<String> getAllOptionsId(){
         List<String> list = new ArrayList<>();
         for (Option option : ALL_OPTIONS){
@@ -128,6 +137,7 @@ public class SettingsManager {
     }
 
     public static boolean setOptionValue(String optionId, Object value){
+        if(optionId == null || value == null) return false;
         for (Option option : ALL_OPTIONS){
             if(option.getId().equalsIgnoreCase(optionId)){
                 int index = option.getPossibleValues().stream().map(Object::toString).collect(Collectors.toList()).indexOf((String) value);

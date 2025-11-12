@@ -29,8 +29,9 @@ public class ProjectileInfo {
     public Vec3d offset;
     public Vec3d position;
     public boolean hasWaterCollision;
+    public boolean throwableFromOffHand;
 
-    public ProjectileInfo(double gravity, double drag, Vec3d initialVelocity, boolean isReadyToShoot, Vec3d offset, Vec3d position, boolean hasWaterCollision) {
+    public ProjectileInfo(double gravity, double drag, Vec3d initialVelocity, boolean isReadyToShoot, Vec3d offset, Vec3d position, boolean hasWaterCollision, boolean throwableFromOffHand) {
         this.gravity = gravity;
         this.drag = drag;
         this.initialVelocity = initialVelocity;
@@ -38,11 +39,17 @@ public class ProjectileInfo {
         this.offset = offset;
         this.position = position;
         this.hasWaterCollision = hasWaterCollision;
+        this.throwableFromOffHand = throwableFromOffHand;
     }
 
-    static public ProjectileInfo getItemsInfo(Item item, PlayerEntity player) {
+    static public ProjectileInfo getItemsInfo(ItemStack itemStack, PlayerEntity player) {
+
         double gravity = 0.05;
         double drag = 0.99;
+        boolean throwableFromOffHand = true;
+
+        Item item = itemStack.getItem();
+
         if (item instanceof BowItem) {
 
             int useTicks = player.getItemUseTime();
@@ -51,25 +58,27 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(3.0 * pull);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, pull > 0, offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, pull > 0, offset, null, false, throwableFromOffHand);
 
         } else if (item instanceof CrossbowItem) {
 
             Vec3d vel = player.getRotationVec(1.0F).multiply(3.15);
             Vec3d offset = new Vec3d(0, -0.06, 0.03);
 
-            ChargedProjectilesComponent chargedProjectilesComponent = player.getMainHandStack().get(DataComponentTypes.CHARGED_PROJECTILES);
+            ChargedProjectilesComponent chargedProjectilesComponent = itemStack.get(DataComponentTypes.CHARGED_PROJECTILES);
 
-            for (ItemStack projectile : chargedProjectilesComponent.getProjectiles()) {
-                if (projectile.isOf(Items.FIREWORK_ROCKET)) {
-                    vel = player.getRotationVec(1.0F).multiply(1.6F);
-                    gravity = 0;
-                } else if (projectile.getItem() instanceof ArrowItem) {
-                    
+            if(chargedProjectilesComponent != null){
+                for (ItemStack projectile : chargedProjectilesComponent.getProjectiles()) {
+                    if (projectile.isOf(Items.FIREWORK_ROCKET)) {
+                        vel = player.getRotationVec(1.0F).multiply(1.6F);
+                        gravity = 0;
+                    } else if (projectile.getItem() instanceof ArrowItem) {
+                        
+                    }
                 }
             }
 
-            return new ProjectileInfo(gravity, drag, vel, CrossbowItem.isCharged(player.getMainHandStack()), offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, CrossbowItem.isCharged(itemStack), offset, null, false, throwableFromOffHand);
             
         } else if (item instanceof TridentItem) {
 
@@ -78,7 +87,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(TridentItem.THROW_SPEED);
             Vec3d offset = new Vec3d(0.2, 0.1, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, useTicks >= TridentItem.MIN_DRAW_DURATION, offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, useTicks >= TridentItem.MIN_DRAW_DURATION, offset, null, false, throwableFromOffHand);
             
         } else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderPearlItem) {
 
@@ -87,7 +96,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(SnowballItem.POWER);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
             
         } else if (item instanceof WindChargeItem) {
 
@@ -97,7 +106,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(1.0);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
             
         } else if (item instanceof ThrowablePotionItem) {
 
@@ -107,7 +116,7 @@ public class ProjectileInfo {
             Vec3d vel = dir.multiply(0.5);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
             
         }  else if (item instanceof ExperienceBottleItem) {
 
@@ -120,7 +129,7 @@ public class ProjectileInfo {
             Vec3d vel = dir.multiply(0.7);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false);
+            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
             
         }  else if (item instanceof FishingRodItem && player.fishHook == null) {
 
@@ -145,10 +154,10 @@ public class ProjectileInfo {
 
             Vec3d offset = new Vec3d(0.16, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, pos, true);
+            return new ProjectileInfo(gravity, drag, vel, true, offset, pos, true, throwableFromOffHand);
             
         }
 
-        return new ProjectileInfo(0.0, 0.0, new Vec3d(0.0, 0.0, 0.0), false, new Vec3d(0.0, 0.0, 0.0), null, false);
+        return new ProjectileInfo(0.0, 0.0, new Vec3d(0.0, 0.0, 0.0), false, new Vec3d(0.0, 0.0, 0.0), null, false, false);
     }
 }

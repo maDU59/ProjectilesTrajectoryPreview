@@ -19,6 +19,8 @@
   "ptp.config.highlight_color_desc": "Choisir la couleur pour le surlignage des cibles.",
   "ptp.config.highlight_opacity": "Opacité",
   "ptp.config.highlight_opacity_desc": "Définissez le niveau d'opacité du surlignage.",
+  "ptp.config.enable_offhand": "Activer la trajectoire pour la seconde main",
+  "ptp.config.enable_offhand_desc": "Activer l'affichage de la trajectoire des projectiles tenus dans la seconde main",
   "ptp.config.trajectory-previsualization": "VISUALISATION DE LA TRAJECTOIRE",
   "ptp.config.target-outlining": "CONTOUR DES CIBLES",
   "ptp.config.target-highlighting": "SURLIGNAGE DES CIBLES",

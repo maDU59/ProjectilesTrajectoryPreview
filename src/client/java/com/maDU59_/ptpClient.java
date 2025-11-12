@@ -27,15 +27,14 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Arm;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
-
-import com.maDU59_.Utils.WorldRenderContextReplacement;
 
 public class ptpClient implements ClientModInitializer {
     private static final MinecraftClient client = MinecraftClient.getInstance();
@@ -59,13 +58,13 @@ public class ptpClient implements ClientModInitializer {
 
             // Send handshake to server
             ClientPlayNetworking.send(new HANDSHAKE_C2SPayload("Check if is installed on server"));
-            System.out.println("[PTP] Sending handshake to server...");
+            LOGGER.info("[PTP] Sending handshake to server...");
         });
 
         // Receive handshake reply
         ClientPlayNetworking.registerGlobalReceiver(HANDSHAKE_S2CPayload.ID,
             (payload, context) -> {
-                System.out.println("[PTP] Received handshake from server...");
+                LOGGER.info("[PTP] Received handshake from server...");
                 serverHasMod = true;
         });
         
@@ -78,10 +77,17 @@ public class ptpClient implements ClientModInitializer {
         PlayerEntity player = client.player;
         if (player == null || !isEnabled()) return;
 
-        Item item = player.getMainHandStack().getItem();
+        ItemStack itemStack = player.getMainHandStack();
 
-        ProjectileInfo projectileInfo = ProjectileInfo.getItemsInfo(item, player);
-        if(!projectileInfo.isReadyToShoot) return;
+        ProjectileInfo projectileInfo = ProjectileInfo.getItemsInfo(itemStack, player);
+        int handMultiplier = client.options.getMainArm().getValue() == Arm.RIGHT? 1:-1;
+        if(!projectileInfo.isReadyToShoot){
+            itemStack = player.getOffHandStack();
+
+            projectileInfo = ProjectileInfo.getItemsInfo(itemStack, player);
+            if(!projectileInfo.throwableFromOffHand || !projectileInfo.isReadyToShoot || Boolean.FALSE.equals(SettingsManager.ENABLE_OFFHAND.getValue())) return;
+            handMultiplier = -handMultiplier;
+        }
 
         Vec3d eye = player.getEyePos();
 
@@ -96,7 +102,7 @@ public class ptpClient implements ClientModInitializer {
             pos = projectileInfo.position;
         }
         Vec3d prevPos = pos;
-        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos);
+        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, handMultiplier);
         HitResult impact = null;
         Entity entityImpact = null;
         boolean hasHit = false;
@@ -191,18 +197,20 @@ public class ptpClient implements ClientModInitializer {
             }
         }
 
-        MatrixStack matrices = context.matrices();
-        VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
-
         value = SettingsManager.SHOW_TRAJECTORY.getValue();
         if (("TargetIsEntity".equals(value) && entityImpact!=null) || Boolean.TRUE.equals(value)) {
+            MatrixStack matrices = context.matrices();
             matrices.push();
             matrices.translate(-cam.x, -cam.y, -cam.z);
+
+            VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
+
+            int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
+
             for (int i = 0; i < trajectoryPoints.size()-1; i++) {
                 Vec3d lerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
                 Vec3d nextLerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
                 pos = trajectoryPoints.get(i).add(lerpedDelta);
-                int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
                 Vec3d dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
                 if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dashed"){
                     dir = dir.multiply(0.5);
@@ -214,33 +222,36 @@ public class ptpClient implements ClientModInitializer {
 
                 VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
             }
+
+            if (hasHit) {
+                lineConsumer = context.consumers().getBuffer(RenderLayer.getLines());
+
+                pos = trajectoryPoints.getLast();
+
+                double r = 0.1;
+                double x = pos.x;
+                double y = pos.y;
+                double z = pos.z;
+
+                Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
+                Vec3d dir = new Vec3d(2*r,0,0);
+                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+
+                floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
+                dir = new Vec3d(0,2*r,0);
+                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+
+                floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
+                dir = new Vec3d(0,0,2 * r);
+                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+            }
+
             matrices.pop();
-        }
 
-        if (hasHit) {
-            matrices.push();
-            matrices.translate(-cam.x, -cam.y, -cam.z);
-            pos = trajectoryPoints.getLast();
-
-            double r = 0.1;
-            double x = pos.x;
-            double y = pos.y;
-            double z = pos.z;
-
-            lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) (x - r), (float) y, (float) z).color(255, 0, 0, 255).normal(0,1,0);
-            lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) (x + r), (float) y, (float) z).color(255, 0, 0, 255).normal(0,1,0);
-
-            lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) x, (float) (y - r), (float) z).color(255, 0, 0, 255).normal(0,1,0);
-            lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) x, (float) (y + r), (float) z).color(255, 0, 0, 255).normal(0,1,0);
-
-            lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) x, (float) y, (float) (z - r)).color(255, 0, 0, 255).normal(0,1,0);
-            lineConsumer.vertex(matrices.peek().getPositionMatrix(), (float) x, (float) y, (float) (z + r)).color(255, 0, 0, 255).normal(0,1,0);
-
-            matrices.pop();
         }
     }
 
-    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos) {
+    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos, int handMultiplier) {
 
         float yaw = (float) Math.toRadians(-player.getYaw(1.0F));
         float pitch = (float) Math.toRadians(-player.getPitch(1.0F));
@@ -249,7 +260,7 @@ public class ptpClient implements ClientModInitializer {
         Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3d right = forward.crossProduct(up).normalize();
 
-        return right.multiply(offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(client.gameRenderer.getCamera().getPos().subtract(startPos));
+        return right.multiply(handMultiplier * offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(client.gameRenderer.getCamera().getPos().subtract(startPos));
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {

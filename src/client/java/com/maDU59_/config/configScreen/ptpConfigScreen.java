@@ -40,6 +40,9 @@ public class ptpConfigScreen extends Screen {
         list.addButton(SettingsManager.TRAJECTORY_STYLE, btn -> {
             SettingsManager.TRAJECTORY_STYLE.setToNextValue();
         }, INDENT);
+        list.addButton(SettingsManager.ENABLE_OFFHAND, btn -> {
+            SettingsManager.ENABLE_OFFHAND.setToNextValue();
+        }, INDENT);
         list.addCategory("ptp.config.target-outlining");
         list.addButton(SettingsManager.OUTLINE_TARGETS, btn -> {
             SettingsManager.OUTLINE_TARGETS.setToNextValue();
