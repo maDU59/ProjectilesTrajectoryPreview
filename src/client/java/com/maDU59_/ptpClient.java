@@ -19,6 +19,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexRendering;
@@ -89,7 +90,7 @@ public class ptpClient implements ClientModInitializer {
             handMultiplier = -handMultiplier;
         }
 
-        Vec3d eye = player.getEyePos();
+        Vec3d eye = player.getCameraPosVec(client.getRenderTickCounter().getTickProgress(false));
 
         Vec3d vel = projectileInfo.initialVelocity.add(player.getVelocity());
 
@@ -116,7 +117,7 @@ public class ptpClient implements ClientModInitializer {
 
             Box box = new Box(prevPos, pos).expand(1.0);
 
-            List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity) && !(e instanceof EnderDragonEntity));
+            List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity) && !(e instanceof EnderDragonEntity) && !(e instanceof ClientPlayerEntity));
 
             Entity closest = null;
             double closestDistance = 99999.0;
@@ -260,7 +261,7 @@ public class ptpClient implements ClientModInitializer {
         Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3d right = forward.crossProduct(up).normalize();
 
-        return right.multiply(handMultiplier * offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(client.gameRenderer.getCamera().getPos().subtract(startPos));
+        return right.multiply(handMultiplier * offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z));
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
