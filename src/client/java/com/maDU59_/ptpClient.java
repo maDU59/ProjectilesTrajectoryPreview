@@ -103,7 +103,7 @@ public class ptpClient implements ClientModInitializer {
             pos = projectileInfo.position;
         }
         Vec3d prevPos = pos;
-        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, handMultiplier);
+        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier);
         HitResult impact = null;
         Entity entityImpact = null;
         boolean hasHit = false;
@@ -252,7 +252,7 @@ public class ptpClient implements ClientModInitializer {
         }
     }
 
-    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos, int handMultiplier) {
+    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos, Vec3d eye, int handMultiplier) {
 
         float yaw = (float) Math.toRadians(-player.getYaw(1.0F));
         float pitch = (float) Math.toRadians(-player.getPitch(1.0F));
@@ -261,7 +261,7 @@ public class ptpClient implements ClientModInitializer {
         Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3d right = forward.crossProduct(up).normalize();
 
-        return right.multiply(handMultiplier * offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z));
+        return right.multiply(handMultiplier * offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(eye.subtract(startPos));
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
