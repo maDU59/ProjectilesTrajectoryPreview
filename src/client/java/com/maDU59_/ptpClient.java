@@ -90,20 +90,16 @@ public class ptpClient implements ClientModInitializer {
             handMultiplier = -handMultiplier;
         }
 
-        Vec3d eye = player.getCameraPosVec(client.getRenderTickCounter().getTickProgress(false));
+        float tickProgress = client.getRenderTickCounter().getTickProgress(false);
+
+        Vec3d eye = player.getCameraPosVec(tickProgress);
 
         Vec3d vel = projectileInfo.initialVelocity.add(player.getVelocity());
 
-        Vec3d pos;
-
-        if(projectileInfo.position == null){
-            pos = eye;
-        }
-        else{
-            pos = projectileInfo.position;
-        }
+        Vec3d pos = projectileInfo.position == null? player.getEyePos() : projectileInfo.position;
         Vec3d prevPos = pos;
-        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier);
+        
+        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
         HitResult impact = null;
         Entity entityImpact = null;
         boolean hasHit = false;
@@ -252,12 +248,12 @@ public class ptpClient implements ClientModInitializer {
         }
     }
 
-    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos, Vec3d eye, int handMultiplier) {
+    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos, Vec3d eye, int handMultiplier, float tickProgress) {
 
-        float yaw = (float) Math.toRadians(-player.getYaw(1.0F));
-        float pitch = (float) Math.toRadians(-player.getPitch(1.0F));
+        float yaw = (float) Math.toRadians(-player.getYaw(tickProgress));
+        float pitch = (float) Math.toRadians(-player.getPitch(tickProgress));
 
-        Vec3d forward = player.getRotationVec(1.0F);
+        Vec3d forward = player.getRotationVec(tickProgress);
         Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3d right = forward.crossProduct(up).normalize();
 

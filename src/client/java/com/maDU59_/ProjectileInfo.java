@@ -140,7 +140,7 @@ public class ProjectileInfo {
             float i = MathHelper.sin(-g * (float) (Math.PI / 180.0) - (float) Math.PI);
             float j = -MathHelper.cos(-f * (float) (Math.PI / 180.0));
             float k = MathHelper.sin(-f * (float) (Math.PI / 180.0));
-            Vec3d p = player.getCameraPosVec(MinecraftClient.getInstance().getRenderTickCounter().getTickProgress(false));
+            Vec3d p = player.getCameraPosVec(1.0F);
             Vec3d pos = new Vec3d(p.x - i * 0.3,p.y,p.z - h * 0.3);
             Vec3d vec3d = new Vec3d(-i, MathHelper.clamp(-(k / j), -5.0F, 5.0F), -h);
             double m = vec3d.length();
