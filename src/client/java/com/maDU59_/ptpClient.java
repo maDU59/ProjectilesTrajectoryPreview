@@ -98,7 +98,7 @@ public class ptpClient implements ClientModInitializer {
 
         Vec3d pos = projectileInfo.position == null? player.getEyePos() : projectileInfo.position;
         Vec3d prevPos = pos;
-        
+
         Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
         HitResult impact = null;
         Entity entityImpact = null;
@@ -164,6 +164,9 @@ public class ptpClient implements ClientModInitializer {
                 hasHit = true;
                 break;
             }
+
+            if ((pos.y) < player.getEntityWorld().getBottomY() - 20) 
+                break;
 
             prevPos = pos;
         }
