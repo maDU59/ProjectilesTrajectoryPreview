@@ -7,10 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.SharedSuggestionProvider;
+import 	net.minecraft.network.chat.Component;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.command.CommandSource;
-import net.minecraft.text.Text;
 import com.mojang.brigadier.arguments.StringArgumentType;
 
 public class ClientCommands {
@@ -20,8 +20,8 @@ public class ClientCommands {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(
                 literal("ptpConfig")
-                    .then(argument("option", StringArgumentType.string()).suggests((context, builder) -> { return CommandSource.suggestMatching(optionsMap.keySet(), builder);})
-                        .then(argument("value", StringArgumentType.string()).suggests((context, builder) -> { return CommandSource.suggestMatching(camelCase(SettingsManager.getOptionPossibleValues(optionsMap.get(StringArgumentType.getString(context, "option")))).keySet(), builder);})
+                    .then(argument("option", StringArgumentType.string()).suggests((context, builder) -> { return SharedSuggestionProvider.suggest(optionsMap.keySet(), builder);})
+                        .then(argument("value", StringArgumentType.string()).suggests((context, builder) -> { return SharedSuggestionProvider.suggest(camelCase(SettingsManager.getOptionPossibleValues(optionsMap.get(StringArgumentType.getString(context, "option")))).keySet(), builder);})
                             .executes(context -> {
                                 String option = "null";
                                 String value = "null";
@@ -34,8 +34,8 @@ public class ClientCommands {
                                 }
 
                                 boolean success = SettingsManager.setOptionValue(option, (Object) value);
-                                MinecraftClient.getInstance().player.sendMessage(
-                                    Text.literal(success ? "Updated " + StringArgumentType.getString(context, "option") + " to " + StringArgumentType.getString(context, "value") : "Failed to update setting."),
+                                Minecraft.getInstance().player.displayClientMessage(
+                                    Component.literal(success ? "Updated " + StringArgumentType.getString(context, "option") + " to " + StringArgumentType.getString(context, "value") : "Failed to update setting."),
                                     false
                                 );
                                 if(success){

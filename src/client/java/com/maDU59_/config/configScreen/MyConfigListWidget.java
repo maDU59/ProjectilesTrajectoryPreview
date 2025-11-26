@@ -1,29 +1,27 @@
 package com.maDU59_.config.configScreen;
 
 import java.util.List;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import com.maDU59_.config.Option;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.text.Text;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.client.sound.PositionedSoundInstance;
+public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
 
-public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Entry> {
-
-    public MyConfigListWidget(MinecraftClient client, int width, int height, int top, int itemHeight) {
+    public MyConfigListWidget(Minecraft client, int width, int height, int top, int itemHeight) {
         super(client, width, height, top, itemHeight);
     }
 
     @Override
-	protected int getScrollbarX() {
+	protected int scrollBarX() {
 		return this.getX() + this.getWidth() - 6;
 	}
 
@@ -36,23 +34,23 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         this.addEntry(new CategoryEntry(name));
     }
 
-    public void addButton(String name, ButtonWidget.PressAction onPress) {
-        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(name), onPress).dimensions(0, 0, 100, 20).build(), null, ""));
+    public void addButton(String name, Button.OnPress onPress) {
+        this.addEntry(new ButtonEntry(Button.builder(Component.literal(name), onPress).bounds(0, 0, 100, 20).build(), null, ""));
     }
 
-    public void addButton(Option option, ButtonWidget.PressAction onPress) {
-        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(option.getValueAsString()), onPress).dimensions(0, 0, 100, 20).build(), option, ""));
+    public void addButton(Option option, Button.OnPress onPress) {
+        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsString()), onPress).bounds(0, 0, 100, 20).build(), option, ""));
     }
 
-    public void addButton(Option option, ButtonWidget.PressAction onPress, String indent) {
-        this.addEntry(new ButtonEntry(ButtonWidget.builder(Text.literal(option.getValueAsString()), onPress).dimensions(0, 0, 100, 20).build(), option, indent));
+    public void addButton(Option option, Button.OnPress onPress, String indent) {
+        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsString()), onPress).bounds(0, 0, 100, 20).build(), option, indent));
     }
 
     // Base entry
-    public abstract static class Entry extends ElementListWidget.Entry<Entry> {}
+    public abstract static class Entry extends ContainerObjectSelectionList.Entry<com.maDU59_.config.configScreen.MyConfigListWidget.Entry> {}
 
     // Category header
-    public static class CategoryEntry extends Entry {
+    public static class CategoryEntry extends com.maDU59_.config.configScreen.MyConfigListWidget.Entry {
         private final String name;
 
         public CategoryEntry(String name) {
@@ -60,33 +58,33 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            Font textRenderer = Minecraft.getInstance().font;
             int textX = getContentX() + getContentWidth() / 2;
-            int textY = getContentY() + (getContentHeight() - textRenderer.fontHeight) / 2;
-            context.drawCenteredTextWithShadow(textRenderer, Text.translatable(this.name), textX, textY, 0xFFFFFFFF);
+            int textY = getContentY() + (getContentHeight() - textRenderer.lineHeight) / 2;
+            context.drawCenteredString(textRenderer, Component.translatable(this.name), textX, textY, 0xFFFFFFFF);
         }  
 
         @Override
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return List.of();
         }
 
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return List.of();
         }
     }
 
     // Button entry
-    public static class ButtonEntry extends Entry{
-        private final ButtonWidget button;
+    public static class ButtonEntry extends com.maDU59_.config.configScreen.MyConfigListWidget.Entry{
+        private final Button button;
         private final String name;
         private final String description;
         private final String indent;
         private final Option option;
 
-        public ButtonEntry(ButtonWidget button, Option option, String indent) {
+        public ButtonEntry(Button button, Option option, String indent) {
             this.button = button;
             this.name = option.getName();
             this.description = option.getDescription();
@@ -95,33 +93,33 @@ public class MyConfigListWidget extends ElementListWidget<MyConfigListWidget.Ent
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
             this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
             this.button.render(context, mouseX, mouseY, tickDelta);
 
             if(this.description == null) return;
 
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            context.drawText(textRenderer, Text.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.fontHeight) / 2, 0xFFFFFFFF, true);
+            Font textRenderer = Minecraft.getInstance().font;
+            context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override
-        public List<? extends Selectable> selectableChildren() {
+        public List<? extends NarratableEntry> narratables() {
             return List.of(this.button);
         }
 
         @Override
-        public List<? extends Element> children() {
+        public List<? extends GuiEventListener> children() {
             return List.of(this.button);
         }
 
         @Override
-        public boolean mouseClicked(Click click, boolean doubleClick) {
+        public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
             if (this.button.mouseClicked(click, doubleClick)) {
-                MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 if(this.option != null){
-                    this.button.setMessage(Text.literal(this.option.getValueAsString()));
+                    this.button.setMessage(Component.literal(this.option.getValueAsString()));
                 }
                 return true;
             }

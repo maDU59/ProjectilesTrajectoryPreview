@@ -1,12 +1,10 @@
 package com.maDU59_.config.configScreen;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
-
 import com.maDU59_.config.SettingsManager;
-
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class ptpConfigScreen extends Screen {
     private MyConfigListWidget list;
@@ -14,7 +12,7 @@ public class ptpConfigScreen extends Screen {
     private final String INDENT = " ⤷  ";
 
     protected ptpConfigScreen(Screen parent) {
-        super(Text.literal("Projectile Trajectory Preview Config"));
+        super(Component.literal("Projectile Trajectory Preview Config"));
         this.parent = parent;
     }
 
@@ -24,7 +22,7 @@ public class ptpConfigScreen extends Screen {
     protected void init() {
         super.init();
         // Create the scrolling list
-        this.list = new MyConfigListWidget(this.client, this.width, this.height - 80, 40, 26);
+        this.list = new MyConfigListWidget(this.minecraft, this.width, this.height - 80, 40, 26);
 
         // Example: Add categories + buttons
         list.addCategory("ptp.config.trajectory-previsualization");
@@ -64,25 +62,25 @@ public class ptpConfigScreen extends Screen {
             SettingsManager.HIGHLIGHT_OPACITY.setToNextValue();
         }, INDENT);
 
-        ButtonWidget doneButton = ButtonWidget.builder(Text.literal("Done"), b -> {
-            this.client.setScreen(this.parent);
+        Button doneButton = Button.builder(Component.literal("Done"), b -> {
+            this.minecraft.setScreen(this.parent);
             SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
-        }).dimensions(this.width / 2 - 50, this.height - 30, 100, 20).build();
+        }).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build();
 
-        this.addDrawableChild(this.list);
-        this.addDrawableChild(doneButton);
+        this.addRenderableWidget(this.list);
+        this.addRenderableWidget(doneButton);
     }
 
     @Override
-    public void close() {
-        this.client.setScreen(this.parent);
+    public void onClose() {
+        this.minecraft.setScreen(this.parent);
         SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         this.list.render(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
-        context.drawCenteredTextWithShadow(this.textRenderer, this.title, this.width / 2, 15, 0xFFFFFF);
+        context.drawCenteredString(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
     }
 }

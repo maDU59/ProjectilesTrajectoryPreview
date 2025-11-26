@@ -12,13 +12,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.Angerable;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.PassiveEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 
 public class SettingsManager {
 
@@ -205,11 +205,11 @@ public class SettingsManager {
     public static int[] getColorFromSetting(String colorName, Entity entity) {
         if(colorName.equals("Depends on target")){
             if(entity == null){colorName = "White";}
-            else if(entity instanceof  PlayerEntity){colorName = "Blue";}
-            else if(entity instanceof  Angerable){colorName = "Yellow";}
-            else if(entity instanceof  PassiveEntity){colorName = "Green";}
-            else if(entity instanceof  HostileEntity){colorName = "Red";}
-            else if(entity instanceof  MobEntity){colorName = "Purple";}
+            else if(entity instanceof  Player){colorName = "Blue";}
+            else if(entity instanceof  NeutralMob){colorName = "Yellow";}
+            else if(entity instanceof  AgeableMob){colorName = "Green";}
+            else if(entity instanceof  Monster){colorName = "Red";}
+            else if(entity instanceof  Mob){colorName = "Purple";}
             else if(entity instanceof  LivingEntity){colorName = "Cyan";}
             else{colorName = "Magenta";}
         }

@@ -12,35 +12,34 @@ import com.maDU59_.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import com.maDU59_.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.maDU59_.config.ClientCommands;
 import com.maDU59_.config.SettingsManager;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexRendering;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Arm;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 
 public class ptpClient implements ClientModInitializer {
-    private static final MinecraftClient client = MinecraftClient.getInstance();
+    private static final Minecraft client = Minecraft.getInstance();
     public static final Logger LOGGER = LogManager.getLogger("ptpClient");
     private static boolean serverHasMod = false;
 
@@ -54,7 +53,7 @@ public class ptpClient implements ClientModInitializer {
             serverHasMod = false;
 
             // Always enabled in singleplayer
-            if (client.isIntegratedServerRunning()) {
+            if (client.hasSingleplayerServer()) {
                 serverHasMod = true;
                 return;
             }
@@ -77,59 +76,59 @@ public class ptpClient implements ClientModInitializer {
     }
 
     public static void renderOverlay(WorldRenderContext context) {
-        PlayerEntity player = client.player;
+        Player player = client.player;
         if (player == null || !isEnabled()) return;
 
-        ItemStack itemStack = player.getMainHandStack();
+        ItemStack itemStack = player.getMainHandItem();
 
         List<ProjectileInfo> projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, true);
-        int handMultiplier = client.options.getMainArm().getValue() == Arm.RIGHT? 1:-1;
+        int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
         if(projectileInfoList.isEmpty()){
             if(Boolean.FALSE.equals(SettingsManager.ENABLE_OFFHAND.getValue())) return;
 
-            itemStack = player.getOffHandStack();
+            itemStack = player.getOffhandItem();
             handMultiplier = -handMultiplier;
             projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, false);
 
             if(projectileInfoList.isEmpty()) return;
         }
 
-        float tickProgress = client.getRenderTickCounter().getTickProgress(false);
-        Vec3d eye = player.getCameraPosVec(tickProgress);
+        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        Vec3 eye = player.getEyePosition(tickProgress);
 
         for(ProjectileInfo projectileInfo : projectileInfoList){
 
-            Vec3d vel = projectileInfo.initialVelocity.add(player.getVelocity());
+            Vec3 vel = projectileInfo.initialVelocity.add(player.getDeltaMovement());
 
-            Vec3d pos = projectileInfo.position == null? player.getEyePos() : projectileInfo.position;
-            Vec3d prevPos = pos;
+            Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
+            Vec3 prevPos = pos;
 
-            Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
+            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
             HitResult impact = null;
             Entity entityImpact = null;
             boolean hasHit = false;
-            List<Vec3d> trajectoryPoints = new ArrayList<>();
+            List<Vec3> trajectoryPoints = new ArrayList<>();
 
             // Simulation
             for (int i = 0; i < 200; i++) {
                 trajectoryPoints.add(pos);
                 pos = pos.add(vel);
-                vel = vel.multiply(projectileInfo.drag).subtract(0, projectileInfo.gravity, 0);
+                vel = vel.scale(projectileInfo.drag).subtract(0, projectileInfo.gravity, 0);
 
-                Box box = new Box(prevPos, pos).expand(1.0);
+                AABB box = new AABB(prevPos, pos).inflate(1.0);
 
-                List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrbEntity) && !(e instanceof EnderDragonEntity) && !(e instanceof ClientPlayerEntity));
+                List<Entity> entities = client.level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
 
                 Entity closest = null;
                 double closestDistance = 99999.0;
-                Vec3d entityHitPos = null;
+                Vec3 entityHitPos = null;
 
                 for (Entity entity : entities) {
-                    Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-                    Optional<Vec3d> entityRaycastHit = entityBox.raycast(prevPos, pos);
+                    AABB entityBox = entity.getBoundingBox().inflate(entity.getPickRadius());
+                    Optional<Vec3> entityRaycastHit = entityBox.clip(prevPos, pos);
 
                     if (entityRaycastHit.isPresent()) {
-                        double distance = prevPos.squaredDistanceTo(entityRaycastHit.get());
+                        double distance = prevPos.distanceToSqr(entityRaycastHit.get());
                         if (distance < closestDistance) {
                             entityHitPos = entityRaycastHit.get();
                             closest = entity;
@@ -140,23 +139,23 @@ public class ptpClient implements ClientModInitializer {
 
                 HitResult hit;
                 if(projectileInfo.hasWaterCollision){
-                    hit = player.getEntityWorld().raycast(
-                    new RaycastContext(prevPos, pos,
-                        RaycastContext.ShapeType.COLLIDER,
-                        RaycastContext.FluidHandling.WATER,
+                    hit = player.level().clip(
+                    new ClipContext(prevPos, pos,
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.WATER,
                         player));
                 }
                 else{
-                    hit = player.getEntityWorld().raycast(
-                    new RaycastContext(prevPos, pos,
-                        RaycastContext.ShapeType.COLLIDER,
-                        RaycastContext.FluidHandling.NONE,
+                    hit = player.level().clip(
+                    new ClipContext(prevPos, pos,
+                        ClipContext.Block.COLLIDER,
+                        ClipContext.Fluid.NONE,
                         player));
                 }
 
-                if (hit.getType() != HitResult.Type.MISS && prevPos.squaredDistanceTo(hit.getPos()) < closestDistance) {
+                if (hit.getType() != HitResult.Type.MISS && prevPos.distanceToSqr(hit.getLocation()) < closestDistance) {
                     impact = hit;
-                    pos = hit.getPos();
+                    pos = hit.getLocation();
                     trajectoryPoints.add(pos);
                     hasHit = true;
                     break;
@@ -170,13 +169,13 @@ public class ptpClient implements ClientModInitializer {
                     break;
                 }
 
-                if (pos.y < player.getEntityWorld().getBottomY() - 20) 
+                if (pos.y < player.level().getMinY() - 20) 
                     break;
 
                 prevPos = pos;
             }
 
-            Vec3d cam = client.gameRenderer.getCamera().getPos();
+            Vec3 cam = client.gameRenderer.getMainCamera().getPosition();
 
             Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
             if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
@@ -185,7 +184,7 @@ public class ptpClient implements ClientModInitializer {
                     renderFilled(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
                 }
                 else if(entityImpact != null) {
-                    Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
+                    AABB entityBoundingBox = entityImpact.getBoundingBox().inflate(entityImpact.getPickRadius());
                     renderFilled(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
                 }
             }
@@ -197,39 +196,39 @@ public class ptpClient implements ClientModInitializer {
                     renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
                 }
                 else if(entityImpact != null) {
-                    Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
+                    AABB entityBoundingBox = entityImpact.getBoundingBox().inflate(entityImpact.getPickRadius());
                     renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
                 }
             }
 
             value = SettingsManager.SHOW_TRAJECTORY.getValue();
             if (("TargetIsEntity".equals(value) && entityImpact!=null) || Boolean.TRUE.equals(value)) {
-                MatrixStack matrices = context.matrices();
-                matrices.push();
+                PoseStack matrices = context.matrices();
+                matrices.pushPose();
                 matrices.translate(-cam.x, -cam.y, -cam.z);
 
-                VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
+                VertexConsumer lineConsumer = context.consumers().getBuffer(RenderType.lineStrip());
 
                 int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
 
                 for (int i = 0; i < trajectoryPoints.size()-1; i++) {
-                    Vec3d lerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
-                    Vec3d nextLerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
+                    Vec3 lerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
+                    Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
                     pos = trajectoryPoints.get(i).add(lerpedDelta);
-                    Vec3d dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
+                    Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
                     if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dashed"){
-                        dir = dir.multiply(0.5);
+                        dir = dir.scale(0.5);
                     }
                     else if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dotted"){
-                        dir = dir.multiply(0.15);
+                        dir = dir.scale(0.15);
                     }
                     Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
-                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
                 }
 
                 if (hasHit) {
-                    lineConsumer = context.consumers().getBuffer(RenderLayer.getLines());
+                    lineConsumer = context.consumers().getBuffer(RenderType.lines());
 
                     pos = trajectoryPoints.getLast();
 
@@ -239,65 +238,65 @@ public class ptpClient implements ClientModInitializer {
                     double z = pos.z;
 
                     Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
-                    Vec3d dir = new Vec3d(2*r,0,0);
-                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                    Vec3 dir = new Vec3(2*r,0,0);
+                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
 
                     floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
-                    dir = new Vec3d(0,2*r,0);
-                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                    dir = new Vec3(0,2*r,0);
+                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
 
                     floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
-                    dir = new Vec3d(0,0,2 * r);
-                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                    dir = new Vec3(0,0,2 * r);
+                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
                 }
 
-                matrices.pop();
+                matrices.popPose();
             }
         }
     }
 
-    private static Vec3d GetHandToEyeDelta(PlayerEntity player, Vec3d offset, WorldRenderContext context, Vec3d startPos, Vec3d eye, int handMultiplier, float tickProgress) {
+    private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, WorldRenderContext context, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
 
-        float yaw = (float) Math.toRadians(-player.getYaw(tickProgress));
-        float pitch = (float) Math.toRadians(-player.getPitch(tickProgress));
+        float yaw = (float) Math.toRadians(-player.getViewYRot(tickProgress));
+        float pitch = (float) Math.toRadians(-player.getViewXRot(tickProgress));
 
-        Vec3d forward = player.getRotationVec(tickProgress);
-        Vec3d up = new Vec3d(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
-        Vec3d right = forward.crossProduct(up).normalize();
+        Vec3 forward = player.getViewVector(tickProgress);
+        Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
+        Vec3 right = forward.cross(up).normalize();
 
-        return right.multiply(handMultiplier * offset.x).add(up.multiply(offset.y)).add(forward.multiply(offset.z)).add(eye.subtract(startPos));
+        return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
     }
 
     private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        MatrixStack matrices = context.matrices();
-        Vec3d camera = client.gameRenderer.getCamera().getPos();
+        PoseStack matrices = context.matrices();
+        Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
 
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderLayer.getDebugFilledBox());
+        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.debugFilledBox());
 
-        VertexRendering.drawFilledBox(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        ShapeRenderer.addChainedFilledBoxVertices(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
-        matrices.pop();
+        matrices.popPose();
     }
 
     private static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        MatrixStack matrices = context.matrices();
-        Vec3d camera = client.gameRenderer.getCamera().getPos();
+        PoseStack matrices = context.matrices();
+        Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
 
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
+        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.lineStrip());
 
-        VertexRendering.drawBox(matrices.peek(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        ShapeRenderer.renderLineBox(matrices.last(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
-        matrices.pop();
+        matrices.popPose();
     }
 
     public static boolean isEnabled() {
-        MinecraftClient client = MinecraftClient.getInstance();
-        return client.isIntegratedServerRunning() || serverHasMod;
+        Minecraft client = Minecraft.getInstance();
+        return client.hasSingleplayerServer() || serverHasMod;
     }
 }
