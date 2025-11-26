@@ -1,8 +1,14 @@
 package com.maDU59_;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ChargedProjectilesComponent;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArrowItem;
 import net.minecraft.item.BowItem;
@@ -15,6 +21,8 @@ import net.minecraft.item.SnowballItem;
 import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.item.TridentItem;
 import net.minecraft.item.WindChargeItem;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.item.EnderPearlItem;
 import net.minecraft.item.ExperienceBottleItem;
 import net.minecraft.item.FishingRodItem;
@@ -26,28 +34,25 @@ public class ProjectileInfo {
     public double gravity;
     public double drag;
     public Vec3d initialVelocity;
-    public boolean isReadyToShoot;
     public Vec3d offset;
     public Vec3d position;
     public boolean hasWaterCollision;
-    public boolean throwableFromOffHand;
 
-    public ProjectileInfo(double gravity, double drag, Vec3d initialVelocity, boolean isReadyToShoot, Vec3d offset, Vec3d position, boolean hasWaterCollision, boolean throwableFromOffHand) {
+    public ProjectileInfo(double gravity, double drag, Vec3d initialVelocity, Vec3d offset, Vec3d position, boolean hasWaterCollision) {
         this.gravity = gravity;
         this.drag = drag;
         this.initialVelocity = initialVelocity;
-        this.isReadyToShoot = isReadyToShoot;
         this.offset = offset;
         this.position = position;
         this.hasWaterCollision = hasWaterCollision;
-        this.throwableFromOffHand = throwableFromOffHand;
     }
 
-    static public ProjectileInfo getItemsInfo(ItemStack itemStack, PlayerEntity player) {
+    static public List<ProjectileInfo> getItemsInfo(ItemStack itemStack, PlayerEntity player, boolean isMainHand) {
+
+        List<ProjectileInfo> projectileInfoList = new ArrayList<>(); 
 
         double gravity = 0.05;
         double drag = 0.99;
-        boolean throwableFromOffHand = true;
 
         Item item = itemStack.getItem();
 
@@ -59,7 +64,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(3.0 * pull);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, pull > 0, offset, null, false, throwableFromOffHand);
+            if(pull > 0) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
 
         } else if (item instanceof CrossbowItem) {
 
@@ -79,7 +84,16 @@ public class ProjectileInfo {
                 }
             }
 
-            return new ProjectileInfo(gravity, drag, vel, CrossbowItem.isCharged(itemStack), offset, null, false, throwableFromOffHand);
+            if(CrossbowItem.isCharged(itemStack)) {
+                projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+                if (hasMultishot(itemStack)){
+                    float angleOffset = 10f;
+                    Vec3d vel1 = vel.rotateY((float) Math.toRadians(angleOffset));
+                    Vec3d vel2 = vel.rotateY((float) Math.toRadians(-angleOffset));
+                    projectileInfoList.add(new ProjectileInfo(gravity, drag, vel1, offset, null, false));
+                    projectileInfoList.add(new ProjectileInfo(gravity, drag, vel2, offset, null, false));
+                }
+            }
             
         } else if (item instanceof TridentItem) {
 
@@ -88,7 +102,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(TridentItem.THROW_SPEED);
             Vec3d offset = new Vec3d(0.2, 0.1, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, useTicks >= TridentItem.MIN_DRAW_DURATION, offset, null, false, throwableFromOffHand);
+            if(useTicks >= TridentItem.MIN_DRAW_DURATION) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
             
         } else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderPearlItem) {
 
@@ -97,7 +111,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(SnowballItem.POWER);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
             
         } else if (item instanceof WindChargeItem) {
 
@@ -107,7 +121,7 @@ public class ProjectileInfo {
             Vec3d vel = player.getRotationVec(1.0F).multiply(1.0);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
             
         } else if (item instanceof ThrowablePotionItem) {
 
@@ -117,7 +131,7 @@ public class ProjectileInfo {
             Vec3d vel = dir.multiply(0.5);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
             
         }  else if (item instanceof ExperienceBottleItem) {
 
@@ -130,7 +144,7 @@ public class ProjectileInfo {
             Vec3d vel = dir.multiply(0.7);
             Vec3d offset = new Vec3d(0.2, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, null, false, throwableFromOffHand);
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
             
         }  else if (item instanceof FishingRodItem && player.fishHook == null) {
 
@@ -156,10 +170,20 @@ public class ProjectileInfo {
 
             Vec3d offset = new Vec3d(0.16, -0.06, 0.2);
 
-            return new ProjectileInfo(gravity, drag, vel, true, offset, pos, true, throwableFromOffHand);
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, pos, true));
             
         }
 
-        return new ProjectileInfo(0.0, 0.0, new Vec3d(0.0, 0.0, 0.0), false, new Vec3d(0.0, 0.0, 0.0), null, false, false);
+        return projectileInfoList;
+    }
+
+    public static boolean hasMultishot(ItemStack stack) {
+        var enchantmentRegistry = MinecraftClient.getInstance().player.getEntityWorld().getRegistryManager()
+            .getOrThrow(RegistryKeys.ENCHANTMENT);
+
+        RegistryEntry<Enchantment> multishotEntry = enchantmentRegistry
+            .getOrThrow(Enchantments.MULTISHOT);
+
+        return EnchantmentHelper.getLevel(multishotEntry, stack) > 0;
     }
 }

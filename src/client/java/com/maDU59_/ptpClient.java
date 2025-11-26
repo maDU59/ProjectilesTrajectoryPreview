@@ -25,6 +25,8 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -80,174 +82,177 @@ public class ptpClient implements ClientModInitializer {
 
         ItemStack itemStack = player.getMainHandStack();
 
-        ProjectileInfo projectileInfo = ProjectileInfo.getItemsInfo(itemStack, player);
+        List<ProjectileInfo> projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, true);
         int handMultiplier = client.options.getMainArm().getValue() == Arm.RIGHT? 1:-1;
-        if(!projectileInfo.isReadyToShoot){
-            itemStack = player.getOffHandStack();
+        if(projectileInfoList.isEmpty()){
+            if(Boolean.FALSE.equals(SettingsManager.ENABLE_OFFHAND.getValue())) return;
 
-            projectileInfo = ProjectileInfo.getItemsInfo(itemStack, player);
-            if(!projectileInfo.throwableFromOffHand || !projectileInfo.isReadyToShoot || Boolean.FALSE.equals(SettingsManager.ENABLE_OFFHAND.getValue())) return;
+            itemStack = player.getOffHandStack();
             handMultiplier = -handMultiplier;
+            projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, false);
+
+            if(projectileInfoList.isEmpty()) return;
         }
 
         float tickProgress = client.getRenderTickCounter().getTickProgress(false);
-
         Vec3d eye = player.getCameraPosVec(tickProgress);
 
-        Vec3d vel = projectileInfo.initialVelocity.add(player.getVelocity());
+        for(ProjectileInfo projectileInfo : projectileInfoList){
 
-        Vec3d pos = projectileInfo.position == null? player.getEyePos() : projectileInfo.position;
-        Vec3d prevPos = pos;
+            Vec3d vel = projectileInfo.initialVelocity.add(player.getVelocity());
 
-        Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
-        HitResult impact = null;
-        Entity entityImpact = null;
-        boolean hasHit = false;
-        List<Vec3d> trajectoryPoints = new ArrayList<>();
+            Vec3d pos = projectileInfo.position == null? player.getEyePos() : projectileInfo.position;
+            Vec3d prevPos = pos;
 
-        // Simulation
-        for (int i = 0; i < 200; i++) {
-            trajectoryPoints.add(pos);
-            pos = pos.add(vel);
-            vel = vel.multiply(projectileInfo.drag).subtract(0, projectileInfo.gravity, 0);
+            Vec3d handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
+            HitResult impact = null;
+            Entity entityImpact = null;
+            boolean hasHit = false;
+            List<Vec3d> trajectoryPoints = new ArrayList<>();
 
-            Box box = new Box(prevPos, pos).expand(1.0);
+            // Simulation
+            for (int i = 0; i < 200; i++) {
+                trajectoryPoints.add(pos);
+                pos = pos.add(vel);
+                vel = vel.multiply(projectileInfo.drag).subtract(0, projectileInfo.gravity, 0);
 
-            List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity) && !(e instanceof EnderDragonEntity) && !(e instanceof ClientPlayerEntity));
+                Box box = new Box(prevPos, pos).expand(1.0);
 
-            Entity closest = null;
-            double closestDistance = 99999.0;
-            Vec3d entityHitPos = null;
+                List<Entity> entities = client.world.getEntitiesByClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof ProjectileEntity) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrbEntity) && !(e instanceof EnderDragonEntity) && !(e instanceof ClientPlayerEntity));
 
-            for (Entity entity : entities) {
-                Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
-                Optional<Vec3d> entityRaycastHit = entityBox.raycast(prevPos, pos);
+                Entity closest = null;
+                double closestDistance = 99999.0;
+                Vec3d entityHitPos = null;
 
-                if (entityRaycastHit.isPresent()) {
-                    double distance = prevPos.squaredDistanceTo(entityRaycastHit.get());
-                    if (distance < closestDistance) {
-                        entityHitPos = entityRaycastHit.get();
-                        closest = entity;
-                        closestDistance = distance;
+                for (Entity entity : entities) {
+                    Box entityBox = entity.getBoundingBox().expand(entity.getTargetingMargin());
+                    Optional<Vec3d> entityRaycastHit = entityBox.raycast(prevPos, pos);
+
+                    if (entityRaycastHit.isPresent()) {
+                        double distance = prevPos.squaredDistanceTo(entityRaycastHit.get());
+                        if (distance < closestDistance) {
+                            entityHitPos = entityRaycastHit.get();
+                            closest = entity;
+                            closestDistance = distance;
+                        }
                     }
                 }
-            }
 
-            HitResult hit;
-            if(projectileInfo.hasWaterCollision){
-                hit = player.getEntityWorld().raycast(
-                new RaycastContext(prevPos, pos,
-                    RaycastContext.ShapeType.COLLIDER,
-                    RaycastContext.FluidHandling.WATER,
-                    player));
-            }
-            else{
-                hit = player.getEntityWorld().raycast(
-                new RaycastContext(prevPos, pos,
-                    RaycastContext.ShapeType.COLLIDER,
-                    RaycastContext.FluidHandling.NONE,
-                    player));
-            }
-
-            if (hit.getType() != HitResult.Type.MISS && prevPos.squaredDistanceTo(hit.getPos()) < closestDistance) {
-                impact = hit;
-                pos = hit.getPos();
-                trajectoryPoints.add(pos);
-                hasHit = true;
-                break;
-            }
-
-            if(entityHitPos != null){
-                entityImpact = closest;
-                pos = entityHitPos;
-                trajectoryPoints.add(pos);
-                hasHit = true;
-                break;
-            }
-
-            if ((pos.y) < player.getEntityWorld().getBottomY() - 20) 
-                break;
-
-            prevPos = pos;
-        }
-
-        Vec3d cam = client.gameRenderer.getCamera().getPos();
-
-        Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
-        if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
-            if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
-                BlockPos impactPos = blockHitResult.getBlockPos();
-                renderFilled(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
-            }
-            else if(entityImpact != null) {
-                Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
-                renderFilled(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
-            }
-        }
-
-        value = SettingsManager.OUTLINE_TARGETS.getValue();
-        if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
-            if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
-                BlockPos impactPos = blockHitResult.getBlockPos();
-                renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
-            }
-            else if(entityImpact != null) {
-                Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
-                renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
-            }
-        }
-
-        value = SettingsManager.SHOW_TRAJECTORY.getValue();
-        if (("TargetIsEntity".equals(value) && entityImpact!=null) || Boolean.TRUE.equals(value)) {
-            MatrixStack matrices = context.matrices();
-            matrices.push();
-            matrices.translate(-cam.x, -cam.y, -cam.z);
-
-            VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
-
-            int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
-
-            for (int i = 0; i < trajectoryPoints.size()-1; i++) {
-                Vec3d lerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
-                Vec3d nextLerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
-                pos = trajectoryPoints.get(i).add(lerpedDelta);
-                Vec3d dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
-                if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dashed"){
-                    dir = dir.multiply(0.5);
+                HitResult hit;
+                if(projectileInfo.hasWaterCollision){
+                    hit = player.getEntityWorld().raycast(
+                    new RaycastContext(prevPos, pos,
+                        RaycastContext.ShapeType.COLLIDER,
+                        RaycastContext.FluidHandling.WATER,
+                        player));
                 }
-                else if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dotted"){
-                    dir = dir.multiply(0.15);
+                else{
+                    hit = player.getEntityWorld().raycast(
+                    new RaycastContext(prevPos, pos,
+                        RaycastContext.ShapeType.COLLIDER,
+                        RaycastContext.FluidHandling.NONE,
+                        player));
                 }
-                Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
-                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                if (hit.getType() != HitResult.Type.MISS && prevPos.squaredDistanceTo(hit.getPos()) < closestDistance) {
+                    impact = hit;
+                    pos = hit.getPos();
+                    trajectoryPoints.add(pos);
+                    hasHit = true;
+                    break;
+                }
+
+                if(entityHitPos != null){
+                    entityImpact = closest;
+                    pos = entityHitPos;
+                    trajectoryPoints.add(pos);
+                    hasHit = true;
+                    break;
+                }
+
+                if (pos.y < player.getEntityWorld().getBottomY() - 20) 
+                    break;
+
+                prevPos = pos;
             }
 
-            if (hasHit) {
-                lineConsumer = context.consumers().getBuffer(RenderLayer.getLines());
+            Vec3d cam = client.gameRenderer.getCamera().getPos();
 
-                pos = trajectoryPoints.getLast();
-
-                double r = 0.1;
-                double x = pos.x;
-                double y = pos.y;
-                double z = pos.z;
-
-                Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
-                Vec3d dir = new Vec3d(2*r,0,0);
-                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
-
-                floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
-                dir = new Vec3d(0,2*r,0);
-                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
-
-                floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
-                dir = new Vec3d(0,0,2 * r);
-                VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+            Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
+            if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
+                if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
+                    BlockPos impactPos = blockHitResult.getBlockPos();
+                    renderFilled(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
+                }
+                else if(entityImpact != null) {
+                    Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
+                    renderFilled(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                }
             }
 
-            matrices.pop();
+            value = SettingsManager.OUTLINE_TARGETS.getValue();
+            if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
+                if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
+                    BlockPos impactPos = blockHitResult.getBlockPos();
+                    renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
+                }
+                else if(entityImpact != null) {
+                    Box entityBoundingBox = entityImpact.getBoundingBox().expand(entityImpact.getTargetingMargin());
+                    renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
+                }
+            }
 
+            value = SettingsManager.SHOW_TRAJECTORY.getValue();
+            if (("TargetIsEntity".equals(value) && entityImpact!=null) || Boolean.TRUE.equals(value)) {
+                MatrixStack matrices = context.matrices();
+                matrices.push();
+                matrices.translate(-cam.x, -cam.y, -cam.z);
+
+                VertexConsumer lineConsumer = context.consumers().getBuffer(RenderLayer.getLineStrip());
+
+                int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
+
+                for (int i = 0; i < trajectoryPoints.size()-1; i++) {
+                    Vec3d lerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
+                    Vec3d nextLerpedDelta = handToEyeDelta.multiply((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
+                    pos = trajectoryPoints.get(i).add(lerpedDelta);
+                    Vec3d dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
+                    if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dashed"){
+                        dir = dir.multiply(0.5);
+                    }
+                    else if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dotted"){
+                        dir = dir.multiply(0.15);
+                    }
+                    Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
+
+                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                }
+
+                if (hasHit) {
+                    lineConsumer = context.consumers().getBuffer(RenderLayer.getLines());
+
+                    pos = trajectoryPoints.getLast();
+
+                    double r = 0.1;
+                    double x = pos.x;
+                    double y = pos.y;
+                    double z = pos.z;
+
+                    Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
+                    Vec3d dir = new Vec3d(2*r,0,0);
+                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+
+                    floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
+                    dir = new Vec3d(0,2*r,0);
+                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+
+                    floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
+                    dir = new Vec3d(0,0,2 * r);
+                    VertexRendering.drawVector(matrices, lineConsumer, floatPos, dir, color);
+                }
+
+                matrices.pop();
+            }
         }
     }
 
