@@ -216,10 +216,11 @@ public class ptpClient implements ClientModInitializer {
                     Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
                     pos = trajectoryPoints.get(i).add(lerpedDelta);
                     Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
-                    if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dashed"){
+                    System.out.println(SettingsManager.TRAJECTORY_STYLE.getValueAsString());
+                    if(SettingsManager.TRAJECTORY_STYLE.getValueAsString().equals("Dashed")){
                         dir = dir.scale(0.5);
                     }
-                    else if(SettingsManager.TRAJECTORY_STYLE.getValueAsString() == "Dotted"){
+                    else if(SettingsManager.TRAJECTORY_STYLE.getValueAsString().equals("Dotted")){
                         dir = dir.scale(0.15);
                     }
                     Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
