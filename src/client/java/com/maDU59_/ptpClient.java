@@ -14,14 +14,14 @@ import com.maDU59_.config.ClientCommands;
 import com.maDU59_.config.SettingsManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -175,17 +175,17 @@ public class ptpClient implements ClientModInitializer {
                 prevPos = pos;
             }
 
-            Vec3 cam = client.gameRenderer.getMainCamera().getPosition();
+            Vec3 cam = client.gameRenderer.getMainCamera().position();
 
             Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
             if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
                 if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
-                    renderFilled(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
+                    RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
                 }
                 else if(entityImpact != null) {
                     AABB entityBoundingBox = entityImpact.getBoundingBox().inflate(entityImpact.getPickRadius());
-                    renderFilled(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                    RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
                 }
             }
 
@@ -193,11 +193,11 @@ public class ptpClient implements ClientModInitializer {
             if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
                 if(!"TargetIsEntity".equals(value) && impact != null && impact.getType() == HitResult.Type.BLOCK  && impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
-                    renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
+                    RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
                 }
                 else if(entityImpact != null) {
                     AABB entityBoundingBox = entityImpact.getBoundingBox().inflate(entityImpact.getPickRadius());
-                    renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
+                    RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
                 }
             }
 
@@ -207,7 +207,7 @@ public class ptpClient implements ClientModInitializer {
                 matrices.pushPose();
                 matrices.translate(-cam.x, -cam.y, -cam.z);
 
-                VertexConsumer lineConsumer = context.consumers().getBuffer(RenderType.lineStrip());
+                VertexConsumer lineConsumer = context.consumers().getBuffer(RenderTypes.lines());
 
                 int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), entityImpact);
 
@@ -224,11 +224,11 @@ public class ptpClient implements ClientModInitializer {
                     }
                     Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
-                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
+                    RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
                 }
 
                 if (hasHit) {
-                    lineConsumer = context.consumers().getBuffer(RenderType.lines());
+                    lineConsumer = context.consumers().getBuffer(RenderTypes.lines());
 
                     pos = trajectoryPoints.getLast();
 
@@ -239,15 +239,15 @@ public class ptpClient implements ClientModInitializer {
 
                     Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
                     Vec3 dir = new Vec3(2*r,0,0);
-                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
+                    RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
 
                     floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
                     dir = new Vec3(0,2*r,0);
-                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
+                    RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
 
                     floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
                     dir = new Vec3(0,0,2 * r);
-                    ShapeRenderer.renderVector(matrices, lineConsumer, floatPos, dir, color);
+                    RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
                 }
 
                 matrices.popPose();
@@ -265,34 +265,6 @@ public class ptpClient implements ClientModInitializer {
         Vec3 right = forward.cross(up).normalize();
 
         return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
-    }
-
-    private static void renderFilled(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        PoseStack matrices = context.matrices();
-        Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
-
-        matrices.pushPose();
-        matrices.translate(-camera.x, -camera.y, -camera.z);
-
-        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.debugFilledBox());
-
-        ShapeRenderer.addChainedFilledBoxVertices(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
-
-        matrices.popPose();
-    }
-
-    private static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        PoseStack matrices = context.matrices();
-        Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
-
-        matrices.pushPose();
-        matrices.translate(-camera.x, -camera.y, -camera.z);
-
-        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.lineStrip());
-
-        ShapeRenderer.renderLineBox(matrices.last(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
-
-        matrices.popPose();
     }
 
     public static boolean isEnabled() {

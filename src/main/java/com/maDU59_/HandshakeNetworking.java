@@ -4,11 +4,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class HandshakeNetworking {
-    public static final ResourceLocation HANDSHAKE_C2S = ResourceLocation.fromNamespaceAndPath("mymod", "handshake_c2s");
-    public static final ResourceLocation HANDSHAKE_S2C = ResourceLocation.fromNamespaceAndPath("mymod", "handshake_s2c");
+    public static final Identifier HANDSHAKE_C2S = Identifier.fromNamespaceAndPath("mymod", "handshake_c2s");
+    public static final Identifier HANDSHAKE_S2C = Identifier.fromNamespaceAndPath("mymod", "handshake_s2c");
 
     public record HANDSHAKE_C2SPayload(String message) implements CustomPacketPayload {
         public static final CustomPacketPayload.Type<HANDSHAKE_C2SPayload> ID = new CustomPacketPayload.Type<>(HANDSHAKE_C2S);
