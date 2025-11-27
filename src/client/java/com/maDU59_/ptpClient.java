@@ -216,7 +216,6 @@ public class PtpClient implements ClientModInitializer {
                     Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
                     pos = trajectoryPoints.get(i).add(lerpedDelta);
                     Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
-                    System.out.println(SettingsManager.TRAJECTORY_STYLE.getValueAsString());
                     if(SettingsManager.TRAJECTORY_STYLE.getValueAsString().equals("Dashed")){
                         dir = dir.scale(0.5);
                     }
