@@ -6,12 +6,12 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class ptpConfigScreen extends Screen {
+public class PtpConfigScreen extends Screen {
     private MyConfigListWidget list;
 
     private final String INDENT = " ⤷  ";
 
-    protected ptpConfigScreen(Screen parent) {
+    protected PtpConfigScreen(Screen parent) {
         super(Component.literal("Projectile Trajectory Preview Config"));
         this.parent = parent;
     }

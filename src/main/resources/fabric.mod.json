@@ -16,10 +16,10 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.maDU59_.ptp"
+			"com.maDU59_.Ptp"
 		],
 		"client": [
-			"com.maDU59_.ptpClient"
+			"com.maDU59_.PtpClient"
 		],
 		"modmenu": [ 
 			"com.maDU59_.config.configScreen.ModMenuApiImpl" 

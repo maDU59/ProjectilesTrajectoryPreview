@@ -38,7 +38,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 
-public class ptpClient implements ClientModInitializer {
+public class PtpClient implements ClientModInitializer {
     private static final Minecraft client = Minecraft.getInstance();
     public static final Logger LOGGER = LogManager.getLogger("ptpClient");
     private static boolean serverHasMod = false;

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.maDU59_.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import com.maDU59_.HandshakeNetworking.HANDSHAKE_S2CPayload;
 
-public class ptp implements ModInitializer {
+public class Ptp implements ModInitializer {
 	public static final String MOD_ID = "ptp";
 
 	// This logger is used to write text to the console and the log file.
