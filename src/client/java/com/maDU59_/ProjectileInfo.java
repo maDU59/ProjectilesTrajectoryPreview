@@ -30,44 +30,65 @@ import net.minecraft.world.phys.Vec3;
 
 public class ProjectileInfo {
 
-    public double gravity;
-    public double drag;
-    public Vec3 initialVelocity;
-    public Vec3 offset;
-    public Vec3 position;
-    public boolean hasWaterCollision;
+    public final double gravity;
+    public final double drag;
+    public final Vec3 initialVelocity;
+    public final Vec3 offset;
+    public final Vec3 position;
+    public final boolean hasWaterCollision;
+    public final double waterDrag;
+    public final double underwaterGravity;
 
-    public ProjectileInfo(double gravity, double drag, Vec3 initialVelocity, Vec3 offset, Vec3 position, boolean hasWaterCollision) {
+    public ProjectileInfo(double gravity, double drag, Vec3 initialVelocity, Vec3 offset, Vec3 position, boolean hasWaterCollision, double waterDrag) {
         this.gravity = gravity;
         this.drag = drag;
         this.initialVelocity = initialVelocity;
         this.offset = offset;
         this.position = position;
         this.hasWaterCollision = hasWaterCollision;
+        this.waterDrag = waterDrag;
+        this.underwaterGravity = gravity;
+    }
+
+    public ProjectileInfo(double gravity, double drag, Vec3 initialVelocity, Vec3 offset, Vec3 position, boolean hasWaterCollision, double waterDrag, double underwaterGravity) {
+        this.gravity = gravity;
+        this.drag = drag;
+        this.initialVelocity = initialVelocity;
+        this.offset = offset;
+        this.position = position;
+        this.hasWaterCollision = hasWaterCollision;
+        this.waterDrag = waterDrag;
+        this.underwaterGravity = underwaterGravity;
     }
 
     static public List<ProjectileInfo> getItemsInfo(ItemStack itemStack, Player player, boolean isMainHand) {
+
+        float tickProgress = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
         List<ProjectileInfo> projectileInfoList = new ArrayList<>(); 
 
         double gravity = 0.05;
         double drag = 0.99;
+        double waterDrag = 0.6;
 
         Item item = itemStack.getItem();
 
         if (item instanceof BowItem) {
+            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
 
             int useTicks = player.getTicksUsingItem();
             float pull = BowItem.getPowerForTime(useTicks);
 
-            Vec3 vel = player.getViewVector(1.0F).scale(3.0 * pull);
+            Vec3 vel = player.getViewVector(tickProgress).scale(3.0 * pull);
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-            if(pull > 0) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+            if(pull >= 0.1) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag));
 
         } else if (item instanceof CrossbowItem) {
 
-            Vec3 vel = player.getViewVector(1.0F).scale(3.15);
+            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+
+            Vec3 vel = player.getViewVector(tickProgress).scale(3.15);
             Vec3 offset = new Vec3(0, -0.06, 0.03);
 
             ChargedProjectiles chargedProjectilesComponent = itemStack.get(DataComponents.CHARGED_PROJECTILES);
@@ -75,8 +96,9 @@ public class ProjectileInfo {
             if(chargedProjectilesComponent != null){
                 for (ItemStack projectile : chargedProjectilesComponent.getItems()) {
                     if (projectile.is(Items.FIREWORK_ROCKET)) {
-                        vel = player.getViewVector(1.0F).scale(1.6F);
+                        vel = player.getViewVector(tickProgress).scale(1.6F);
                         gravity = 0;
+                        waterDrag = drag;
                     } else if (projectile.getItem() instanceof ArrowItem) {
                         
                     }
@@ -84,66 +106,80 @@ public class ProjectileInfo {
             }
 
             if(CrossbowItem.isCharged(itemStack)) {
-                projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+                projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag));
                 if (hasMultishot(itemStack)){
                     float angleOffset = 10f;
                     Vec3 vel1 = vel.yRot((float) Math.toRadians(angleOffset));
                     Vec3 vel2 = vel.yRot((float) Math.toRadians(-angleOffset));
-                    projectileInfoList.add(new ProjectileInfo(gravity, drag, vel1, offset, null, false));
-                    projectileInfoList.add(new ProjectileInfo(gravity, drag, vel2, offset, null, false));
+                    projectileInfoList.add(new ProjectileInfo(gravity, drag, vel1, offset, position, false, waterDrag));
+                    projectileInfoList.add(new ProjectileInfo(gravity, drag, vel2, offset, position, false, waterDrag));
                 }
             }
             
         } else if (item instanceof TridentItem) {
 
+            waterDrag = 0.99;
+
             int useTicks = player.getTicksUsingItem();
 
-            Vec3 vel = player.getViewVector(1.0F).scale(TridentItem.PROJECTILE_SHOOT_POWER);
+            Vec3 vel = player.getViewVector(tickProgress).scale(TridentItem.PROJECTILE_SHOOT_POWER);
             Vec3 offset = new Vec3(0.2, 0.1, 0.2);
 
-            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false, waterDrag));
             
         } else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderpearlItem) {
 
+            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+
+            waterDrag = 0.8;
             gravity = 0.03;
 
-            Vec3 vel = player.getViewVector(1.0F).scale(SnowballItem.PROJECTILE_SHOOT_POWER);
+            Vec3 vel = player.getViewVector(tickProgress).scale(SnowballItem.PROJECTILE_SHOOT_POWER);
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag));
             
         } else if (item instanceof WindChargeItem) {
 
-            gravity = 0;
-            drag = 1.0;
+            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
 
-            Vec3 vel = player.getViewVector(1.0F).scale(1.0);
+            gravity = 0;
+            drag = 0.95;
+            waterDrag = 0.8;
+
+            Vec3 vel = player.getViewVector(tickProgress);
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag));
             
         } else if (item instanceof ThrowablePotionItem) {
 
-            Vec3 dir = player.getViewVector(1.0F).add(0, 0.1, 0);
+            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+
+            waterDrag = 0.8;
+
+            Vec3 dir = player.getViewVector(tickProgress).add(0, 0.1, 0);
             dir = dir.normalize();
 
-            Vec3 vel = dir.scale(0.5);
+            Vec3 vel = dir.scale(ThrowablePotionItem.PROJECTILE_SHOOT_POWER); //0.5
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag));
             
         }  else if (item instanceof ExperienceBottleItem) {
 
-            gravity = 0.07;
-            drag = 0.99;
+            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
 
-            Vec3 dir = player.getViewVector(1.0F).add(0, 0.1, 0);
+            gravity = 0.07;
+            waterDrag = 0.8;
+
+            Vec3 dir = player.getViewVector(tickProgress).add(0, 0.1, 0);
             dir = dir.normalize();
 
             Vec3 vel = dir.scale(0.7);
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false));
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag));
             
         }  else if (item instanceof FishingRodItem && player.fishing == null) {
 
@@ -153,7 +189,7 @@ public class ProjectileInfo {
             float i = Mth.sin(-g * (float) (Math.PI / 180.0) - (float) Math.PI);
             float j = -Mth.cos(-f * (float) (Math.PI / 180.0));
             float k = Mth.sin(-f * (float) (Math.PI / 180.0));
-            Vec3 p = player.getEyePosition(1.0F);
+            Vec3 p = player.getEyePosition(tickProgress);
             Vec3 pos = new Vec3(p.x - i * 0.3,p.y,p.z - h * 0.3);
             Vec3 vec3d = new Vec3(-i, Mth.clamp(-(k / j), -5.0F, 5.0F), -h);
             double m = vec3d.length();
@@ -169,11 +205,31 @@ public class ProjectileInfo {
 
             Vec3 offset = new Vec3(0.16, -0.06, 0.2);
 
-            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, pos, true));
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, pos, true, drag));
             
         }
 
         return projectileInfoList;
+    }
+
+    static public ProjectileInfo getDropTrajectory(Player player){
+        double gravity = 0.04;
+        double drag = 0.98;
+        double waterDrag = 0.98 * 0.9900000095367432;
+        //double underwaterGravity = - (double)(5.0E-4F) / 0.9900000095367432;
+        Vec3 offset = new Vec3(0.2, -0.06, 0.2);
+
+        Vec3 pos = new Vec3(player.getX(), player.getEyeY() - 0.30000001192092896, player.getZ());
+
+        float g = Mth.sin((double)(player.getXRot() * 0.017453292F));
+        float h = Mth.cos((double)(player.getXRot() * 0.017453292F));
+        float i = Mth.sin((double)(player.getYRot() * 0.017453292F));
+        float j = Mth.cos((double)(player.getYRot() * 0.017453292F));
+        float k = 0.5F * 6.2831855F;
+        float l = 0.02F * 0.5F;
+        Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
+
+        return new ProjectileInfo(gravity, drag, vel, offset, pos, false, waterDrag, gravity);
     }
 
     public static boolean hasMultishot(ItemStack stack) {

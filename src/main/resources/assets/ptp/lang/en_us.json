@@ -43,5 +43,7 @@
   "Solid": "Solid",
   "Dashed": "Dashed",
   "Dotted": "Dotted",
-  "TargetIsEntity": "Only if the target is an entity"
+  "TargetIsEntity": "Only if the target is an entity",
+  "key.category.ptp.ptp": "Projectiles Trajectory Preview",
+  "ptp.key.item_drop_trajectory": "Show item drop trajectory"
 }
