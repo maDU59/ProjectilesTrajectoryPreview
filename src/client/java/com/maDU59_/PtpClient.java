@@ -237,10 +237,15 @@ public class PtpClient implements ClientModInitializer {
         double drag =  projectileInfo.drag;
         double gravity = projectileInfo.gravity;
         Vec3 vel = projectileInfo.initialVelocity.add(player.getDeltaMovement());
+
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
-            pos = pos.add(vel);
-            vel = vel.scale(drag).subtract(0, gravity, 0);
+            
+            for (int order : projectileInfo.order){
+                if (order == 0) pos = pos.add(vel);
+                else if (order == 1) vel = vel.scale(drag);
+                else if (order == 2) vel = vel.subtract(0, gravity, 0);
+            }
 
             AABB box = new AABB(prevPos, pos).inflate(1.0);
 
