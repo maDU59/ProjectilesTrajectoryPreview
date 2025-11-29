@@ -27,8 +27,7 @@ To edit the settings of the mod:
 ## ⚠️ Limitations and notes
 
 - Minecraft Projectiles often have a random offset, so the actual impact may sometime differs a bit from the preview.
-- Water and lava may interfere with trajectory accuracy, fluid support is a work in progress.
-- Modded items are not supported. If you want compatibility with a specific mod, open an issue on Github and suggest it, I'll do my best to add it.
+- Modded items are not yet supported. If you want compatibility with a specific mod, open an issue on Github and suggest it, I'll do my best to add it.
 
 ## 🛑 Usage on servers 
 
