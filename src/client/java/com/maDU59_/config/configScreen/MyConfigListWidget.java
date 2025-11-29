@@ -39,11 +39,11 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     }
 
     public void addButton(Option option, Button.OnPress onPress) {
-        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsString()), onPress).bounds(0, 0, 100, 20).build(), option, ""));
+        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), onPress).bounds(0, 0, 100, 20).build(), option, ""));
     }
 
     public void addButton(Option option, Button.OnPress onPress, String indent) {
-        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsString()), onPress).bounds(0, 0, 100, 20).build(), option, indent));
+        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), onPress).bounds(0, 0, 100, 20).build(), option, indent));
     }
 
     // Base entry
@@ -119,7 +119,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             if (this.button.mouseClicked(click, doubleClick)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 if(this.option != null){
-                    this.button.setMessage(Component.literal(this.option.getValueAsString()));
+                    this.button.setMessage(Component.literal(this.option.getValueAsTranslatedString()));
                 }
                 return true;
             }

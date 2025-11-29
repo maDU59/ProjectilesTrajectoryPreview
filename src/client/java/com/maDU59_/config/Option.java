@@ -51,6 +51,13 @@ public class Option {
 
     public String getValueAsString() {
         if( value instanceof Boolean boolValue) {
+            return boolValue ? "Enabled" : "Disabled";
+        }
+        return this.value.toString();
+    }
+
+    public String getValueAsTranslatedString() {
+        if( value instanceof Boolean boolValue) {
             return boolValue ? I18n.get("ptp.config.enabled") : I18n.get("ptp.config.disabled");
         }
         return I18n.get(this.value.toString());
