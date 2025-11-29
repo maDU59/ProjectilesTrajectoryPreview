@@ -176,6 +176,8 @@ public class PtpClient implements ClientModInitializer {
         Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3 right = forward.cross(up).normalize();
 
+        if(client.gameRenderer.getMainCamera().isDetached()) offset = offset.scale(0);
+
         return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
     }
 
