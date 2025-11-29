@@ -80,8 +80,10 @@ public class ProjectileInfo {
 
         Item item = itemStack.getItem();
 
+        Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+
         if (item instanceof BowItem) {
-            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+            
 
             int useTicks = player.getTicksUsingItem();
             float pull = BowItem.getPowerForTime(useTicks);
@@ -93,7 +95,7 @@ public class ProjectileInfo {
 
         } else if (item instanceof CrossbowItem) {
 
-            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+            
 
             Vec3 vel = player.getViewVector(tickProgress).scale(3.15);
             Vec3 offset = new Vec3(0, -0.06, 0.03);
@@ -125,6 +127,8 @@ public class ProjectileInfo {
             
         } else if (item instanceof TridentItem) {
 
+            
+
             waterDrag = 0.99;
 
             int useTicks = player.getTicksUsingItem();
@@ -132,11 +136,11 @@ public class ProjectileInfo {
             Vec3 vel = player.getViewVector(tickProgress).scale(TridentItem.PROJECTILE_SHOOT_POWER);
             Vec3 offset = new Vec3(0.2, 0.1, 0.2);
 
-            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, null, false, waterDrag, ORDER_MDG));
+            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG));
             
         } else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderpearlItem) {
 
-            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+            
 
             waterDrag = 0.8;
             gravity = 0.03;
@@ -148,7 +152,7 @@ public class ProjectileInfo {
             
         } else if (item instanceof WindChargeItem) {
 
-            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+            
 
             gravity = 0;
             drag = 0.95;
@@ -161,7 +165,7 @@ public class ProjectileInfo {
             
         } else if (item instanceof ThrowablePotionItem) {
 
-            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+            
 
             waterDrag = 0.8;
 
@@ -173,8 +177,6 @@ public class ProjectileInfo {
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDM));
             
         }  else if (item instanceof ExperienceBottleItem) {
-
-            Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
 
             gravity = 0.07;
             waterDrag = 0.8;
@@ -196,7 +198,7 @@ public class ProjectileInfo {
             float j = -Mth.cos(-f * (float) (Math.PI / 180.0));
             float k = Mth.sin(-f * (float) (Math.PI / 180.0));
             Vec3 p = player.getEyePosition(tickProgress);
-            Vec3 pos = new Vec3(p.x - i * 0.3,p.y,p.z - h * 0.3);
+            position = new Vec3(p.x - i * 0.3,p.y,p.z - h * 0.3);
             Vec3 vec3d = new Vec3(-i, Mth.clamp(-(k / j), -5.0F, 5.0F), -h);
             double m = vec3d.length();
             vec3d = vec3d.multiply(
@@ -211,7 +213,7 @@ public class ProjectileInfo {
 
             Vec3 offset = new Vec3(0.16, -0.06, 0.2);
 
-            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, pos, true, drag, ORDER_GMD));
+            projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, true, drag, ORDER_GMD));
             
         }
 
