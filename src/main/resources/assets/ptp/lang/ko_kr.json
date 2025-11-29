@@ -43,5 +43,7 @@
   "Solid": "실선",
   "Dashed": "대시선",
   "Dotted": "점선",
-  "TargetIsEntity": "대상이 엔티티일 경우에만"
+  "TargetIsEntity": "대상이 엔티티일 경우에만",
+  "key.category.ptp.ptp": "Projectiles Trajectory Preview",
+  "ptp.key.item_drop_trajectory": "아이템 드롭 궤적 표시"
 }

@@ -43,5 +43,7 @@
   "Solid": "Durchgezogen",
   "Dashed": "Gestrichelt",
   "Dotted": "Gepunktet",
-  "TargetIsEntity": "Nur wenn das Ziel eine Entität ist"
+  "TargetIsEntity": "Nur wenn das Ziel eine Entität ist",
+  "key.category.ptp.ptp": "Projectiles Trajectory Preview",
+  "ptp.key.item_drop_trajectory": "Flugbahn fallengelassener Gegenstände anzeigen"
 }

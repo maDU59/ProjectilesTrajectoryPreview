@@ -43,5 +43,7 @@
   "Solid": "Pleine",
   "Dashed": "Tiretée",
   "Dotted": "Pointillée",
-  "TargetIsEntity": "Seulement si la cible est une entité"
+  "TargetIsEntity": "Seulement si la cible est une entité",
+  "key.category.ptp.ptp": "Projectiles Trajectory Preview",
+  "ptp.key.item_drop_trajectory": "Afficher la trajectoire de l'objet lâché"
 }

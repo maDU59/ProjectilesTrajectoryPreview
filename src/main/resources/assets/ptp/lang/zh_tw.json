@@ -43,5 +43,7 @@
   "Solid": "實線",
   "Dashed": "虛線",
   "Dotted": "點線",
-  "TargetIsEntity": "僅當目標為實體時"
+  "TargetIsEntity": "僅當目標為實體時",
+  "key.category.ptp.ptp": "Projectiles Trajectory Preview",
+  "ptp.key.item_drop_trajectory": "顯示物品掉落軌跡"
 }
