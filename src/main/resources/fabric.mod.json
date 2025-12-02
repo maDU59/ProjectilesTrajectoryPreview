@@ -1,6 +1,6 @@
 {
 	"schemaVersion": 1,
-	"id": "ptr",
+	"id": "ptp",
 	"version": "${version}",
 	"name": "Projectiles Trajectory Prediction",
 	"description": "Shows the trajectory of projectiles like arrows, snowballs, eggs, tridents and ender pearls.",
@@ -8,21 +8,21 @@
 		"maDU59_"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://madu59.github.io/",
+		"sources": "https://github.com/maDU59/ProjectilesTrajectoryPreview"
 	},
 	"license": "MIT",
 	"icon": "assets/ptp/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.maDU59_.Ptp"
+			"fr.madu59.ptp.Ptp"
 		],
 		"client": [
-			"com.maDU59_.PtpClient"
+			"fr.madu59.ptp.PtpClient"
 		],
 		"modmenu": [ 
-			"com.maDU59_.config.configScreen.ModMenuApiImpl" 
+			"fr.madu59.ptp.config.configScreen.ModMenuApiImpl" 
 		]
 	},
 	"mixins": [

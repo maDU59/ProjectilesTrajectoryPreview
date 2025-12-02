@@ -1,6 +1,6 @@
-package com.maDU59_.config.configScreen;
+package fr.madu59.ptp.config.configScreen;
 
-import com.maDU59_.config.SettingsManager;
+import fr.madu59.ptp.config.SettingsManager;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;

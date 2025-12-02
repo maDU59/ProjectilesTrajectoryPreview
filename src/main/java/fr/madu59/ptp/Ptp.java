@@ -1,4 +1,4 @@
-package com.maDU59_;
+package fr.madu59.ptp;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -7,8 +7,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.maDU59_.HandshakeNetworking.HANDSHAKE_C2SPayload;
-import com.maDU59_.HandshakeNetworking.HANDSHAKE_S2CPayload;
+import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
+import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 
 public class Ptp implements ModInitializer {
 	public static final String MOD_ID = "ptp";

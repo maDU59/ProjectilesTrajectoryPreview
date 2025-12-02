@@ -1,8 +1,9 @@
-package com.maDU59_.config;
+package fr.madu59.ptp.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import fr.madu59.ptp.config.SettingsManager;
 
 import java.lang.Math;
 import java.io.*;

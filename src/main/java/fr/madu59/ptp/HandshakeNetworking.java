@@ -1,4 +1,4 @@
-package com.maDU59_;
+package fr.madu59.ptp;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

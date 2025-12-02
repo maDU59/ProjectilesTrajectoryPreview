@@ -1,6 +1,10 @@
-package com.maDU59_.config.configScreen;
+package fr.madu59.ptp.config.configScreen;
 
 import java.util.List;
+
+import fr.madu59.ptp.config.configScreen.MyConfigListWidget;
+
+import fr.madu59.ptp.config.Option;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,7 +16,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import com.maDU59_.config.Option;
 
 public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
 
@@ -47,10 +50,10 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     }
 
     // Base entry
-    public abstract static class Entry extends ContainerObjectSelectionList.Entry<com.maDU59_.config.configScreen.MyConfigListWidget.Entry> {}
+    public abstract static class Entry extends ContainerObjectSelectionList.Entry<MyConfigListWidget.Entry> {}
 
     // Category header
-    public static class CategoryEntry extends com.maDU59_.config.configScreen.MyConfigListWidget.Entry {
+    public static class CategoryEntry extends MyConfigListWidget.Entry {
         private final String name;
 
         public CategoryEntry(String name) {
@@ -77,7 +80,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     }
 
     // Button entry
-    public static class ButtonEntry extends com.maDU59_.config.configScreen.MyConfigListWidget.Entry{
+    public static class ButtonEntry extends MyConfigListWidget.Entry{
         private final Button button;
         private final String name;
         private final String description;

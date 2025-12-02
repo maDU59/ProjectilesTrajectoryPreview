@@ -1,4 +1,4 @@
-package com.maDU59_.config;
+package fr.madu59.ptp.config;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.commands.SharedSuggestionProvider;
 import 	net.minecraft.network.chat.Component;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 
 public class ClientCommands {

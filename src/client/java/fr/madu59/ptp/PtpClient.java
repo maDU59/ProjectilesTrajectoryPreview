@@ -1,4 +1,4 @@
-package com.maDU59_;
+package fr.madu59.ptp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,11 @@ import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import com.maDU59_.HandshakeNetworking.HANDSHAKE_C2SPayload;
-import com.maDU59_.HandshakeNetworking.HANDSHAKE_S2CPayload;
-import com.maDU59_.config.ClientCommands;
-import com.maDU59_.config.SettingsManager;
+import fr.madu59.ptp.config.ClientCommands;
+import fr.madu59.ptp.config.SettingsManager;
+
+import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
+import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

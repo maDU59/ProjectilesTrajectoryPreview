@@ -1,7 +1,10 @@
-package com.maDU59_;
+package fr.madu59.ptp;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.madu59.ptp.ProjectileInfo;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;

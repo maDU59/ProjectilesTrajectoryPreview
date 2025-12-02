@@ -1,4 +1,4 @@
-package com.maDU59_;
+package fr.madu59.ptp;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
