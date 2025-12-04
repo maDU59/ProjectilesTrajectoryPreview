@@ -2,7 +2,6 @@ package fr.madu59.ptp.config;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,6 @@ public class ClientCommands {
     }
 
     private static Map<String,String> camelCase(List<String> list){
-        if(list == null) return Collections.emptyMap();
         Map<String,String> result = new LinkedHashMap<String, String>();
 
         for (String string : list) {
