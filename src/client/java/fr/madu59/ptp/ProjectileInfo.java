@@ -136,7 +136,7 @@ public class ProjectileInfo {
 
             int useTicks = player.getTicksUsingItem();
 
-            Vec3 vel = player.getViewVector(tickProgress).scale(TridentItem.PROJECTILE_SHOOT_POWER);
+            Vec3 vel = player.getViewVector(tickProgress).scale(TridentItem.SHOOT_POWER); //2.5F
             Vec3 offset = new Vec3(0.2, 0.1, 0.2);
 
             if(useTicks >= TridentItem.THROW_THRESHOLD_TIME) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG));
@@ -148,7 +148,7 @@ public class ProjectileInfo {
             waterDrag = 0.8;
             gravity = 0.03;
 
-            Vec3 vel = player.getViewVector(tickProgress).scale(SnowballItem.PROJECTILE_SHOOT_POWER);
+            Vec3 vel = player.getViewVector(tickProgress).scale(1.5F);
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDM));
@@ -174,7 +174,7 @@ public class ProjectileInfo {
 
             Vec3 dir = AngleFromRot(player.getXRot(), player.getYRot(), -20.0F);
 
-            Vec3 vel = dir.scale(ThrowablePotionItem.PROJECTILE_SHOOT_POWER); //0.5
+            Vec3 vel = dir.scale(0.5F); //0.5
             Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDM));
@@ -232,10 +232,10 @@ public class ProjectileInfo {
 
         Vec3 pos = new Vec3(player.getX(), player.getEyeY() - 0.30000001192092896, player.getZ());
 
-        float g = Mth.sin((double)(player.getXRot() * 0.017453292F));
-        float h = Mth.cos((double)(player.getXRot() * 0.017453292F));
-        float i = Mth.sin((double)(player.getYRot() * 0.017453292F));
-        float j = Mth.cos((double)(player.getYRot() * 0.017453292F));
+        float g = Mth.sin(player.getXRot() * 0.017453292F);
+        float h = Mth.cos(player.getXRot() * 0.017453292F);
+        float i = Mth.sin(player.getYRot() * 0.017453292F);
+        float j = Mth.cos(player.getYRot() * 0.017453292F);
         float k = 0.5F * 6.2831855F;
         float l = 0.02F * 0.5F;
         Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
@@ -254,9 +254,9 @@ public class ProjectileInfo {
     }
 
     private static Vec3 AngleFromRot(float f, float g, float h){
-        float k = -Mth.sin((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
-        float l = -Mth.sin((double)((f + h) * 0.017453292F));
-        float m = Mth.cos((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
+        float k = -Mth.sin(g * 0.017453292F) * Mth.cos(f * 0.017453292F);
+        float l = -Mth.sin((f + h) * 0.017453292F);
+        float m = Mth.cos(g * 0.017453292F) * Mth.cos(f * 0.017453292F);
 
         return new Vec3((double)k, (double)l, (double)m).normalize();
     }
