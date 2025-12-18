@@ -3,6 +3,8 @@ package fr.madu59.ptp.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import fr.madu59.ptp.Ptp;
 import fr.madu59.ptp.config.SettingsManager;
 
 import java.lang.Math;
@@ -284,8 +286,8 @@ public class SettingsManager {
             Type type = new TypeToken<Map<String, Option>>() {}.getType();
             Map<String, Option> map = GSON.fromJson(reader, type);
             return map.get(key);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Ptp.LOGGER.info("[Ptp] Config file not found or invalid, using default");
             return null;
         }
     }
