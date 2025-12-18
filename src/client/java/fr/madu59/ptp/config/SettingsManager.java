@@ -286,8 +286,8 @@ public class SettingsManager {
             Type type = new TypeToken<Map<String, Option>>() {}.getType();
             Map<String, Option> map = GSON.fromJson(reader, type);
             return map.get(key);
-        } catch (IOException e) {
-            Ptp.LOGGER.info("[PTP] Config file not found, using default");
+        } catch (Exception e) {
+            Ptp.LOGGER.info("[PTP] Config file not found or invalid, using default");
             return null;
         }
     }
