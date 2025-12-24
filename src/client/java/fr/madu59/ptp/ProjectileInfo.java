@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArrowItem;
@@ -119,7 +120,7 @@ public class ProjectileInfo {
 
             if(CrossbowItem.isCharged(itemStack)) {
                 projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG));
-                if (hasMultishot(itemStack)){
+                if (hasEnchantment(itemStack, Enchantments.MULTISHOT)){
                     float angleOffset = 10f;
                     Vec3 vel1 = vel.yRot((float) Math.toRadians(angleOffset));
                     Vec3 vel2 = vel.yRot((float) Math.toRadians(-angleOffset));
@@ -130,8 +131,6 @@ public class ProjectileInfo {
             
         } else if (item instanceof TridentItem) {
 
-            
-
             waterDrag = 0.99;
 
             int useTicks = player.getTicksUsingItem();
@@ -139,7 +138,7 @@ public class ProjectileInfo {
             Vec3 vel = player.getViewVector(tickProgress).scale(TridentItem.PROJECTILE_SHOOT_POWER);
             Vec3 offset = new Vec3(0.2, 0.1, 0.2);
 
-            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG));
+            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME && !hasEnchantment(itemStack, Enchantments.RIPTIDE)) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG));
             
         } else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderpearlItem) {
 
@@ -243,14 +242,14 @@ public class ProjectileInfo {
         return new ProjectileInfo(gravity, drag, vel, offset, pos, true, waterDrag, gravity, ORDER_GMD);
     }
 
-    public static boolean hasMultishot(ItemStack stack) {
+    public static boolean hasEnchantment(ItemStack stack, ResourceKey<Enchantment> enchantment) {
         var enchantmentRegistry = Minecraft.getInstance().player.level().registryAccess()
             .lookupOrThrow(Registries.ENCHANTMENT);
 
-        Holder<Enchantment> multishotEntry = enchantmentRegistry
-            .getOrThrow(Enchantments.MULTISHOT);
+        Holder<Enchantment> enchantmentEntry = enchantmentRegistry
+            .getOrThrow(enchantment);
 
-        return EnchantmentHelper.getItemEnchantmentLevel(multishotEntry, stack) > 0;
+        return EnchantmentHelper.getItemEnchantmentLevel(enchantmentEntry, stack) > 0;
     }
 
     private static Vec3 AngleFromRot(float f, float g, float h){
