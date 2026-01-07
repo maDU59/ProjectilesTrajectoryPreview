@@ -87,7 +87,7 @@ public class PtpClient implements ClientModInitializer {
 
     public static void renderOverlay(WorldRenderContext context) {
         Player player = client.player;
-        if (player == null || !isEnabled()) return;
+        if (player == null) return;
 
         ItemStack itemStack = player.getMainHandItem();
         int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
@@ -111,6 +111,7 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void showItemTrajectory(WorldRenderContext context, Player player, ProjectileInfo projectileInfo, int handMultiplier) {
+        if(!isEnabled(projectileInfo)) return;
         float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
         Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
@@ -128,6 +129,8 @@ public class PtpClient implements ClientModInitializer {
         Vec3 eye = player.getEyePosition(tickProgress);
 
         for(ProjectileInfo projectileInfo : projectileInfoList){
+
+            if (!isEnabled(projectileInfo)) continue;
 
             Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
             Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
@@ -328,6 +331,11 @@ public class PtpClient implements ClientModInitializer {
     public static boolean isEnabled() {
         Minecraft client = Minecraft.getInstance();
         return client.hasSingleplayerServer() || serverHasMod;
+    }
+
+    public static boolean isEnabled(ProjectileInfo projectileInfo) {
+        Minecraft client = Minecraft.getInstance();
+        return client.hasSingleplayerServer() || serverHasMod || projectileInfo.bypassAntiCheat;
     }
 
     private static void registerKeyMappings() {
