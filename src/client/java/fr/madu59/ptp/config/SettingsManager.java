@@ -307,6 +307,7 @@ public class SettingsManager {
             loadedOption.setPossibleValues(possibleValues);
             loadedOption.setName(name);
             loadedOption.setDescription(description);
+            loadedOption.setDefaultValue(defaultValue);
             SettingsManager.ALL_OPTIONS.add(loadedOption);
             return loadedOption;
         }

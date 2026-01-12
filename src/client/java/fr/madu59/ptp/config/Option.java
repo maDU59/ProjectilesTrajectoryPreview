@@ -6,11 +6,11 @@ import net.minecraft.client.resources.language.I18n;
 
 public class Option {
     public String id;
-    public String name;
-    public String description;
+    public transient String name;
+    public transient String description;
     public Object value;
-    public Object defaultValue;
-    public List<Object> possibleValues;
+    public transient Object defaultValue;
+    public transient List<Object> possibleValues;
 
     public Option(String id, String name, String description, Object value, Object defaultValue, List<Object> possibleValues) {
         this.id = id;
@@ -80,5 +80,9 @@ public class Option {
     }
     public void setDescription(String description){
         this.description = description;
+    }
+
+    public void setDefaultValue(Object defaultValue){
+        this.defaultValue = defaultValue;
     }
 }
