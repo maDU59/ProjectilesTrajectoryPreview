@@ -33,7 +33,7 @@ public class ClientCommands {
                                     }
                                 }
 
-                                boolean success = SettingsManager.setOptionValue(option, (Object) value);
+                                boolean success = SettingsManager.setOptionValue(option, value);
                                 Minecraft.getInstance().player.displayClientMessage(
                                     Component.literal(success ? "Updated " + StringArgumentType.getString(context, "option") + " to " + StringArgumentType.getString(context, "value") : "Failed to update setting."),
                                     false

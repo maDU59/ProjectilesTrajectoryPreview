@@ -1,13 +1,10 @@
 package fr.madu59.ptp.config.configScreen;
 
 import java.util.List;
-
-import fr.madu59.ptp.config.configScreen.MyConfigListWidget;
-
-import fr.madu59.ptp.config.Option;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -16,6 +13,8 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import fr.madu59.ptp.config.Option;
+import fr.madu59.ptp.config.configScreen.MyConfigListWidget;
 
 public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigListWidget.Entry> {
 
@@ -41,19 +40,82 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         this.addEntry(new ButtonEntry(Button.builder(Component.literal(name), onPress).bounds(0, 0, 100, 20).build(), null, ""));
     }
 
-    public void addButton(Option option, Button.OnPress onPress) {
+    public void addButton(Option<?> option, Button.OnPress onPress) {
         this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), onPress).bounds(0, 0, 100, 20).build(), option, ""));
     }
 
-    public void addButton(Option option, Button.OnPress onPress, String indent) {
+    public void addButton(Option<?> option, Button.OnPress onPress, String indent) {
         this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), onPress).bounds(0, 0, 100, 20).build(), option, indent));
     }
 
+    public <N extends Number> void addSlider(Option<N> option, N min, N max, N step) {
+        this.addSlider(option, min, max, step, "");
+    }
+
+    public <N extends Number> void addSlider(Option<N> option, N min, N max, N step, String indent) {
+
+        double dMin = min.doubleValue();
+        double dMax = max.doubleValue();
+        double dCurrent = option.getValue().doubleValue();
+
+        double initialPosition = (dMax <= dMin) ? 0 : (dCurrent - dMin) / (dMax - dMin);
+        
+        initialPosition = Math.max(0.0, Math.min(1.0, initialPosition));
+
+        this.addEntry(new SliderEntry(new AbstractSliderButton(0, 0, 100, 20, 
+        Component.literal(option.getValue().toString()), initialPosition){
+
+            @Override
+            protected void updateMessage() {
+
+                String stepStr = step.toString();
+                int decimalPlaces = 0;
+                if (stepStr.contains(".")) {
+                    decimalPlaces = stepStr.length() - stepStr.indexOf('.') - 1;
+                }
+
+                String format = "%." + decimalPlaces + "f";
+                String formattedValue = String.format(java.util.Locale.ROOT, format, option.getValue());
+
+                this.setMessage(Component.literal(formattedValue));
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void applyValue() {
+                if (option.getValue() instanceof Integer) {
+
+                    int imax = max.intValue();
+                    int imin = min.intValue();
+                    int istep = step.intValue();
+                    int newValue = imin + Math.round((imax - imin) * (float)this.value / istep) * istep;
+                    option.setValue((N)(Object) Math.round(newValue));
+
+                } else if (option.getValue() instanceof Double) {
+                    
+                    double dmax = max.doubleValue();
+                    double dmin = min.doubleValue();
+                    double dstep = step.doubleValue();
+                    double newValue = dmin + (double)Math.round((dmax - dmin) * this.value / dstep) * dstep;
+                    option.setValue((N)(Object) newValue);
+
+                } else if (option.getValue() instanceof Float) {
+
+                    float fmax = max.floatValue();
+                    float fmin = min.floatValue();
+                    float fstep = step.floatValue();
+                    float newValue = fmin + (float)Math.round((fmax - fmin) * (float)this.value / fstep) * fstep;
+                    option.setValue((N)(Object) newValue);
+                }
+            }
+        }, option, indent));
+    }
+
     // Base entry
-    public abstract static class Entry extends ContainerObjectSelectionList.Entry<MyConfigListWidget.Entry> {}
+    public abstract static class Entry extends ContainerObjectSelectionList.Entry<fr.madu59.ptp.config.configScreen.MyConfigListWidget.Entry> {}
 
     // Category header
-    public static class CategoryEntry extends MyConfigListWidget.Entry {
+    public static class CategoryEntry extends fr.madu59.ptp.config.configScreen.MyConfigListWidget.Entry {
         private final String name;
 
         public CategoryEntry(String name) {
@@ -80,14 +142,14 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
     }
 
     // Button entry
-    public static class ButtonEntry extends MyConfigListWidget.Entry{
+    public static class ButtonEntry extends fr.madu59.ptp.config.configScreen.MyConfigListWidget.Entry{
         private final Button button;
         private final String name;
         private final String description;
         private final String indent;
-        private final Option option;
+        private final Option<?> option;
 
-        public ButtonEntry(Button button, Option option, String indent) {
+        public ButtonEntry(Button button, Option<?> option, String indent) {
             this.button = button;
             this.name = option.getName();
             this.description = option.getDescription();
@@ -101,7 +163,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
             this.button.render(context, mouseX, mouseY, tickDelta);
 
-            if(this.description == null) return;
+            if(this.name == null) return;
 
             Font textRenderer = Minecraft.getInstance().font;
             context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
@@ -127,6 +189,43 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
                 return true;
             }
             return false;
+        }
+    }
+
+    // Slider entry
+    public static class SliderEntry extends MyConfigListWidget.Entry{
+        private final AbstractSliderButton slider;
+        private final String name;
+        private final String description;
+        private final String indent;
+
+        public SliderEntry(AbstractSliderButton slider, Option<?> option, String indent) {
+            this.slider = slider;
+            this.name = option.getName();
+            this.description = option.getDescription();
+            this.indent = indent;
+        }
+
+        @Override
+        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.slider.setY(this.getContentY() + (this.getContentHeight() - this.slider.getHeight()) / 2);
+            this.slider.setX(this.getContentWidth() - this.slider.getWidth() - 10);
+            this.slider.render(context, mouseX, mouseY, tickDelta);
+
+            if(this.name == null) return;
+
+            Font textRenderer = Minecraft.getInstance().font;
+            context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
+        }
+
+        @Override
+        public List<? extends NarratableEntry> narratables() {
+            return List.of(this.slider);
+        }
+
+        @Override
+        public List<? extends GuiEventListener> children() {
+            return List.of(this.slider);
         }
     }
 }

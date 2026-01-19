@@ -4,21 +4,18 @@ import java.util.List;
 
 import net.minecraft.client.resources.language.I18n;
 
-public class Option {
+public class Option<T> {
     public String id;
-    public transient String name;
-    public transient String description;
-    public Object value;
-    public transient Object defaultValue;
-    public transient List<Object> possibleValues;
+    public String name;
+    public String description;
+    public T value;
+    public T defaultValue;
 
-    public Option(String id, String name, String description, Object value, Object defaultValue, List<Object> possibleValues) {
+    public Option(String id, String name, String description, T value, T defaultValue) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.value = value;
-        this.defaultValue = defaultValue;
-        this.possibleValues = possibleValues;
         SettingsManager.ALL_OPTIONS.add(this);
     }
 
@@ -26,11 +23,11 @@ public class Option {
         this.value = this.defaultValue;
     }
 
-    public void setValue(Object newValue) {
+    public void setValue(T newValue) {
         this.value = newValue;
     }
 
-    public Object getValue() {
+    public T getValue() {
         return this.value;
     }
 
@@ -46,15 +43,14 @@ public class Option {
         return I18n.get(this.description);
     }
 
-    public List<Object> getPossibleValues(){
-        return this.possibleValues;
-    }
-
-    public String getValueAsString() {
-        if( value instanceof Boolean boolValue) {
-            return boolValue ? "Enabled" : "Disabled";
+    public List<?> getPossibleValues(){
+        if(this.value instanceof Boolean){
+            return List.of(true, false);
         }
-        return this.value.toString();
+        if(this.value instanceof Enum<?> enumValue){
+            return List.of(enumValue.getDeclaringClass().getEnumConstants());
+        }
+        else return List.of();
     }
 
     public String getValueAsTranslatedString() {
@@ -65,16 +61,22 @@ public class Option {
     }
 
     public void setToNextValue() {
-        if (possibleValues != null && !possibleValues.isEmpty()) {
-            int currentIndex = possibleValues.indexOf(value);
-            int nextIndex = (currentIndex + 1) % possibleValues.size();
-            value = possibleValues.get(nextIndex);
-        }
+        this.value = cycle(this.value);
     }
 
-    public void setPossibleValues(List<Object> possibleValues){
-        this.possibleValues = possibleValues;
+    @SuppressWarnings("unchecked")
+    public T cycle(T value) {
+        if (value instanceof Enum<?> enumValue) {
+            Enum<?>[] constants = enumValue.getDeclaringClass().getEnumConstants();
+            int nextOrdinal = (enumValue.ordinal() + 1) % constants.length;
+            return (T) constants[nextOrdinal];
+        }
+        else if (value instanceof Boolean boolValue) {
+           return (T) Boolean.valueOf(!boolValue);
+        }
+        else return null;
     }
+
     public void setName(String name){
         this.name = name;
     }
@@ -82,7 +84,34 @@ public class Option {
         this.description = description;
     }
 
-    public void setDefaultValue(Object defaultValue){
-        this.defaultValue = defaultValue;
+    public static enum State{
+        ENABLED,
+        TARGET_IS_ENTITY,
+        DISABLED
+    }
+
+    public static enum Opacity{
+        OPAQUE,
+        TRANSPARENT,
+        PULSING
+    }
+
+    public static enum Style{
+        SOLID,
+        DASHED,
+        DOTTED
+    }
+
+    public static enum Color{
+        RED,
+        GREEN,
+        BLUE,
+        YELLOW,
+        CYAN,
+        MAGENTA,
+        WHITE,
+        PURPLE,
+        BLACK,
+        DEPENDS_ON_TARGET
     }
 }

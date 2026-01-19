@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import fr.madu59.ptp.config.ClientCommands;
+import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.SettingsManager;
 
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
@@ -98,7 +99,7 @@ public class PtpClient implements ClientModInitializer {
         else{
             List<ProjectileInfo> projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, true);
             if(projectileInfoList.isEmpty()){
-                if(Boolean.FALSE.equals(SettingsManager.ENABLE_OFFHAND.getValue())) return;
+                if(SettingsManager.ENABLE_OFFHAND.getValue() == false) return;
 
                 itemStack = player.getOffhandItem();
                 handMultiplier = -handMultiplier;
@@ -119,7 +120,7 @@ public class PtpClient implements ClientModInitializer {
 
         PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, false);
 
-        int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), null);
+        int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), null);
 
         renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
     }
@@ -138,33 +139,33 @@ public class PtpClient implements ClientModInitializer {
             // Simulation
             PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, true);
 
-            Object value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
-            if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
-                if(!"TargetIsEntity".equals(value) && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
+            Option.State value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
+            if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
+                if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
-                    RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));
+                    RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
                 }
                 else if(previewImpact.entityImpact != null) {
                     AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                    RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                    RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
                 }
             }
 
             value = SettingsManager.OUTLINE_TARGETS.getValue();
-            if("TargetIsEntity".equals(value) || Boolean.TRUE.equals(value)){
-                if(!"TargetIsEntity".equals(value) && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
+            if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
+                if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
-                    RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));
+                    RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
                 }
                 else if(previewImpact.entityImpact != null) {
                     AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                    RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting((String)SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting((String)SettingsManager.OUTLINE_OPACITY.getValue())));    
+                    RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));    
                 }
             }
 
             value = SettingsManager.SHOW_TRAJECTORY.getValue();
-            if (("TargetIsEntity".equals(value) && previewImpact.entityImpact!=null) || Boolean.TRUE.equals(value)) {
-                int color = SettingsManager.getARGBColorFromSetting((String)SettingsManager.TRAJECTORY_COLOR.getValue(), (String)SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
+            if ((value == Option.State.TARGET_IS_ENTITY && previewImpact.entityImpact!=null) || value == Option.State.ENABLED) {
+                int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
 
                 renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
             }
@@ -198,10 +199,10 @@ public class PtpClient implements ClientModInitializer {
             Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
             Vec3 pos = trajectoryPoints.get(i).add(lerpedDelta);
             Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
-            if(SettingsManager.TRAJECTORY_STYLE.getValueAsString().equals("Dashed")){
+            if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DASHED){
                 dir = dir.scale(0.5);
             }
-            else if(SettingsManager.TRAJECTORY_STYLE.getValueAsString().equals("Dotted")){
+            else if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DOTTED){
                 dir = dir.scale(0.15);
             }
             Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
