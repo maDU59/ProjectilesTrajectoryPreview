@@ -30,8 +30,15 @@ To edit the settings of the mod:
 - Modded items are not yet supported. If you want compatibility with a specific mod, open an issue on Github and suggest it, I'll do my best to add it.
 
 ## 🛑 Usage on servers 
+## 🛑 Usage on servers 
 
 This mod doesn't work on servers to prevent using it as a cheat in PVP. If you want to have it on your custom servers, you still can, just install the mod on both, the client and the server.
+
+## 🆕 Multiplayer-enabled release
+
+Version v1.0.23 of this repository enables the trajectory overlay on multiplayer servers (client-side). If you downloaded a release from the `shellduck8` fork, that build includes this change.
+
+Important: using this feature on servers may violate server rules. The release author (`shellduck8`) is not responsible for any account bans, suspensions, or other penalties that may result from using the mod on multiplayer servers. Use at your own risk and only on servers where you have explicit permission to run it.
 
 ## 📦 Modpack
 
