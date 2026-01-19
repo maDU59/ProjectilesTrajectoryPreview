@@ -330,13 +330,11 @@ public class PtpClient implements ClientModInitializer {
     }
 
     public static boolean isEnabled() {
-        Minecraft client = Minecraft.getInstance();
-        return client.hasSingleplayerServer() || serverHasMod;
+        return true;
     }
 
     public static boolean isEnabled(ProjectileInfo projectileInfo) {
-        Minecraft client = Minecraft.getInstance();
-        return client.hasSingleplayerServer() || serverHasMod || projectileInfo.bypassAntiCheat;
+        return true;
     }
 
     private static void registerKeyMappings() {
