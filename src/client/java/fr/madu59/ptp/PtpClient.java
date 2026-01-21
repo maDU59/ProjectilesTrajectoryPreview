@@ -124,7 +124,7 @@ public class PtpClient implements ClientModInitializer {
         float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
         Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
-        Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
+        Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, pos, eye, handMultiplier, tickProgress);
 
         PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, false);
 
@@ -142,7 +142,7 @@ public class PtpClient implements ClientModInitializer {
             if (!isEnabled(projectileInfo)) continue;
 
             Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
-            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
+            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, pos, eye, handMultiplier, tickProgress);
 
             PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, true);
 
@@ -179,7 +179,7 @@ public class PtpClient implements ClientModInitializer {
         }
     }
 
-    private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, WorldRenderContext context, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
+    private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
 
         float yaw = (float) Math.toRadians(-player.getViewYRot(tickProgress));
         float pitch = (float) Math.toRadians(-player.getViewXRot(tickProgress));
