@@ -48,5 +48,5 @@
   "TARGET_IS_ENTITY": "Only if the target is an entity",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
   "ptp.key.item_drop_trajectory": "Show item drop trajectory",
-  "ptp.key.toggle": "Cycle between the different states of the mod (Enabled/Only if the target is an entity/Disabled)"
+  "ptp.key.toggle": "Toggle trajectories"
 }

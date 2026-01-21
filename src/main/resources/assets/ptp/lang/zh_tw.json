@@ -48,5 +48,5 @@
   "TARGET_IS_ENTITY": "僅當目標為實體時",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
   "ptp.key.item_drop_trajectory": "顯示物品掉落軌跡",
-  "ptp.key.toggle": "切換模組狀態（啟用/僅限目標為實體時/停用）"
+  "ptp.key.toggle": "切換軌跡顯示"
 }

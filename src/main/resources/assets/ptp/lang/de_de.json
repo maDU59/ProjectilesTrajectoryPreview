@@ -48,5 +48,5 @@
   "TARGET_IS_ENTITY": "Nur wenn das Ziel eine Entität ist",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
   "ptp.key.item_drop_trajectory": "Flugbahn fallengelassener Gegenstände anzeigen",
-  "ptp.key.toggle": "Zwischen Mod-Zuständen wechseln (Aktiviert/Nur wenn Ziel ein Wesen ist/Deaktiviert)"
+  "ptp.key.toggle": "Flugbahnen umschalten"
 }

@@ -48,5 +48,5 @@
   "TARGET_IS_ENTITY": "Seulement si la cible est une entité",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
   "ptp.key.item_drop_trajectory": "Afficher la trajectoire de l'objet lâché",
-  "ptp.key.toggle": "Changer l'état du mod (Activé/Uniquement si la cible est une entité/Désactivé)"
+  "ptp.key.toggle": "Afficher/Masquer les trajectoires"
 }
