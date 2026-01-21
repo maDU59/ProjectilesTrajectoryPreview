@@ -47,5 +47,6 @@
   "DOTTED": "Пунктирная",
   "TARGET_IS_ENTITY": "Только если цель является объектом",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
-  "ptp.key.item_drop_trajectory": "Показать траекторию падения предмета"
+  "ptp.key.item_drop_trajectory": "Показать траекторию падения предмета",
+  "ptp.key.toggle": "Переключение состояний мода (Включен/Только если цель — существо/Выключен)"
 }

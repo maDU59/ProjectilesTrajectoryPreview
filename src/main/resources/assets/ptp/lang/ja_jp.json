@@ -47,5 +47,6 @@
   "DOTTED": "点線",
   "TARGET_IS_ENTITY": "ターゲットがエンティティの場合のみ",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
-  "ptp.key.item_drop_trajectory": "アイテムドロップの軌道を表示"
+  "ptp.key.item_drop_trajectory": "アイテムドロップの軌道を表示",
+  "ptp.key.toggle": "モードの状態を切り替え (有効/エンティティのみ/無効)"
 }

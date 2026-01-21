@@ -47,5 +47,6 @@
   "DOTTED": "점선",
   "TARGET_IS_ENTITY": "대상이 엔티티일 경우에만",
   "key.category.ptp.ptp": "Projectiles Trajectory Preview",
-  "ptp.key.item_drop_trajectory": "아이템 드롭 궤적 표시"
+  "ptp.key.item_drop_trajectory": "아이템 드롭 궤적 표시",
+  "ptp.key.toggle": "모드 상태 전환 (활성화/대상이 엔티티인 경우만/비활성화)"
 }

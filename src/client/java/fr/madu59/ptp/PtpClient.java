@@ -20,6 +20,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -50,7 +51,8 @@ public class PtpClient implements ClientModInitializer {
     private static final Minecraft client = Minecraft.getInstance();
     public static final Logger LOGGER = LogManager.getLogger("ptpClient");
     private static boolean serverHasMod = false;
-    private static KeyMapping keyMapping;
+    private static KeyMapping itemDropKey;
+    private static KeyMapping toggleKey;
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
 
 
@@ -84,6 +86,12 @@ public class PtpClient implements ClientModInitializer {
         WorldRenderEvents.AFTER_ENTITIES.register(context -> {
             renderOverlay(context);
         });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (toggleKey.consumeClick()) {
+                SettingsManager.SHOW_TRAJECTORY.setToNextValue();
+            }
+        });
     }
 
     public static void renderOverlay(WorldRenderContext context) {
@@ -93,7 +101,7 @@ public class PtpClient implements ClientModInitializer {
         ItemStack itemStack = player.getMainHandItem();
         int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
 
-        if (keyMapping.isDown()){
+        if (itemDropKey.isDown()){
             showItemTrajectory(context, player, ProjectileInfo.getDropTrajectory(player), handMultiplier);
         }
         else{
@@ -340,10 +348,16 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void registerKeyMappings() {
-        keyMapping = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+        itemDropKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "ptp.key.item_drop_trajectory",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_B,
+            CATEGORY
+        ));
+        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+            "ptp.key.toggle",
+            InputConstants.Type.KEYSYM,
+            InputConstants.UNKNOWN.getValue(),
             CATEGORY
         ));
     }
