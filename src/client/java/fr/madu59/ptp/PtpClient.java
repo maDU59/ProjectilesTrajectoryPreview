@@ -79,7 +79,7 @@ public class PtpClient implements ClientModInitializer {
         // Receive handshake reply
         ClientPlayNetworking.registerGlobalReceiver(HANDSHAKE_S2CPayload.ID,
             (payload, context) -> {
-                LOGGER.info("[PTP] Received handshake from server...");
+                LOGGER.info("[PTP] Received handshake from server!");
                 serverHasMod = true;
         });
         
