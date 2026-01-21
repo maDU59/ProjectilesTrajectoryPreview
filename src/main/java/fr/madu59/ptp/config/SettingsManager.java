@@ -14,7 +14,6 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,12 +21,13 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.fml.loading.FMLPaths;
 
 public class SettingsManager {
 
     public static List<Option<?>> ALL_OPTIONS = new ArrayList<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve(Ptp.MOD_ID + ".json");
+    private static final Path CONFIG_PATH = FMLPaths.CONFIGDIR.get().resolve(Ptp.MOD_ID + ".json");
     private static Map<String, String> loadedSettings = loadSettings();
 
     public static Option<Option.State> SHOW_TRAJECTORY = loadOptionWithDefaults(

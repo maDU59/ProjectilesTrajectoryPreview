@@ -1,39 +1,57 @@
 package fr.madu59.ptp;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.mojang.logging.LogUtils;
 
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 
-public class Ptp implements ModInitializer {
+@Mod(Ptp.MOD_ID)
+public class Ptp{
 	public static final String MOD_ID = "ptp";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final Logger LOGGER = LogUtils.getLogger();
 
-	@Override
-	public void onInitialize() {
-		// This code runs as soon as Minecraft is in a mod-load-ready state.
-		// However, some things (like resources) may still be uninitialized.
-		// Proceed with mild caution.
+	public Ptp(IEventBus modEventBus, ModContainer modContainer) {
 
-		PayloadTypeRegistry.playC2S().register(HANDSHAKE_C2SPayload.ID, HANDSHAKE_C2SPayload.CODEC);
-		PayloadTypeRegistry.playS2C().register(HANDSHAKE_S2CPayload.ID, HANDSHAKE_S2CPayload.CODEC);
-
-		ServerPlayNetworking.registerGlobalReceiver(HANDSHAKE_C2SPayload.ID,
-            (payload, context) -> {
-                // Send back a reply packet
-                ServerPlayNetworking.send(context.player(), new HANDSHAKE_S2CPayload("Is installed on server"));
-				LOGGER.info("[PTP] Sending handshake to player...");
-            });
-
-		LOGGER.info("Hello Fabric world!");
+		modEventBus.addListener(this::registerNetworking);
 	}
+
+	private void registerNetworking(final RegisterPayloadHandlersEvent event) {
+
+        final PayloadRegistrar registrar = event.registrar("ptp"); 
+
+		// Register C2S (Client to Server) Handshake
+		registrar.playToServer(
+			HANDSHAKE_C2SPayload.ID,
+			HANDSHAKE_C2SPayload.CODEC,
+			(payload, context) -> {
+				// context.player() is the player who sent the packet
+				LOGGER.info("[PTP] Sending handshake to player...");
+				
+				// Sending back the S2C reply
+				context.reply(new HANDSHAKE_S2CPayload("Is installed on server"));
+			}
+		);
+
+		// Register S2C (Server to Client) so the client knows how to decode the reply
+		registrar.playToClient(
+			HANDSHAKE_S2CPayload.ID,
+			HANDSHAKE_S2CPayload.CODEC,
+			(payload, context) -> {
+				LOGGER.info("[PTP] Received handashake from server!");
+				PtpClient.serverHasMod = true;
+			}
+		);
+    }
 }

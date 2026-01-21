@@ -11,7 +11,7 @@ public class PtpConfigScreen extends Screen {
 
     private final String INDENT = " ⤷  ";
 
-    protected PtpConfigScreen(Screen parent) {
+    public PtpConfigScreen(Screen parent) {
         super(Component.literal("Projectile Trajectory Preview Config"));
         this.parent = parent;
     }

@@ -9,22 +9,14 @@ import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import fr.madu59.ptp.config.ClientCommands;
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.SettingsManager;
-
+import fr.madu59.ptp.config.configScreen.PtpConfigScreen;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
-import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -44,65 +36,94 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
-public class PtpClient implements ClientModInitializer {
+@Mod(value = Ptp.MOD_ID, dist = Dist.CLIENT)
+@EventBusSubscriber(modid = Ptp.MOD_ID, value = Dist.CLIENT)
+public class PtpClient {
 
-    private static final Minecraft client = Minecraft.getInstance();
     public static final Logger LOGGER = LogManager.getLogger("ptpClient");
-    private static boolean serverHasMod = false;
+    public static boolean serverHasMod = false;
     private static KeyMapping itemDropKey;
     private static KeyMapping toggleKey;
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
 
-
-    @Override
-    public void onInitializeClient() {
-        ClientCommands.register();
-        registerKeyMappings();
-
-        // Reset handshake state on join
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
-            serverHasMod = false;
-
-            // Always enabled in singleplayer
-            if (client.hasSingleplayerServer()) {
-                serverHasMod = true;
-                return;
-            }
-
-            // Send handshake to server
-            ClientPlayNetworking.send(new HANDSHAKE_C2SPayload("Check if is installed on server"));
-            LOGGER.info("[PTP] Sending handshake to server...");
-        });
-
-        // Receive handshake reply
-        ClientPlayNetworking.registerGlobalReceiver(HANDSHAKE_S2CPayload.ID,
-            (payload, context) -> {
-                LOGGER.info("[PTP] Received handshake from server...");
-                serverHasMod = true;
-        });
-        
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
-            renderOverlay(context);
-        });
-
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (toggleKey.consumeClick()) {
-                SettingsManager.SHOW_TRAJECTORY.setToNextValue();
-            }
+    public PtpClient(ModContainer container){
+        container.registerExtensionPoint(IConfigScreenFactory.class, (client, parent) -> {
+            return new PtpConfigScreen(parent);
         });
     }
 
-    public static void renderOverlay(WorldRenderContext context) {
-        Player player = client.player;
+    @SubscribeEvent
+    static void onClientSetup(FMLClientSetupEvent event) {
+
+    }
+
+    @SubscribeEvent
+    static void onServerJoin(ClientPlayerNetworkEvent.LoggingIn event){
+        serverHasMod = false;
+
+        // Always enabled in singleplayer
+        if (Minecraft.getInstance().hasSingleplayerServer()) {
+            serverHasMod = true;
+            return;
+        }
+
+        // Send handshake to server
+        ClientPacketDistributor.sendToServer(new HANDSHAKE_C2SPayload("Check if is installed on server"));
+        LOGGER.info("[PTP] Sending handshake to server...");
+    }
+
+    @SubscribeEvent
+    public static void onRenderLevelStage(RenderLevelStageEvent.AfterEntities event) {
+        renderOverlay(event); 
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(ClientTickEvent.Post event) {
+        while (toggleKey.consumeClick()) {
+            SettingsManager.SHOW_TRAJECTORY.setToNextValue();
+        }
+    }
+
+    @SubscribeEvent
+    private static void registerKeyMappings(RegisterKeyMappingsEvent event) {
+        itemDropKey = new KeyMapping(
+            "ptp.key.item_drop_trajectory",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_B,
+            CATEGORY
+        );
+        event.register(itemDropKey);
+        toggleKey = new KeyMapping(
+            "ptp.key.toggle",
+            InputConstants.Type.KEYSYM,
+            InputConstants.UNKNOWN.getValue(),
+            CATEGORY
+        );
+        event.register(toggleKey);
+    }
+
+    public static void renderOverlay(RenderLevelStageEvent.AfterEntities event) {
+        Player player = Minecraft.getInstance().player;
         if (player == null) return;
 
         ItemStack itemStack = player.getMainHandItem();
-        int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
+        int handMultiplier = Minecraft.getInstance().options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
 
         if (itemDropKey.isDown()){
-            showItemTrajectory(context, player, ProjectileInfo.getDropTrajectory(player), handMultiplier);
+            showItemTrajectory(event, player, ProjectileInfo.getDropTrajectory(player), handMultiplier);
         }
         else{
             List<ProjectileInfo> projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, true);
@@ -115,26 +136,26 @@ public class PtpClient implements ClientModInitializer {
 
                 if(projectileInfoList.isEmpty()) return;
             }
-            showProjectileTrajectory(context, player, projectileInfoList, handMultiplier);
+            showProjectileTrajectory(event, player, projectileInfoList, handMultiplier);
         }
     }
 
-    private static void showItemTrajectory(WorldRenderContext context, Player player, ProjectileInfo projectileInfo, int handMultiplier) {
+    private static void showItemTrajectory(RenderLevelStageEvent.AfterEntities event, Player player, ProjectileInfo projectileInfo, int handMultiplier) {
         if(!isEnabled(projectileInfo)) return;
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
         Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
-        Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
+        Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, pos, eye, handMultiplier, tickProgress);
 
         PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, false);
 
         int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), null);
 
-        renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
+        renderTrajectory(event, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
     }
 
-    private static void showProjectileTrajectory(WorldRenderContext context, Player player, List<ProjectileInfo> projectileInfoList, int handMultiplier) {
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+    private static void showProjectileTrajectory(RenderLevelStageEvent.AfterEntities event, Player player, List<ProjectileInfo> projectileInfoList, int handMultiplier) {
+        float tickProgress = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
 
         for(ProjectileInfo projectileInfo : projectileInfoList){
@@ -142,7 +163,7 @@ public class PtpClient implements ClientModInitializer {
             if (!isEnabled(projectileInfo)) continue;
 
             Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
-            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, context, pos, eye, handMultiplier, tickProgress);
+            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, pos, eye, handMultiplier, tickProgress);
 
             PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, true);
 
@@ -153,11 +174,11 @@ public class PtpClient implements ClientModInitializer {
                 if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
                     if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                         BlockPos impactPos = blockHitResult.getBlockPos();
-                        RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
+                        RenderUtils.renderFilledBox(event, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
                     }
                     else if(previewImpact.entityImpact != null) {
                         AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                        RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                        RenderUtils.renderFilledBox(event, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
                     }
                 }
 
@@ -165,21 +186,21 @@ public class PtpClient implements ClientModInitializer {
                 if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
                     if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                         BlockPos impactPos = blockHitResult.getBlockPos();
-                        RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
+                        RenderUtils.renderBox(event, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
                     }
                     else if(previewImpact.entityImpact != null) {
                         AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                        RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));    
+                        RenderUtils.renderBox(event, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));    
                     }
                 }
                 int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
 
-                renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
+                renderTrajectory(event, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
             }
         }
     }
 
-    private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, WorldRenderContext context, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
+    private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
 
         float yaw = (float) Math.toRadians(-player.getViewYRot(tickProgress));
         float pitch = (float) Math.toRadians(-player.getViewXRot(tickProgress));
@@ -188,16 +209,16 @@ public class PtpClient implements ClientModInitializer {
         Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3 right = forward.cross(up).normalize();
 
-        if(client.gameRenderer.getMainCamera().isDetached()) offset = offset.scale(0);
+        if(Minecraft.getInstance().gameRenderer.getMainCamera().isDetached()) offset = offset.scale(0);
 
         return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
     }
 
-    private static void renderTrajectory(WorldRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
+    private static void renderTrajectory(RenderLevelStageEvent.AfterEntities event, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
 
-        VertexConsumer lineConsumer = context.consumers().getBuffer(RenderTypes.lines());
-        Vec3 cam = client.gameRenderer.getMainCamera().position();
-        PoseStack matrices = context.matrices();
+        VertexConsumer lineConsumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+        Vec3 cam = Minecraft.getInstance().gameRenderer.getMainCamera().position();
+        PoseStack matrices = event.getPoseStack();
         matrices.pushPose();
         matrices.translate(-cam.x, -cam.y, -cam.z);
 
@@ -263,7 +284,7 @@ public class PtpClient implements ClientModInitializer {
 
             AABB box = new AABB(prevPos, pos).inflate(1.0);
 
-            List<Entity> entities = client.level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
+            List<Entity> entities = Minecraft.getInstance().level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
 
             Entity closest = null;
             double closestDistance = 99999.0;
@@ -337,27 +358,10 @@ public class PtpClient implements ClientModInitializer {
     }
 
     public static boolean isEnabled() {
-        Minecraft client = Minecraft.getInstance();
-        return client.hasSingleplayerServer() || serverHasMod;
+        return Minecraft.getInstance().hasSingleplayerServer() || serverHasMod;
     }
 
     public static boolean isEnabled(ProjectileInfo projectileInfo) {
-        Minecraft client = Minecraft.getInstance();
-        return client.hasSingleplayerServer() || serverHasMod || projectileInfo.bypassAntiCheat;
-    }
-
-    private static void registerKeyMappings() {
-        itemDropKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "ptp.key.item_drop_trajectory",
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_B,
-            CATEGORY
-        ));
-        toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "ptp.key.toggle",
-            InputConstants.Type.KEYSYM,
-            InputConstants.UNKNOWN.getValue(),
-            CATEGORY
-        ));
+        return Minecraft.getInstance().hasSingleplayerServer() || serverHasMod || projectileInfo.bypassAntiCheat;
     }
 }
