@@ -1,8 +1,9 @@
 package fr.madu59.ptp.config.configScreen;
 
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+import static net.minecraft.commands.Commands.literal;
 import fr.madu59.ptp.config.SettingsManager;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -20,16 +21,15 @@ public class PtpConfigScreen extends Screen {
         this.parent = parent;
     }
 
-    public static void registerCommand() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(
-                literal("ptpConfig")
-                    .executes(context -> {
-                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new PtpConfigScreen(null)));
+    @SubscribeEvent
+    public static void onRegisterClientCommands(RegisterClientCommandsEvent event) {
+        event.getDispatcher().register(
+            literal("ptpConfig")
+                .executes(context -> {
+                    Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new PtpConfigScreen(null)));
                         return 1;
-                    })
-            );
-        });
+                })
+        );
     }
 
     @Override

@@ -38,6 +38,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
@@ -59,7 +61,8 @@ public class PtpClient {
     private static KeyMapping toggleKey;
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
 
-    public PtpClient(ModContainer container){
+    public PtpClient(ModContainer container, IEventBus bus){
+        NeoForge.EVENT_BUS.register(PtpConfigScreen.class);
         container.registerExtensionPoint(IConfigScreenFactory.class, (client, parent) -> {
             return new PtpConfigScreen(parent);
         });
