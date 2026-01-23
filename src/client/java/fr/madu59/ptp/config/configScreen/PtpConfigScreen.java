@@ -11,8 +11,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public class PtpConfigScreen extends Screen {
+    
     private MyConfigListWidget list;
-
+    private final Screen parent;
     private final String INDENT = " ⤷  ";
 
     public PtpConfigScreen(Screen parent) {
@@ -31,8 +32,6 @@ public class PtpConfigScreen extends Screen {
             );
         });
     }
-
-    private final Screen parent;
 
     @Override
     protected void init() {
