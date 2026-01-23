@@ -9,10 +9,9 @@ import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import fr.madu59.ptp.config.ClientCommands;
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.SettingsManager;
-
+import fr.madu59.ptp.config.configScreen.PtpConfigScreen;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -58,7 +57,7 @@ public class PtpClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ClientCommands.register();
+        PtpConfigScreen.registerCommand();
         registerKeyMappings();
 
         // Reset handshake state on join

@@ -1,6 +1,10 @@
 package fr.madu59.ptp.config.configScreen;
 
 import fr.madu59.ptp.config.SettingsManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -11,9 +15,21 @@ public class PtpConfigScreen extends Screen {
 
     private final String INDENT = " ⤷  ";
 
-    protected PtpConfigScreen(Screen parent) {
+    public PtpConfigScreen(Screen parent) {
         super(Component.literal("Projectile Trajectory Preview Config"));
         this.parent = parent;
+    }
+
+    public static void registerCommand() {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
+                literal("ptpConfig")
+                    .executes(context -> {
+                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new PtpConfigScreen(null)));
+                        return 1;
+                    })
+            );
+        });
     }
 
     private final Screen parent;
