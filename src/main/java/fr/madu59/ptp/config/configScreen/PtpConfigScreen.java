@@ -1,14 +1,18 @@
 package fr.madu59.ptp.config.configScreen;
 
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*;
 import fr.madu59.ptp.config.SettingsManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public class PtpConfigScreen extends Screen {
+    
     private MyConfigListWidget list;
-
+    private final Screen parent;
     private final String INDENT = " ⤷  ";
 
     public PtpConfigScreen(Screen parent) {
@@ -16,7 +20,17 @@ public class PtpConfigScreen extends Screen {
         this.parent = parent;
     }
 
-    private final Screen parent;
+    public static void registerCommand() {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+            dispatcher.register(
+                literal("ptpConfig")
+                    .executes(context -> {
+                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new PtpConfigScreen(null)));
+                        return 1;
+                    })
+            );
+        });
+    }
 
     @Override
     protected void init() {
