@@ -40,12 +40,12 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         this.addEntry(new ButtonEntry(Button.builder(Component.literal(name), onPress).bounds(0, 0, 100, 20).build(), null, ""));
     }
 
-    public void addButton(Option<?> option, Button.OnPress onPress) {
-        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), onPress).bounds(0, 0, 100, 20).build(), option, ""));
+    public void addButton(Option<?> option) {
+        addButton(option, "");
     }
 
-    public void addButton(Option<?> option, Button.OnPress onPress, String indent) {
-        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), onPress).bounds(0, 0, 100, 20).build(), option, indent));
+    public void addButton(Option<?> option, String indent) {
+        this.addEntry(new ButtonEntry(Button.builder(Component.literal(option.getValueAsTranslatedString()), btn -> {option.setToNextValue();}).bounds(0, 0, 100, 20).build(), option, indent));
     }
 
     public <N extends Number> void addSlider(Option<N> option, N min, N max, N step) {

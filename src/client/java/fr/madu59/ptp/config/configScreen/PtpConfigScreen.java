@@ -41,41 +41,19 @@ public class PtpConfigScreen extends Screen {
 
         // Example: Add categories + buttons
         list.addCategory("ptp.config.trajectory-previsualization");
-        list.addButton(SettingsManager.SHOW_TRAJECTORY, btn -> {
-            SettingsManager.SHOW_TRAJECTORY.setToNextValue();
-        });
-        list.addButton(SettingsManager.TRAJECTORY_COLOR, btn -> {
-            SettingsManager.TRAJECTORY_COLOR.setToNextValue();
-        }, INDENT);
-        list.addButton(SettingsManager.TRAJECTORY_OPACITY, btn -> {
-            SettingsManager.TRAJECTORY_OPACITY.setToNextValue();
-        }, INDENT);
-        list.addButton(SettingsManager.TRAJECTORY_STYLE, btn -> {
-            SettingsManager.TRAJECTORY_STYLE.setToNextValue();
-        }, INDENT);
-        list.addButton(SettingsManager.ENABLE_OFFHAND, btn -> {
-            SettingsManager.ENABLE_OFFHAND.setToNextValue();
-        }, INDENT);
+        list.addButton(SettingsManager.SHOW_TRAJECTORY);
+        list.addButton(SettingsManager.TRAJECTORY_COLOR, INDENT);
+        list.addButton(SettingsManager.TRAJECTORY_OPACITY, INDENT);
+        list.addButton(SettingsManager.TRAJECTORY_STYLE, INDENT);
+        list.addButton(SettingsManager.ENABLE_OFFHAND, INDENT);
         list.addCategory("ptp.config.target-outlining");
-        list.addButton(SettingsManager.OUTLINE_TARGETS, btn -> {
-            SettingsManager.OUTLINE_TARGETS.setToNextValue();
-        });
-        list.addButton(SettingsManager.OUTLINE_COLOR, btn -> {
-            SettingsManager.OUTLINE_COLOR.setToNextValue();
-        }, INDENT);
-        list.addButton(SettingsManager.OUTLINE_OPACITY, btn -> {
-            SettingsManager.OUTLINE_OPACITY.setToNextValue();
-        }, INDENT);
+        list.addButton(SettingsManager.OUTLINE_TARGETS);
+        list.addButton(SettingsManager.OUTLINE_COLOR, INDENT);
+        list.addButton(SettingsManager.OUTLINE_OPACITY, INDENT);
         list.addCategory("ptp.config.target-highlighting");
-        list.addButton(SettingsManager.HIGHLIGHT_TARGETS, btn -> {
-            SettingsManager.HIGHLIGHT_TARGETS.setToNextValue();
-        });
-        list.addButton(SettingsManager.HIGHLIGHT_COLOR, btn -> {
-            SettingsManager.HIGHLIGHT_COLOR.setToNextValue();
-        }, INDENT);
-        list.addButton(SettingsManager.HIGHLIGHT_OPACITY, btn -> {
-            SettingsManager.HIGHLIGHT_OPACITY.setToNextValue();
-        }, INDENT);
+        list.addButton(SettingsManager.HIGHLIGHT_TARGETS);
+        list.addButton(SettingsManager.HIGHLIGHT_COLOR, INDENT);
+        list.addButton(SettingsManager.HIGHLIGHT_OPACITY, INDENT);
 
         Button doneButton = Button.builder(Component.literal("Done"), b -> {
             this.minecraft.setScreen(this.parent);
