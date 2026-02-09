@@ -297,6 +297,9 @@ public class SettingsManager {
         else if (defaultValue instanceof Float){
             return (T) Float.valueOf(loadedSettings.get(key));
         }
+        else if (defaultValue instanceof Boolean){
+            return (T) (Boolean) Boolean.parseBoolean(loadedSettings.get(key));
+        }
         else return null;
     }
 
