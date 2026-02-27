@@ -20,9 +20,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.HumanoidArm;
@@ -59,7 +59,7 @@ public class PtpClient {
     public static boolean serverHasMod = false;
     private static KeyMapping itemDropKey;
     private static KeyMapping toggleKey;
-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("ptp", "ptp"));
 
     public PtpClient(ModContainer container, IEventBus bus){
         NeoForge.EVENT_BUS.register(PtpConfigScreen.class);
@@ -219,7 +219,7 @@ public class PtpClient {
 
     private static void renderTrajectory(RenderLevelStageEvent.AfterEntities event, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
 
-        VertexConsumer lineConsumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderTypes.lines());
+        VertexConsumer lineConsumer = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.lines());
         Vec3 cam = Minecraft.getInstance().gameRenderer.getMainCamera().position();
         PoseStack matrices = event.getPoseStack();
         matrices.pushPose();
