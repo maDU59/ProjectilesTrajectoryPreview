@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting": "대상 강조 표시",
   "ptp.config.enabled": "활성",
   "ptp.config.disabled": "비활성",
+  "ptp.config.projectile-toggle": "아이템별 토글",
 
   "ENABLED": "활성",
   "DISABLED": "비활성",

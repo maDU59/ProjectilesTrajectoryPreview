@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting": "SURLIGNAGE DES CIBLES",
   "ptp.config.enabled":"Activé",
   "ptp.config.disabled":"Désactivé",
+  "ptp.config.projectile-toggle": "ACTIVATION PAR OBJET",
 
   "ENABLED": "Activé",
   "DISABLED": "Désactivé",

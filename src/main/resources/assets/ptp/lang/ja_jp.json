@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting": "ターゲットのハイライト",
   "ptp.config.enabled": "有効",
   "ptp.config.disabled": "無効",
+  "ptp.config.projectile-toggle": "アイテムごとに切り替え",
 
   "ENABLED": "有効",
   "DISABLED": "無効",

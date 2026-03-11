@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting":"ВЫДЕЛЕНИЕ ЦЕЛИ",
   "ptp.config.enabled":"Включено",
   "ptp.config.disabled":"Выключено",
+  "ptp.config.projectile-toggle": "ПЕРЕКЛЮЧАТЕЛЬ ДЛЯ КАЖДОГО ПРЕДМЕТА",
 
   "ENABLED": "Включено",
   "DISABLED": "Выключено",

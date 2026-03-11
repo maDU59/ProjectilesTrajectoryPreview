@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting":"TARGET HIGHLIGHTING",
   "ptp.config.enabled":"Enabled",
   "ptp.config.disabled":"Disabled",
+  "ptp.config.projectile-toggle":"PER ITEM TOGGLE",
 
   "ENABLED": "Enabled",
   "DISABLED": "Disabled",

@@ -54,6 +54,18 @@ public class PtpConfigScreen extends Screen {
         list.addButton(SettingsManager.HIGHLIGHT_TARGETS);
         list.addButton(SettingsManager.HIGHLIGHT_COLOR, INDENT);
         list.addButton(SettingsManager.HIGHLIGHT_OPACITY, INDENT);
+        list.addCategory("ptp.config.projectile-toggle");
+        list.addButton(SettingsManager.TOGGLE_BOW);
+        list.addButton(SettingsManager.TOGGLE_CROSSBOW);
+        list.addButton(SettingsManager.TOGGLE_TRIDENT);
+        list.addButton(SettingsManager.TOGGLE_ENDERPEARL);
+        list.addButton(SettingsManager.TOGGLE_SNOWBALL);
+        list.addButton(SettingsManager.TOGGLE_EGG);
+        list.addButton(SettingsManager.TOGGLE_WINDCHARGE);
+        list.addButton(SettingsManager.TOGGLE_POTION);
+        list.addButton(SettingsManager.TOGGLE_EXPPOTION);
+        list.addButton(SettingsManager.TOGGLE_FISHINGROD);
+
 
         Button doneButton = Button.builder(Component.literal("Done"), b -> {
             this.minecraft.setScreen(this.parent);

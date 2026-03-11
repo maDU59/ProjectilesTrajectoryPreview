@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.madu59.ptp.ProjectileInfo;
+import fr.madu59.ptp.config.SettingsManager;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -90,7 +91,7 @@ public class ProjectileInfo {
 
         Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
 
-        if (item instanceof BowItem) {
+        if (item instanceof BowItem && SettingsManager.TOGGLE_BOW.getValue()) {
             
 
             int useTicks = player.getTicksUsingItem();
@@ -101,7 +102,7 @@ public class ProjectileInfo {
 
             if(pull >= 0.1) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG, bypassAntiCheat));
 
-        } else if (item instanceof CrossbowItem) {
+        } else if (item instanceof CrossbowItem && SettingsManager.TOGGLE_CROSSBOW.getValue()) {
 
             
 
@@ -133,7 +134,7 @@ public class ProjectileInfo {
                 }
             }
             
-        } else if (item instanceof TridentItem) {
+        } else if (item instanceof TridentItem && SettingsManager.TOGGLE_TRIDENT.getValue()) {
 
             waterDrag = 0.99;
 
@@ -144,7 +145,7 @@ public class ProjectileInfo {
 
             if(useTicks >= TridentItem.THROW_THRESHOLD_TIME && !hasEnchantment(itemStack, Enchantments.RIPTIDE)) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG, bypassAntiCheat));
             
-        } else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderpearlItem) {
+        } else if ((item instanceof SnowballItem && SettingsManager.TOGGLE_SNOWBALL.getValue()) || (item instanceof EggItem && SettingsManager.TOGGLE_EGG.getValue()) || (item instanceof EnderpearlItem && SettingsManager.TOGGLE_ENDERPEARL.getValue())) {
 
             bypassAntiCheat = item instanceof EnderpearlItem;
             waterDrag = 0.8;
@@ -155,7 +156,7 @@ public class ProjectileInfo {
 
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDM, bypassAntiCheat));
             
-        } else if (item instanceof WindChargeItem) {
+        } else if (item instanceof WindChargeItem && SettingsManager.TOGGLE_WINDCHARGE.getValue()) {
 
             
 
@@ -168,7 +169,7 @@ public class ProjectileInfo {
 
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG, bypassAntiCheat));
             
-        } else if (item instanceof ThrowablePotionItem) {
+        } else if (item instanceof ThrowablePotionItem && SettingsManager.TOGGLE_POTION.getValue()) {
 
             
 
@@ -181,7 +182,7 @@ public class ProjectileInfo {
 
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDM, bypassAntiCheat));
             
-        }  else if (item instanceof ExperienceBottleItem) {
+        }  else if (item instanceof ExperienceBottleItem && SettingsManager.TOGGLE_EXPPOTION.getValue()) {
 
             gravity = 0.07;
             waterDrag = 0.8;
@@ -194,7 +195,7 @@ public class ProjectileInfo {
 
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDM, true));
             
-        }  else if (item instanceof FishingRodItem && player.fishing == null) {
+        }  else if (item instanceof FishingRodItem && player.fishing == null && SettingsManager.TOGGLE_FISHINGROD.getValue()) {
 
             float f = player.getXRot();
             float g = player.getYRot();

@@ -1,6 +1,8 @@
 package fr.madu59.ptp.config.configScreen;
 
 import java.util.List;
+
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -127,7 +129,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             Font textRenderer = Minecraft.getInstance().font;
             int textX = getContentX() + getContentWidth() / 2;
             int textY = getContentY() + (getContentHeight() - textRenderer.lineHeight) / 2;
-            context.drawCenteredString(textRenderer, Component.translatable(this.name), textX, textY, 0xFFFFFFFF);
+            context.drawCenteredString(textRenderer, Component.translatable(this.name).withStyle(ChatFormatting.UNDERLINE), textX, textY, 0xFFFFFFFF);
         }  
 
         @Override

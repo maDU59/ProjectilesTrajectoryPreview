@@ -107,6 +107,76 @@ public class SettingsManager {
         false
     );
 
+    public static Option<Boolean> TOGGLE_BOW = loadOptionWithDefaults(
+        "TOGGLE_BOW",
+        "item.minecraft.bow",
+        "ptp.config.toggle_bow_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_CROSSBOW = loadOptionWithDefaults(
+        "TOGGLE_CROSSBOW",
+        "item.minecraft.crossbow",
+        "ptp.config.toggle_crossbow_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_TRIDENT = loadOptionWithDefaults(
+        "TOGGLE_TRIDENT",
+        "item.minecraft.trident",
+        "ptp.config.toggle_trident_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_ENDERPEARL = loadOptionWithDefaults(
+        "TOGGLE_ENDERPEARL",
+        "item.minecraft.ender_pearl",
+        "ptp.config.toggle_enderpearl_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_SNOWBALL = loadOptionWithDefaults(
+        "TOGGLE_SNOWBALL",
+        "item.minecraft.snowball",
+        "ptp.config.toggle_snowball_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_EGG = loadOptionWithDefaults(
+        "TOGGLE_EGG",
+        "item.minecraft.egg",
+        "ptp.config.toggle_egg_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_WINDCHARGE = loadOptionWithDefaults(
+        "TOGGLE_WINDCHARGE",
+        "item.minecraft.wind_charge",
+        "ptp.config.toggle_windcharge_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_POTION = loadOptionWithDefaults(
+        "TOGGLE_POTION",
+        "item.minecraft.splash_potion",
+        "ptp.config.toggle_potion_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_EXPPOTION = loadOptionWithDefaults(
+        "TOGGLE_EXPPOTION",
+        "item.minecraft.experience_bottle",
+        "ptp.config.toggle_exppotion_desc",
+        true
+    );
+
+    public static Option<Boolean> TOGGLE_FISHINGROD = loadOptionWithDefaults(
+        "TOGGLE_FISHINGROD",
+        "item.minecraft.fishing_rod",
+        "ptp.config.toggle_fishingrod_desc",
+        true
+    );
+
     public static List<String> getAllOptionsId(){
         List<String> list = new ArrayList<>();
         for (Option<?> option : ALL_OPTIONS){

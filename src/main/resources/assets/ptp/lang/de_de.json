@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting": "ZIELHERVORHEBUNG",
   "ptp.config.enabled": "Aktiviert",
   "ptp.config.disabled": "Deaktiviert",
+  "ptp.config.projectile-toggle": "PRO GEGENSTAND UMSCHALTEN",
 
   "ENABLED": "Aktiviert",
   "DISABLED": "Deaktiviert",

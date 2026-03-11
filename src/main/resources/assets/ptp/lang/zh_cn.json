@@ -26,6 +26,7 @@
   "ptp.config.target-highlighting": "目标高亮",
   "ptp.config.enabled": "已启用",
   "ptp.config.disabled": "已禁用",
+  "ptp.config.projectile-toggle": "按物品切换",
 
   "ENABLED": "已启用",
   "DISABLED": "已禁用",
