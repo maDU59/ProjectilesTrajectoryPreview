@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
@@ -125,11 +125,11 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             Font textRenderer = Minecraft.getInstance().font;
             int textX = getContentX() + getContentWidth() / 2;
             int textY = getContentY() + (getContentHeight() - textRenderer.lineHeight) / 2;
-            context.drawCenteredString(textRenderer, Component.translatable(this.name).withStyle(ChatFormatting.UNDERLINE), textX, textY, 0xFFFFFFFF);
+            context.centeredText(textRenderer, Component.translatable(this.name).withStyle(ChatFormatting.UNDERLINE), textX, textY, 0xFFFFFFFF);
         }  
 
         @Override
@@ -160,15 +160,15 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
             this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
-            this.button.render(context, mouseX, mouseY, tickDelta);
+            this.button.extractRenderState(context, mouseX, mouseY, tickDelta);
 
             if(this.name == null) return;
 
             Font textRenderer = Minecraft.getInstance().font;
-            context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
+            context.text(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override
@@ -209,15 +209,15 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void extractContent(GuiGraphicsExtractor context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             this.slider.setY(this.getContentY() + (this.getContentHeight() - this.slider.getHeight()) / 2);
             this.slider.setX(this.getContentWidth() - this.slider.getWidth() - 10);
-            this.slider.render(context, mouseX, mouseY, tickDelta);
+            this.slider.extractRenderState(context, mouseX, mouseY, tickDelta);
 
             if(this.name == null) return;
 
             Font textRenderer = Minecraft.getInstance().font;
-            context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
+            context.text(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override

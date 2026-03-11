@@ -6,7 +6,7 @@ import org.joml.Vector3f;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.Vec3;
@@ -16,28 +16,28 @@ public class RenderUtils {
     private static final float LINE_WIDTH = 2.0f;
     private static final Minecraft client = Minecraft.getInstance();
 
-    public static void renderFilledBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        PoseStack matrices = context.matrices();
+    public static void renderFilledBox(LevelRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
+        PoseStack matrices = context.poseStack();
         Vec3 camera = client.gameRenderer.getMainCamera().position();
 
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderTypes.debugFilledBox());
+        VertexConsumer quadConsumer = context.bufferSource().getBuffer(RenderTypes.debugFilledBox());
 
         addChainedFilledBoxVertices(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         matrices.popPose();
     }
 
-    public static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        PoseStack matrices = context.matrices();
+    public static void renderBox(LevelRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
+        PoseStack matrices = context.poseStack();
         Vec3 camera = client.gameRenderer.getMainCamera().position();
 
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        VertexConsumer quadConsumer = context.consumers().getBuffer(RenderTypes.lines());
+        VertexConsumer quadConsumer = context.bufferSource().getBuffer(RenderTypes.lines());
 
         renderLineBox(matrices.last(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 

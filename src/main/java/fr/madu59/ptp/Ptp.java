@@ -24,8 +24,8 @@ public class Ptp implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		PayloadTypeRegistry.playC2S().register(HANDSHAKE_C2SPayload.ID, HANDSHAKE_C2SPayload.CODEC);
-		PayloadTypeRegistry.playS2C().register(HANDSHAKE_S2CPayload.ID, HANDSHAKE_S2CPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(HANDSHAKE_C2SPayload.ID, HANDSHAKE_C2SPayload.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(HANDSHAKE_S2CPayload.ID, HANDSHAKE_S2CPayload.CODEC);
 
 		ServerPlayNetworking.registerGlobalReceiver(HANDSHAKE_C2SPayload.ID,
             (payload, context) -> {

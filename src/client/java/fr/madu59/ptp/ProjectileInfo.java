@@ -22,6 +22,7 @@ import net.minecraft.world.item.ExperienceBottleItem;
 import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SnowballItem;
 import net.minecraft.world.item.ThrowablePotionItem;
@@ -112,12 +113,12 @@ public class ProjectileInfo {
             ChargedProjectiles chargedProjectilesComponent = itemStack.get(DataComponents.CHARGED_PROJECTILES);
 
             if(chargedProjectilesComponent != null){
-                for (ItemStack projectile : chargedProjectilesComponent.getItems()) {
+                for (ItemStackTemplate projectile : chargedProjectilesComponent.items()) {
                     if (projectile.is(Items.FIREWORK_ROCKET)) {
                         vel = player.getViewVector(tickProgress).scale(1.6F);
                         gravity = 0;
                         waterDrag = drag;
-                    } else if (projectile.getItem() instanceof ArrowItem) {
+                    } else if (projectile.item() instanceof ArrowItem) {
                         
                     }
                 }
