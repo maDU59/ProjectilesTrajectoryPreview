@@ -149,7 +149,7 @@ public class PtpClient implements ClientModInitializer {
             if ((value == Option.State.TARGET_IS_ENTITY && previewImpact.entityImpact!=null) || value == Option.State.ENABLED) {
 
                 value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
-                if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
+                if(value != Option.State.DISABLED){
                     if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                         BlockPos impactPos = blockHitResult.getBlockPos();
                         RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
@@ -161,7 +161,7 @@ public class PtpClient implements ClientModInitializer {
                 }
 
                 value = SettingsManager.OUTLINE_TARGETS.getValue();
-                if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
+                if(value != Option.State.DISABLED){
                     if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                         BlockPos impactPos = blockHitResult.getBlockPos();
                         RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
@@ -327,7 +327,7 @@ public class PtpClient implements ClientModInitializer {
                 break;
             }
 
-            if (pos.y < player.level().getMinY() - 20) 
+            if (pos.y < player.level().getMinY() - 120) 
                 break;
 
             prevPos = pos;
