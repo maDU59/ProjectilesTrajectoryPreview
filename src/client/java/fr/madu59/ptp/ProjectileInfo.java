@@ -94,7 +94,6 @@ public class ProjectileInfo {
 
         if (item instanceof BowItem && SettingsManager.TOGGLE_BOW.getValue()) {
             
-
             int useTicks = player.getTicksUsingItem();
             float pull = BowItem.getPowerForTime(useTicks);
 
@@ -104,8 +103,6 @@ public class ProjectileInfo {
             if(pull >= 0.1) projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG, bypassAntiCheat));
 
         } else if (item instanceof CrossbowItem && SettingsManager.TOGGLE_CROSSBOW.getValue()) {
-
-            
 
             Vec3 vel = player.getViewVector(tickProgress).scale(3.15);
             Vec3 offset = new Vec3(0, -0.06, 0.03);
@@ -159,8 +156,6 @@ public class ProjectileInfo {
             
         } else if (item instanceof WindChargeItem && SettingsManager.TOGGLE_WINDCHARGE.getValue()) {
 
-            
-
             gravity = 0;
             drag = 0.95;
             waterDrag = 0.8;
@@ -171,8 +166,6 @@ public class ProjectileInfo {
             projectileInfoList.add(new ProjectileInfo(gravity, drag, vel, offset, position, false, waterDrag, ORDER_MDG, bypassAntiCheat));
             
         } else if (item instanceof ThrowablePotionItem && SettingsManager.TOGGLE_POTION.getValue()) {
-
-            
 
             waterDrag = 0.8;
 

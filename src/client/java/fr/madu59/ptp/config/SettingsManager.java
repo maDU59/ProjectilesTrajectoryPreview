@@ -12,7 +12,6 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.world.entity.AgeableMob;
@@ -221,15 +220,6 @@ public class SettingsManager {
     @SuppressWarnings("unchecked")
     private static <T> void setOptionValueHelper(Option<T> option, Object value) {
         option.setValue((T) value);
-    }
-
-    public static <T> List<String> getOptionPossibleValues(String optionId){
-        for (Option<?> option : ALL_OPTIONS){
-            if (option.getId().equalsIgnoreCase(optionId)){
-                return option.getPossibleValues().stream().map(Object::toString).collect(Collectors.toList());
-            }
-        }
-        return Collections.emptyList();
     }
 
     public static int getARGBColorFromSetting(Option.Color color, Option.Opacity opacitySetting, Entity entity) {
