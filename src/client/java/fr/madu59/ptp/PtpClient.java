@@ -71,8 +71,13 @@ public class PtpClient implements ClientModInitializer {
             }
 
             // Send handshake to server
-            ClientPlayNetworking.send(new HANDSHAKE_C2SPayload("Check if is installed on server"));
-            LOGGER.info("[PTP] Sending handshake to server...");
+            if(ClientPlayNetworking.canSend(HANDSHAKE_C2SPayload.ID)) {
+                LOGGER.info("[PTP] Sending handshake to server...");
+                ClientPlayNetworking.send(new HANDSHAKE_C2SPayload("Check if is installed on server"));
+            }
+            else{
+                LOGGER.info("[PTP] Can't send handshake to server! Server mod might be too old or missing.");
+            }
         });
 
         // Receive handshake reply
