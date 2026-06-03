@@ -259,10 +259,10 @@ public class PtpClient implements ClientModInitializer {
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
             
-            for (int order : projectileInfo.order){
-                if (order == 0) pos = pos.add(vel);
-                else if (order == 1) vel = vel.scale(drag);
-                else if (order == 2) vel = vel.subtract(0, gravity, 0);
+            for (PhysicsStep order : projectileInfo.order.steps()){
+                if (order == PhysicsStep.POSITION) pos = pos.add(vel);
+                else if (order == PhysicsStep.DRAG) vel = vel.scale(drag);
+                else if (order == PhysicsStep.GRAVITY) vel = vel.subtract(0, gravity, 0);
             }
 
             AABB box = new AABB(prevPos, pos).inflate(1.0);
