@@ -19,7 +19,7 @@ public class ProjectileData {
      * Registers a projectile with the given ID and info.
      * @param id The unique identifier for the projectile (e.g., "minecraft:arrow").
      * @param info The ProjectileInfo containing physics parameters and update order.
-     * @since 1.0.29
+     * @since 1.0.30
      */
     public static void registerProjectile(Identifier id, ProjectileInfo info) {
         projectileInfoMap.put(id, info);
@@ -28,7 +28,7 @@ public class ProjectileData {
     /*
      * Adds a projectile ID to the blacklisted list, it will prevent it from showing a trajectory.
      * @param id The unique identifier for the projectile.
-     * @since 1.0.29
+     * @since 1.0.30
      */
     public static void blacklistProjectile(Identifier id) {
         blacklistedProjectiles.add(id);
@@ -38,7 +38,7 @@ public class ProjectileData {
      * Retrieves the ProjectileInfo for a given projectile ID.
      * @param id The unique identifier for the projectile.
      * @return The ProjectileInfo associated with the ID, or null if not found.
-     * @since 1.0.29
+     * @since 1.0.30
      */
     @ApiStatus.Internal
     public static ProjectileInfo getProjectileInfo(Identifier id) {
@@ -49,7 +49,7 @@ public class ProjectileData {
      * Checks if a projectile with the given ID exists.
      * @param id The unique identifier for the projectile.
      * @return true if the projectile exists, false otherwise.
-     * @since 1.0.29
+     * @since 1.0.30
      */
     @ApiStatus.Internal
     public static boolean hasProjectileInfo(Identifier id) {
@@ -60,7 +60,7 @@ public class ProjectileData {
      * Checks if a projectile with the given ID is blacklisted.
      * @param id The unique identifier for the projectile.
      * @return true if the projectile is blacklisted, false otherwise.
-     * @since 1.0.29
+     * @since 1.0.30
      */
     @ApiStatus.Internal
     public static boolean isBlacklisted(Identifier id) {
