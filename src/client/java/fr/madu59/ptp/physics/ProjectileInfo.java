@@ -1,11 +1,10 @@
-package fr.madu59.ptp;
+package fr.madu59.ptp.physics;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.madu59.ptp.ProjectileInfo;
 import fr.madu59.ptp.config.SettingsManager;
-
+import fr.madu59.ptp.physics.ProjectileInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;

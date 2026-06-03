@@ -1,4 +1,4 @@
-package fr.madu59.ptp;
+package fr.madu59.ptp.physics;
 
 public enum PhysicsStep{
     DRAG,
