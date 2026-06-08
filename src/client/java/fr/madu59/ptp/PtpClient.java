@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.SettingsManager;
-import fr.madu59.ptp.config.configScreen.PtpConfigScreen;
+import fr.madu59.ptp.config.configscreen.PtpConfigScreen;
 import fr.madu59.ptp.physics.PhysicsStep;
 import fr.madu59.ptp.physics.PreviewImpact;
 import fr.madu59.ptp.physics.ProjectileInfo;
@@ -69,7 +69,7 @@ public class PtpClient implements ClientModInitializer {
             serverHasMod = false;
 
             // Always enabled in singleplayer
-            if (client.hasSingleplayerServer()) {
+            if (client.hasSingleplayerServer() || client.getCurrentServer().isLan()) {
                 serverHasMod = true;
                 return;
             }
