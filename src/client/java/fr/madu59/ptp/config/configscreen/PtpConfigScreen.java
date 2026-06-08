@@ -14,7 +14,6 @@ public class PtpConfigScreen extends Screen {
     
     private MyConfigListWidget list;
     private final Screen parent;
-    private final String INDENT = " ⤷  ";
 
     public PtpConfigScreen(Screen parent) {
         super(Component.literal("Projectile Trajectory Preview Config"));
@@ -36,35 +35,33 @@ public class PtpConfigScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        // Create the scrolling list
         this.list = new MyConfigListWidget(this.minecraft, this.width, this.height - 80, 40, 26);
 
-        // Example: Add categories + buttons
-        list.addCategory("ptp.config.trajectory-previsualization");
-        list.addButton(SettingsManager.SHOW_TRAJECTORY);
-        list.addButton(SettingsManager.TRAJECTORY_COLOR, INDENT);
-        list.addButton(SettingsManager.TRAJECTORY_OPACITY, INDENT);
-        list.addButton(SettingsManager.TRAJECTORY_STYLE, INDENT);
-        list.addButton(SettingsManager.ENABLE_OFFHAND, INDENT);
-        list.addCategory("ptp.config.target-outlining");
-        list.addButton(SettingsManager.OUTLINE_TARGETS);
-        list.addButton(SettingsManager.OUTLINE_COLOR, INDENT);
-        list.addButton(SettingsManager.OUTLINE_OPACITY, INDENT);
-        list.addCategory("ptp.config.target-highlighting");
-        list.addButton(SettingsManager.HIGHLIGHT_TARGETS);
-        list.addButton(SettingsManager.HIGHLIGHT_COLOR, INDENT);
-        list.addButton(SettingsManager.HIGHLIGHT_OPACITY, INDENT);
-        list.addCategory("ptp.config.projectile-toggle");
-        list.addButton(SettingsManager.TOGGLE_BOW);
-        list.addButton(SettingsManager.TOGGLE_CROSSBOW);
-        list.addButton(SettingsManager.TOGGLE_TRIDENT);
-        list.addButton(SettingsManager.TOGGLE_ENDERPEARL);
-        list.addButton(SettingsManager.TOGGLE_SNOWBALL);
-        list.addButton(SettingsManager.TOGGLE_EGG);
-        list.addButton(SettingsManager.TOGGLE_WINDCHARGE);
-        list.addButton(SettingsManager.TOGGLE_POTION);
-        list.addButton(SettingsManager.TOGGLE_EXPPOTION);
-        list.addButton(SettingsManager.TOGGLE_FISHINGROD);
+        list.category("ptp.config.trajectory-previsualization").build();
+        list.button(SettingsManager.SHOW_TRAJECTORY).build();
+        list.button(SettingsManager.TRAJECTORY_COLOR).indent().build();
+        list.button(SettingsManager.TRAJECTORY_OPACITY).indent().build();
+        list.button(SettingsManager.TRAJECTORY_STYLE).indent().build();
+        list.button(SettingsManager.ENABLE_OFFHAND).indent().build();
+        list.category("ptp.config.target-outlining").build();
+        list.button(SettingsManager.OUTLINE_TARGETS).build();
+        list.button(SettingsManager.OUTLINE_COLOR).indent().build();
+        list.button(SettingsManager.OUTLINE_OPACITY).indent().build();
+        list.category("ptp.config.target-highlighting").build();
+        list.button(SettingsManager.HIGHLIGHT_TARGETS).build();
+        list.button(SettingsManager.HIGHLIGHT_COLOR).indent().build();
+        list.button(SettingsManager.HIGHLIGHT_OPACITY).indent().build();
+        list.category("ptp.config.projectile-toggle").build();
+        list.button(SettingsManager.TOGGLE_BOW).build();
+        list.button(SettingsManager.TOGGLE_CROSSBOW).build();
+        list.button(SettingsManager.TOGGLE_TRIDENT).build();
+        list.button(SettingsManager.TOGGLE_ENDERPEARL).build();
+        list.button(SettingsManager.TOGGLE_SNOWBALL).build();
+        list.button(SettingsManager.TOGGLE_EGG).build();
+        list.button(SettingsManager.TOGGLE_WINDCHARGE).build();
+        list.button(SettingsManager.TOGGLE_POTION).build();
+        list.button(SettingsManager.TOGGLE_EXPPOTION).build();
+        list.button(SettingsManager.TOGGLE_FISHINGROD).build();
 
 
         Button doneButton = Button.builder(Component.literal("Done"), b -> {

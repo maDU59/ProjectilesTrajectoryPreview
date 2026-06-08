@@ -12,6 +12,10 @@ import org.lwjgl.glfw.GLFW;
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.SettingsManager;
 import fr.madu59.ptp.config.configscreen.PtpConfigScreen;
+import fr.madu59.ptp.physics.PhysicsStep;
+import fr.madu59.ptp.physics.PreviewImpact;
+import fr.madu59.ptp.physics.ProjectileInfo;
+import fr.madu59.ptp.rendering.RenderUtils;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -65,7 +69,7 @@ public class PtpClient implements ClientModInitializer {
             serverHasMod = false;
 
             // Always enabled in singleplayer
-            if (client.hasSingleplayerServer()) {
+            if (client.hasSingleplayerServer() || client.getCurrentServer().isLan()) {
                 serverHasMod = true;
                 return;
             }
@@ -259,10 +263,10 @@ public class PtpClient implements ClientModInitializer {
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
             
-            for (int order : projectileInfo.order){
-                if (order == 0) pos = pos.add(vel);
-                else if (order == 1) vel = vel.scale(drag);
-                else if (order == 2) vel = vel.subtract(0, gravity, 0);
+            for (PhysicsStep order : projectileInfo.order.steps()){
+                if (order == PhysicsStep.POSITION) pos = pos.add(vel);
+                else if (order == PhysicsStep.DRAG) vel = vel.scale(drag);
+                else if (order == PhysicsStep.GRAVITY) vel = vel.subtract(0, gravity, 0);
             }
 
             AABB box = new AABB(prevPos, pos).inflate(1.0);
