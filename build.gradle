@@ -86,3 +86,39 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+publishMods {
+    file = jar.archiveFile
+    changelog = providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText.get()
+    type = STABLE
+	version = project.mod_version
+    modLoaders.add("fabric")
+	modLoaders.add("quilt")
+
+    curseforge {
+		displayName = file.map { it.asFile.name }
+        projectId = project.curseforge_id
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        
+		minecraftVersionRange {
+            start = "26.1"
+            end = "26.1.2"
+        }
+
+        client = true
+        server = false
+        requires("fabric-api")
+    }
+    modrinth {
+		displayName = "Projectile Trajectory Preview $project.mod_version"
+        projectId = project.modrinth_id
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+
+		minecraftVersionRange {
+            start = "26.1"
+            end = "26.1.2"
+        }
+
+		requires("fabric-api")
+    }
+}
