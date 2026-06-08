@@ -160,7 +160,7 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             if (this.button.mouseClicked(click, doubleClick)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 if(this.option != null){
-                    this.button.setMessage(Component.translatable(Ptp.MOD_ID + ".config.value." + this.option.getValue().toString().toLowerCase()));
+                    this.button.setMessage(Component.literal(this.option.getValueAsTranslatedString()));
                 }
                 return true;
             }

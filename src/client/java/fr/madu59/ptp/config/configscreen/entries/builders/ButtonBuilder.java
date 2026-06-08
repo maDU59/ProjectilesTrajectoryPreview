@@ -37,7 +37,7 @@ public class ButtonBuilder extends AbstractEntryBuilder{
     }
 
     public void build() {
-        button = Button.builder(Component.translatable(Ptp.MOD_ID + ".config.value." + option.getValue().toString().toLowerCase()), btn -> {option.setToNextValue();}).bounds(0, 0, 100, 20).build();
+        button = Button.builder(Component.literal(this.option.getValueAsTranslatedString()), btn -> {option.setToNextValue();}).bounds(0, 0, 100, 20).build();
         parent.addBuiltEntry(new ButtonEntry(parent, button, option, indent, isEnabledSupplier));
     }
 }
