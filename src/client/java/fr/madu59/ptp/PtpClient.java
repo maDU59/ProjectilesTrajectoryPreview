@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.SettingsManager;
-import fr.madu59.ptp.config.configScreen.PtpConfigScreen;
+import fr.madu59.ptp.config.configscreen.PtpConfigScreen;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
