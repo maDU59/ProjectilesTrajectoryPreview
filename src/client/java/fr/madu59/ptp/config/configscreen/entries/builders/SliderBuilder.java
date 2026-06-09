@@ -78,14 +78,21 @@ public class SliderBuilder<N extends Number> extends AbstractEntryBuilder{
             @Override
             protected void updateMessage() {
 
-                String stepStr = step.toString();
-                int decimalPlaces = 0;
-                if (stepStr.contains(".")) {
-                    decimalPlaces = stepStr.length() - stepStr.indexOf('.') - 1;
-                }
+                N value = option.getValue();
 
-                String format = "%." + decimalPlaces + "f";
-                String formattedValue = String.format(java.util.Locale.ROOT, format, option.getValue());
+                String formattedValue;
+                if (value instanceof Integer || value instanceof Long) {
+                    formattedValue = String.format(java.util.Locale.ROOT, "%d", value);
+                } else {
+                    String stepStr = step.toString();
+                    int decimalPlaces = 0;
+                    if (stepStr.contains(".")) {
+                        decimalPlaces = stepStr.length() - stepStr.indexOf('.') - 1;
+                    }
+
+                    String format = "%." + decimalPlaces + "f";
+                    formattedValue = String.format(java.util.Locale.ROOT, format, option.getValue());
+                }
 
                 this.setMessage(Component.literal(formattedValue));
             }
