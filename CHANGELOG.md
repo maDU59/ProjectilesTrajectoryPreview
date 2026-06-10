@@ -1,2 +1,2 @@
 # What's new:
-- Fixed sliders causing erros with Int values
+- Fixed sliders causing errors with Int values
