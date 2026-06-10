@@ -1,2 +1,2 @@
 # What's new:
-- Fixed some text not being translated properly
+- Fixed sliders causing errors with Int values
