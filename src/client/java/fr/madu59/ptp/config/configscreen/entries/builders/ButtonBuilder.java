@@ -2,7 +2,6 @@ package fr.madu59.ptp.config.configscreen.entries.builders;
 
 import java.util.function.BooleanSupplier;
 
-import fr.madu59.ptp.Ptp;
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.configscreen.MyConfigListWidget;
 import fr.madu59.ptp.config.configscreen.MyConfigListWidget.ButtonEntry;
