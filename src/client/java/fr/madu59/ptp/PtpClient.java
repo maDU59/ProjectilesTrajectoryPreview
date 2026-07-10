@@ -90,7 +90,7 @@ public class PtpClient implements ClientModInitializer {
                 LOGGER.info("[PTP] Received handshake from server!");
                 serverHasMod = true;
         });
-        
+
         LevelRenderEvents.AFTER_SOLID_FEATURES.register(context -> {
             renderOverlay(context);
         });
@@ -165,7 +165,7 @@ public class PtpClient implements ClientModInitializer {
                     }
                     else if(previewImpact.entityImpact != null) {
                         AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                        RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                        RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
                     }
                 }
 
@@ -177,7 +177,7 @@ public class PtpClient implements ClientModInitializer {
                     }
                     else if(previewImpact.entityImpact != null) {
                         AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                        RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));    
+                        RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
                     }
                 }
                 int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
@@ -196,56 +196,54 @@ public class PtpClient implements ClientModInitializer {
         Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3 right = forward.cross(up).normalize();
 
-        if(client.gameRenderer.getMainCamera().isDetached()) offset = offset.scale(0);
+        if(client.gameRenderer.mainCamera().isDetached()) offset = offset.scale(0);
 
         return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
     }
 
     private static void renderTrajectory(LevelRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
-
-        VertexConsumer lineConsumer = context.bufferSource().getBuffer(RenderTypes.lines());
-        Vec3 cam = client.gameRenderer.getMainCamera().position();
+        Vec3 cam = client.gameRenderer.mainCamera().position();
         PoseStack matrices = context.poseStack();
         matrices.pushPose();
         matrices.translate(-cam.x, -cam.y, -cam.z);
 
-        for (int i = 0; i < trajectoryPoints.size()-1; i++) {
-            Vec3 lerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
-            Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
-            Vec3 pos = trajectoryPoints.get(i).add(lerpedDelta);
-            Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
-            if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DASHED){
-                dir = dir.scale(0.5);
+        context.submitNodeCollector().submitCustomGeometry(matrices, RenderTypes.lines(), (pose, lineConsumer) -> {
+            for (int i = 0; i < trajectoryPoints.size()-1; i++) {
+                Vec3 lerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
+                Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
+                Vec3 pos = trajectoryPoints.get(i).add(lerpedDelta);
+                Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
+                if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DASHED){
+                    dir = dir.scale(0.5);
+                }
+                else if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DOTTED){
+                    dir = dir.scale(0.15);
+                }
+                Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
+
+                RenderUtils.renderVector(pose, lineConsumer, floatPos, dir, color);
             }
-            else if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DOTTED){
-                dir = dir.scale(0.15);
+
+            if (hasHit) {
+                Vec3 pos = trajectoryPoints.getLast();
+                double r = 0.1;
+                double x = pos.x;
+                double y = pos.y;
+                double z = pos.z;
+
+                Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
+                Vec3 dir = new Vec3(2*r,0,0);
+                RenderUtils.renderVector(pose, lineConsumer, floatPos, dir, color);
+
+                floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
+                dir = new Vec3(0,2*r,0);
+                RenderUtils.renderVector(pose, lineConsumer, floatPos, dir, color);
+
+                floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
+                dir = new Vec3(0,0,2 * r);
+                RenderUtils.renderVector(pose, lineConsumer, floatPos, dir, color);
             }
-            Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
-
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
-        }
-
-        if (hasHit) {
-
-            Vec3 pos = trajectoryPoints.getLast();
-
-            double r = 0.1;
-            double x = pos.x;
-            double y = pos.y;
-            double z = pos.z;
-
-            Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
-            Vec3 dir = new Vec3(2*r,0,0);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
-
-            floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
-            dir = new Vec3(0,2*r,0);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
-
-            floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
-            dir = new Vec3(0,0,2 * r);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
-        }
+        });
 
         matrices.popPose();
     }
@@ -262,7 +260,7 @@ public class PtpClient implements ClientModInitializer {
 
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
-            
+
             for (PhysicsStep order : projectileInfo.order.steps()){
                 if (order == PhysicsStep.POSITION) pos = pos.add(vel);
                 else if (order == PhysicsStep.DRAG) vel = vel.scale(drag);
@@ -336,7 +334,7 @@ public class PtpClient implements ClientModInitializer {
                 break;
             }
 
-            if (pos.y < player.level().getMinY() - 120) 
+            if (pos.y < player.level().getMinY() - 120)
                 break;
 
             prevPos = pos;
