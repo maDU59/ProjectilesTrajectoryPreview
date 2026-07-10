@@ -18,46 +18,43 @@ public class RenderUtils {
 
     public static void renderFilledBox(LevelRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
         PoseStack matrices = context.poseStack();
-        Vec3 camera = client.gameRenderer.getMainCamera().position();
+        Vec3 camera = client.gameRenderer.mainCamera().position();
 
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        VertexConsumer quadConsumer = context.bufferSource().getBuffer(RenderTypes.debugFilledBox());
-
-        addChainedFilledBoxVertices(matrices, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        context.submitNodeCollector().submitCustomGeometry(matrices, RenderTypes.debugFilledBox(), (pose, buffer) ->
+                addChainedFilledBoxVertices(pose, buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha));
 
         matrices.popPose();
     }
 
     public static void renderBox(LevelRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
         PoseStack matrices = context.poseStack();
-        Vec3 camera = client.gameRenderer.getMainCamera().position();
+        Vec3 camera = client.gameRenderer.mainCamera().position();
 
         matrices.pushPose();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
-        VertexConsumer quadConsumer = context.bufferSource().getBuffer(RenderTypes.lines());
-
-        renderLineBox(matrices.last(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        context.submitNodeCollector().submitCustomGeometry(matrices, RenderTypes.lines(), (pose, buffer) ->
+                renderLineBox(pose, buffer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha));
 
         matrices.popPose();
     }
 
-    public static void renderVector(PoseStack poseStack, VertexConsumer vertexConsumer, Vector3f vector3f, Vec3 vec3, int i) {
-        PoseStack.Pose pose = poseStack.last();
+    public static void renderVector(PoseStack.Pose pose, VertexConsumer vertexConsumer, Vector3f vector3f, Vec3 vec3, int i) {
         vertexConsumer.addVertex(pose, vector3f).setColor(i).setNormal(pose, (float)vec3.x, (float)vec3.y, (float)vec3.z).setLineWidth(LINE_WIDTH);
         vertexConsumer.addVertex(pose, (float)((double)vector3f.x() + vec3.x), (float)((double)vector3f.y() + vec3.y), (float)((double)vector3f.z() + vec3.z)).setColor(i).setNormal(pose, (float)vec3.x, (float)vec3.y, (float)vec3.z).setLineWidth(LINE_WIDTH);
     }
 
 
 
-    private static void addChainedFilledBoxVertices(PoseStack poseStack, VertexConsumer vertexConsumer, double d, double e, double f, double g, double h, double i, float j, float k, float l, float m) {
-        addChainedFilledBoxVertices(poseStack, vertexConsumer, (float)d, (float)e, (float)f, (float)g, (float)h, (float)i, j, k, l, m);
+    private static void addChainedFilledBoxVertices(PoseStack.Pose pose, VertexConsumer vertexConsumer, double d, double e, double f, double g, double h, double i, float j, float k, float l, float m) {
+        addChainedFilledBoxVertices(pose, vertexConsumer, (float)d, (float)e, (float)f, (float)g, (float)h, (float)i, j, k, l, m);
     }
 
-    private static void addChainedFilledBoxVertices(PoseStack poseStack, VertexConsumer vertexConsumer, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o) {
-        Matrix4f matrix4f = poseStack.last().pose();
+    private static void addChainedFilledBoxVertices(PoseStack.Pose pose, VertexConsumer vertexConsumer, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o) {
+        Matrix4f matrix4f = pose.pose();
 
         // X-
         vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o);
