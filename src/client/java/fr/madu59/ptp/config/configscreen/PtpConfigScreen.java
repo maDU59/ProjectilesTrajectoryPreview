@@ -25,7 +25,7 @@ public class PtpConfigScreen extends Screen {
             dispatcher.register(
                 literal("ptpConfig")
                     .executes(context -> {
-                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(new PtpConfigScreen(null)));
+                        Minecraft.getInstance().execute(() -> Minecraft.getInstance().gui.setScreen(new PtpConfigScreen(null)));
                         return 1;
                     })
             );
@@ -65,7 +65,7 @@ public class PtpConfigScreen extends Screen {
 
 
         Button doneButton = Button.builder(Component.literal("Done"), b -> {
-            this.minecraft.setScreen(this.parent);
+            this.minecraft.gui.setScreen(this.parent);
             SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
         }).bounds(this.width / 2 - 50, this.height - 30, 100, 20).build();
 
@@ -75,7 +75,7 @@ public class PtpConfigScreen extends Screen {
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.parent);
+        this.minecraft.gui.setScreen(this.parent);
         SettingsManager.saveSettings(SettingsManager.ALL_OPTIONS);
     }
 

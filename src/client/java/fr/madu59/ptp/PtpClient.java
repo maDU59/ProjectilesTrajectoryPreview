@@ -20,7 +20,6 @@ import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -32,6 +31,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -196,16 +196,15 @@ public class PtpClient implements ClientModInitializer {
         Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3 right = forward.cross(up).normalize();
 
-        if(client.gameRenderer.getMainCamera().isDetached()) offset = offset.scale(0);
+        if(client.gameRenderer.mainCamera().isDetached()) offset = offset.scale(0);
 
         return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
     }
 
     private static void renderTrajectory(LevelRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
-
-        VertexConsumer lineConsumer = context.bufferSource().getBuffer(RenderTypes.lines());
-        Vec3 cam = client.gameRenderer.getMainCamera().position();
+        Vec3 cam = client.gameRenderer.mainCamera().position();
         PoseStack matrices = context.poseStack();
+        RenderType renderType = RenderTypes.LINES;
         matrices.pushPose();
         matrices.translate(-cam.x, -cam.y, -cam.z);
 
@@ -222,7 +221,7 @@ public class PtpClient implements ClientModInitializer {
             }
             Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
         }
 
         if (hasHit) {
@@ -236,15 +235,15 @@ public class PtpClient implements ClientModInitializer {
 
             Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
             Vec3 dir = new Vec3(2*r,0,0);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
 
             floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
             dir = new Vec3(0,2*r,0);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
 
             floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
             dir = new Vec3(0,0,2 * r);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
         }
 
         matrices.popPose();

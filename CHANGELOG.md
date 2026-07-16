@@ -1,2 +1,2 @@
 # What's new:
-- Fixed sliders causing errors with Int values
+- Ported to 26.2

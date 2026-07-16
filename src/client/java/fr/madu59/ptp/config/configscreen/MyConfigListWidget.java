@@ -3,7 +3,6 @@ package fr.madu59.ptp.config.configscreen;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-import fr.madu59.ptp.Ptp;
 import fr.madu59.ptp.config.Option;
 import fr.madu59.ptp.config.configscreen.entries.builders.ButtonBuilder;
 import fr.madu59.ptp.config.configscreen.entries.builders.CategoryBuilder;

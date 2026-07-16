@@ -117,7 +117,7 @@ public class ProjectileInfo {
                         vel = player.getViewVector(tickProgress).scale(1.6F);
                         gravity = 0;
                         waterDrag = drag;
-                    } else if (projectile.item() instanceof ArrowItem) {
+                    } else if (projectile.item().value() instanceof ArrowItem) {
                         
                     }
                 }
