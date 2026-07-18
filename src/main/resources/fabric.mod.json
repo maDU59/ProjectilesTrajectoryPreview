@@ -22,7 +22,7 @@
 			"fr.madu59.ptp.PtpClient"
 		],
 		"modmenu": [ 
-			"fr.madu59.ptp.config.configScreen.ModMenuApiImpl" 
+			"fr.madu59.ptp.config.configscreen.ModMenuApiImpl" 
 		]
 	},
 	"depends": {
