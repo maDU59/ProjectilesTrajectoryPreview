@@ -1,2 +1,3 @@
 # What's new:
-- Ported to 26.2
+- Added compatibility with Vivecraft
+- Improved the API so that registering modded projectiles is now actually possible
