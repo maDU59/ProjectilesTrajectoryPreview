@@ -23,11 +23,11 @@ public class TrajectoryUtils {
 
     public static float getViewXRot(Player player, float tickProgress){
         if(ModCompat.isVivecraftLoaded()) return VivecraftCompat.getViewXRot(player, tickProgress);
-        return player.getViewYRot(tickProgress);
+        return player.getViewXRot(tickProgress);
     }
 
     public static float getViewYRot(float tickProgress){
-        return getViewXRot(Minecraft.getInstance().player, tickProgress);
+        return getViewYRot(Minecraft.getInstance().player, tickProgress);
     }
 
     public static float getViewYRot(Player player, float tickProgress){
