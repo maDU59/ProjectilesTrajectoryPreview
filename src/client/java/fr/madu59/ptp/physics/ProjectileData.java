@@ -93,7 +93,7 @@ public class ProjectileData {
         double waterDrag = 0.6;
         boolean bypassAntiCheat = false;
 
-        Vec3 position = player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+        Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);
 
         if (item instanceof BowItem && SettingsManager.TOGGLE_BOW.getValue()) {
             
@@ -198,13 +198,13 @@ public class ProjectileData {
             
         }  else if (item instanceof FishingRodItem && player.fishing == null && SettingsManager.TOGGLE_FISHINGROD.getValue()) {
 
-            float f = player.getXRot();
-            float g = player.getYRot();
+            float f = TrajectoryUtils.getViewXRot(player, tickProgress);
+            float g = TrajectoryUtils.getViewYRot(player, tickProgress);
             float h = Mth.cos(-g * (float) (Math.PI / 180.0) - (float) Math.PI);
             float i = Mth.sin(-g * (float) (Math.PI / 180.0) - (float) Math.PI);
             float j = -Mth.cos(-f * (float) (Math.PI / 180.0));
             float k = Mth.sin(-f * (float) (Math.PI / 180.0));
-            Vec3 p = player.getEyePosition(tickProgress);
+            Vec3 p = position.add(new Vec3(0, 0.10000000149011612, 0));
             position = new Vec3(p.x - i * 0.3,p.y,p.z - h * 0.3);
             Vec3 vec3d = new Vec3(-i, Mth.clamp(-(k / j), -5.0F, 5.0F), -h);
             double m = vec3d.length();
@@ -234,12 +234,16 @@ public class ProjectileData {
         //double underwaterGravity = - (double)(5.0E-4F) / 0.9900000095367432;
         Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-        Vec3 pos = new Vec3(player.getX(), player.getEyeY() - 0.30000001192092896, player.getZ());
+        float tickProgress = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        Vec3 pos = TrajectoryUtils.getAimPos(player, tickProgress).add(new Vec3(0, -0.2,0));
 
-        float g = Mth.sin((double)(player.getXRot() * 0.017453292F));
-        float h = Mth.cos((double)(player.getXRot() * 0.017453292F));
-        float i = Mth.sin((double)(player.getYRot() * 0.017453292F));
-        float j = Mth.cos((double)(player.getYRot() * 0.017453292F));
+        float xRot = TrajectoryUtils.getViewXRot(player, tickProgress);
+        float yRot = TrajectoryUtils.getViewYRot(player, tickProgress);
+
+        float g = Mth.sin((double)(xRot * 0.017453292F));
+        float h = Mth.cos((double)(xRot * 0.017453292F));
+        float i = Mth.sin((double)(yRot * 0.017453292F));
+        float j = Mth.cos((double)(yRot * 0.017453292F));
         float k = 0.5F * 6.2831855F;
         float l = 0.02F * 0.5F;
         Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
