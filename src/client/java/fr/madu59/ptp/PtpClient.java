@@ -196,13 +196,13 @@ public class PtpClient implements ClientModInitializer {
         Vec3 up = new Vec3(-Math.sin(pitch) * Math.sin(yaw), Math.cos(pitch), -Math.sin(pitch) * Math.cos(yaw)).normalize();
         Vec3 right = forward.cross(up).normalize();
 
-        if(client.gameRenderer.mainCamera().isDetached()) offset = offset.scale(0);
+        if(client.gameRenderer.getMainCamera().isDetached()) offset = offset.scale(0);
 
         return right.scale(handMultiplier * offset.x).add(up.scale(offset.y)).add(forward.scale(offset.z)).add(eye.subtract(startPos));
     }
 
     private static void renderTrajectory(LevelRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
-        Vec3 cam = client.gameRenderer.mainCamera().position();
+        Vec3 cam = client.gameRenderer.getMainCamera().position();
         PoseStack matrices = context.poseStack();
         RenderType renderType = RenderTypes.LINES;
         matrices.pushPose();
