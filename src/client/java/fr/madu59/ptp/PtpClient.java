@@ -14,7 +14,7 @@ import fr.madu59.ptp.config.SettingsManager;
 import fr.madu59.ptp.config.configscreen.PtpConfigScreen;
 import fr.madu59.ptp.physics.PhysicsStep;
 import fr.madu59.ptp.physics.PreviewImpact;
-import fr.madu59.ptp.physics.ProjectileInfo;
+import fr.madu59.ptp.physics.ProjectileData;
 import fr.madu59.ptp.rendering.RenderUtils;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
@@ -32,6 +32,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -110,49 +111,49 @@ public class PtpClient implements ClientModInitializer {
         int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
 
         if (itemDropKey.isDown()){
-            showItemTrajectory(context, player, ProjectileInfo.getDropTrajectory(player), handMultiplier);
+            showItemTrajectory(context, player, ProjectileData.getDropTrajectory(player), handMultiplier);
         }
         else{
-            List<ProjectileInfo> projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, true);
-            if(projectileInfoList.isEmpty()){
+            List<ProjectileData> projectileDataList = ProjectileData.getItemsData(itemStack, player, true);
+            if(projectileDataList.isEmpty()){
                 if(SettingsManager.ENABLE_OFFHAND.getValue() == false) return;
 
                 itemStack = player.getOffhandItem();
                 handMultiplier = -handMultiplier;
-                projectileInfoList = ProjectileInfo.getItemsInfo(itemStack, player, false);
+                projectileDataList = ProjectileData.getItemsData(itemStack, player, false);
 
-                if(projectileInfoList.isEmpty()) return;
+                if(projectileDataList.isEmpty()) return;
             }
-            showProjectileTrajectory(context, player, projectileInfoList, handMultiplier);
+            showProjectileTrajectory(context, player, projectileDataList, handMultiplier);
         }
     }
 
-    private static void showItemTrajectory(WorldRenderContext context, Player player, ProjectileInfo projectileInfo, int handMultiplier) {
-        if(!isEnabled(projectileInfo)) return;
+    private static void showItemTrajectory(WorldRenderContext context, Player player, ProjectileData projectileData, int handMultiplier) {
+        if(!isEnabled(projectileData)) return;
         float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
-        Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
-        Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, pos, eye, handMultiplier, tickProgress);
+        Vec3 pos = projectileData.position == null? player.getEyePosition() : projectileData.position;
+        Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileData.offset, pos, eye, handMultiplier, tickProgress);
 
-        PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, false);
+        PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileData, false);
 
         int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), null);
 
         renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
     }
 
-    private static void showProjectileTrajectory(WorldRenderContext context, Player player, List<ProjectileInfo> projectileInfoList, int handMultiplier) {
+    private static void showProjectileTrajectory(WorldRenderContext context, Player player, List<ProjectileData> projectileDataList, int handMultiplier) {
         float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
 
-        for(ProjectileInfo projectileInfo : projectileInfoList){
+        for(ProjectileData projectileData : projectileDataList){
 
-            if (!isEnabled(projectileInfo)) continue;
+            if (!isEnabled(projectileData)) continue;
 
-            Vec3 pos = projectileInfo.position == null? player.getEyePosition() : projectileInfo.position;
-            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileInfo.offset, pos, eye, handMultiplier, tickProgress);
+            Vec3 pos = projectileData.position == null? player.getEyePosition() : projectileData.position;
+            Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileData.offset, pos, eye, handMultiplier, tickProgress);
 
-            PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileInfo, true);
+            PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileData, true);
 
             Option.State value = SettingsManager.SHOW_TRAJECTORY.getValue();
             if ((value == Option.State.TARGET_IS_ENTITY && previewImpact.entityImpact!=null) || value == Option.State.ENABLED) {
@@ -205,9 +206,9 @@ public class PtpClient implements ClientModInitializer {
 
         VertexConsumer lineConsumer = context.consumers().getBuffer(RenderTypes.lines());
         Vec3 cam = client.gameRenderer.getMainCamera().position();
-        PoseStack matrices = context.matrices();
-        matrices.pushPose();
-        matrices.translate(-cam.x, -cam.y, -cam.z);
+        PoseStack poseStack = context.matrices();
+        poseStack.pushPose();
+        poseStack.translate(-cam.x, -cam.y, -cam.z);
 
         for (int i = 0; i < trajectoryPoints.size()-1; i++) {
             Vec3 lerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
@@ -222,7 +223,7 @@ public class PtpClient implements ClientModInitializer {
             }
             Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(poseStack, lineConsumer, floatPos, dir, color);
         }
 
         if (hasHit) {
@@ -236,34 +237,34 @@ public class PtpClient implements ClientModInitializer {
 
             Vector3f floatPos = new Vector3f((float) (x - r), (float) y, (float) z);
             Vec3 dir = new Vec3(2*r,0,0);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(poseStack, lineConsumer, floatPos, dir, color);
 
             floatPos = new Vector3f((float) x, (float) (y - r), (float) z);
             dir = new Vec3(0,2*r,0);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(poseStack, lineConsumer, floatPos, dir, color);
 
             floatPos = new Vector3f((float) x, (float) y, (float) (z - r));
             dir = new Vec3(0,0,2 * r);
-            RenderUtils.renderVector(matrices, lineConsumer, floatPos, dir, color);
+            RenderUtils.renderVector(poseStack, lineConsumer, floatPos, dir, color);
         }
 
-        matrices.popPose();
+        poseStack.popPose();
     }
 
-    private static PreviewImpact calculateTrajectory(Vec3 pos, Player player, ProjectileInfo projectileInfo, boolean canHitEntities) {
+    private static PreviewImpact calculateTrajectory(Vec3 pos, Player player, ProjectileData projectileData, boolean canHitEntities) {
         Vec3 prevPos = pos;
         HitResult impact = null;
         Entity entityImpact = null;
         boolean hasHit = false;
         List<Vec3> trajectoryPoints = new ArrayList<>();
-        double drag =  projectileInfo.drag;
-        double gravity = projectileInfo.gravity;
-        Vec3 vel = projectileInfo.initialVelocity.add(player.getDeltaMovement());
+        double drag =  projectileData.drag;
+        double gravity = projectileData.gravity;
+        Vec3 vel = projectileData.initialVelocity.add(player.getDeltaMovement());
 
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
             
-            for (PhysicsStep order : projectileInfo.order.steps()){
+            for (PhysicsStep order : projectileData.order.steps()){
                 if (order == PhysicsStep.POSITION) pos = pos.add(vel);
                 else if (order == PhysicsStep.DRAG) vel = vel.scale(drag);
                 else if (order == PhysicsStep.GRAVITY) vel = vel.subtract(0, gravity, 0);
@@ -294,7 +295,7 @@ public class PtpClient implements ClientModInitializer {
             }
 
             HitResult hit;
-            if(projectileInfo.hasWaterCollision){
+            if(projectileData.hasWaterCollision){
                 hit = player.level().clip(
                 new ClipContext(prevPos, pos,
                     ClipContext.Block.COLLIDER,
@@ -311,12 +312,12 @@ public class PtpClient implements ClientModInitializer {
                     ClipContext.Block.COLLIDER,
                     ClipContext.Fluid.WATER,
                     player)).getType() != HitResult.Type.MISS) {
-                        drag = projectileInfo.waterDrag;
-                        gravity = projectileInfo.underwaterGravity;
+                        drag = projectileData.waterDrag;
+                        gravity = projectileData.underwaterGravity;
                     }
                     else{
-                        drag = projectileInfo.drag;
-                        gravity = projectileInfo.gravity;
+                        drag = projectileData.drag;
+                        gravity = projectileData.gravity;
                     }
             }
 
@@ -348,8 +349,8 @@ public class PtpClient implements ClientModInitializer {
         return client.hasSingleplayerServer() || serverHasMod;
     }
 
-    public static boolean isEnabled(ProjectileInfo projectileInfo) {
-        return client.hasSingleplayerServer() || serverHasMod || projectileInfo.bypassAntiCheat;
+    public static boolean isEnabled(ProjectileData projectileData) {
+        return client.hasSingleplayerServer() || serverHasMod || projectileData.bypassAntiCheat;
     }
 
     private static void registerKeyMappings() {
