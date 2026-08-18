@@ -22,7 +22,7 @@ public class VivecraftCompat {
             return new Vec3(ClientNetworking.getActiveAimDir());
         }
 
-        return Vec3.ZERO;
+        return player.getViewVector(tickProgress);
     }
 
     public static float getViewXRot(Player player, float tickProgress){
@@ -59,6 +59,6 @@ public class VivecraftCompat {
             return ClientNetworking.getActiveAimPos();
         }
 
-        return Vec3.ZERO;
+        return player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
     }
 }

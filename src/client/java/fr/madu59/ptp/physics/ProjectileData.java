@@ -3,36 +3,25 @@ package fr.madu59.ptp.physics;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.madu59.ptp.PtpClient;
 import fr.madu59.ptp.api.projectiles.ProjectileDataAPI;
 import fr.madu59.ptp.config.SettingsManager;
-import fr.madu59.ptp.rendering.TrajectoryUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
+import fr.madu59.ptp.util.ItemUtils;
+import fr.madu59.ptp.util.TrajectoryUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArrowItem;
-import net.minecraft.world.item.BowItem;
-import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.EggItem;
 import net.minecraft.world.item.EnderpearlItem;
 import net.minecraft.world.item.ExperienceBottleItem;
 import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SnowballItem;
 import net.minecraft.world.item.ThrowablePotionItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.WindChargeItem;
-import net.minecraft.world.item.component.ChargedProjectiles;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 
@@ -81,12 +70,12 @@ public class ProjectileData {
             return projectileDataList;
         }
 
-        if(ProjectileDataAPI.hasProjectileData(itemStack)){
-            projectileDataList.add(ProjectileDataAPI.getProjectileData(itemStack));
+        if(ProjectileDataAPI.hasProjectileData(itemStack) && ProjectileDataAPI.isEnabled(itemStack)){
+            ProjectileDataAPI.getProjectileData(itemStack, player, projectileDataList);
             return projectileDataList;
         }
 
-        float tickProgress = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = PtpClient.getTickProgress();
 
         double gravity = 0.05;
         double drag = 0.99;
@@ -95,60 +84,7 @@ public class ProjectileData {
 
         Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);
 
-        if (item instanceof BowItem && SettingsManager.TOGGLE_BOW.getValue()) {
-            
-            int useTicks = player.getTicksUsingItem();
-            float pull = BowItem.getPowerForTime(useTicks);
-
-            Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(3.0 * pull);
-            Vec3 offset = new Vec3(0.2, -0.06, 0.2);
-
-            if(pull >= 0.1) projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_PDG, bypassAntiCheat));
-
-        } else if (item instanceof CrossbowItem && SettingsManager.TOGGLE_CROSSBOW.getValue()) {
-
-            Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(3.15);
-            Vec3 offset = new Vec3(0, -0.06, 0.03);
-
-            ChargedProjectiles chargedProjectilesComponent = itemStack.get(DataComponents.CHARGED_PROJECTILES);
-
-            if(chargedProjectilesComponent != null){
-                for (ItemStackTemplate projectile : chargedProjectilesComponent.items()) {
-                    if (projectile.is(Items.FIREWORK_ROCKET)) {
-                        vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(1.6F);
-                        gravity = 0;
-                        waterDrag = drag;
-                    } else if (projectile.item().value() instanceof ArrowItem) {
-                        
-                    }
-                }
-            }
-
-            if(CrossbowItem.isCharged(itemStack)) {
-                projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_PDG, bypassAntiCheat));
-                if (hasEnchantment(itemStack, Enchantments.MULTISHOT)){
-                    float angleOffset = 10f;
-                    Vec3 vel1 = vel.yRot((float) Math.toRadians(angleOffset));
-                    Vec3 vel2 = vel.yRot((float) Math.toRadians(-angleOffset));
-                    projectileDataList.add(new ProjectileData(gravity, drag, vel1, offset, position, false, waterDrag, ORDER_PDG, bypassAntiCheat));
-                    projectileDataList.add(new ProjectileData(gravity, drag, vel2, offset, position, false, waterDrag, ORDER_PDG, bypassAntiCheat));
-                }
-            }
-            
-        } else if (item instanceof TridentItem && SettingsManager.TOGGLE_TRIDENT.getValue()) {
-
-            waterDrag = 0.99;
-
-            int useTicks = player.getTicksUsingItem();
-
-            Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(TridentItem.PROJECTILE_SHOOT_POWER);
-            Vec3 offset = new Vec3(0.2, 0.1, 0.2);
-
-            if(useTicks >= TridentItem.THROW_THRESHOLD_TIME && !hasEnchantment(itemStack, Enchantments.RIPTIDE)){
-                projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_PDG, bypassAntiCheat));
-            }
-
-        } else if ((item instanceof SnowballItem && SettingsManager.TOGGLE_SNOWBALL.getValue()) ||
+        if ((item instanceof SnowballItem && SettingsManager.TOGGLE_SNOWBALL.getValue()) ||
                 (item instanceof EggItem && SettingsManager.TOGGLE_EGG.getValue()) ||
                 (item instanceof EnderpearlItem && SettingsManager.TOGGLE_ENDERPEARL.getValue())) {
 
@@ -234,7 +170,7 @@ public class ProjectileData {
         //double underwaterGravity = - (double)(5.0E-4F) / 0.9900000095367432;
         Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-        float tickProgress = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = PtpClient.getTickProgress();
         Vec3 pos = TrajectoryUtils.getAimPos(player, tickProgress).add(new Vec3(0, -0.2,0));
 
         float xRot = TrajectoryUtils.getViewXRot(player, tickProgress);
@@ -249,21 +185,6 @@ public class ProjectileData {
         Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
 
         return new ProjectileData(gravity, drag, vel, offset, pos, true, waterDrag, gravity, ORDER_GPD, true);
-    }
-
-    public static boolean hasEnchantment(ItemStack stack, ResourceKey<Enchantment> enchantment) {
-        try{
-            var enchantmentRegistry = Minecraft.getInstance().player.level().registryAccess()
-                .lookupOrThrow(Registries.ENCHANTMENT);
-
-            Holder<Enchantment> enchantmentEntry = enchantmentRegistry
-                .getOrThrow(enchantment);
-            
-
-            return EnchantmentHelper.getItemEnchantmentLevel(enchantmentEntry, stack) > 0;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private static Vec3 angleFromRot(float f, float g, float h){

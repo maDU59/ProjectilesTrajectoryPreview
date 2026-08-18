@@ -1,12 +1,18 @@
-package fr.madu59.ptp.rendering;
+package fr.madu59.ptp.util;
 
 import fr.madu59.ptp.compat.ModCompat;
 import fr.madu59.ptp.compat.VivecraftCompat;
+import fr.madu59.ptp.physics.PhysicsOrder;
+import fr.madu59.ptp.physics.PhysicsStep;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public class TrajectoryUtils {
+
+    public final static PhysicsOrder ORDER_PDG = new PhysicsOrder(new PhysicsStep[]{PhysicsStep.POSITION, PhysicsStep.DRAG, PhysicsStep.GRAVITY});
+    public final static PhysicsOrder ORDER_GPD = new PhysicsOrder(new PhysicsStep[]{PhysicsStep.GRAVITY, PhysicsStep.POSITION, PhysicsStep.DRAG});
+    public final static PhysicsOrder ORDER_GDP = new PhysicsOrder(new PhysicsStep[]{PhysicsStep.GRAVITY, PhysicsStep.DRAG, PhysicsStep.POSITION});
 
     public static Vec3 getViewVector(float tickProgress){
         return getViewVector(Minecraft.getInstance().player, tickProgress);

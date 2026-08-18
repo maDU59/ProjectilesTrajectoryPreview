@@ -15,7 +15,8 @@ import fr.madu59.ptp.config.configscreen.PtpConfigScreen;
 import fr.madu59.ptp.physics.PhysicsStep;
 import fr.madu59.ptp.physics.PreviewImpact;
 import fr.madu59.ptp.physics.ProjectileData;
-import fr.madu59.ptp.rendering.RenderUtils;
+import fr.madu59.ptp.registry.ProjectileRegistry;
+import fr.madu59.ptp.util.RenderUtils;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -62,6 +63,7 @@ public class PtpClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         PtpConfigScreen.registerCommand();
+        ProjectileRegistry.init();
         registerKeyMappings();
 
         // Reset handshake state on join
@@ -349,6 +351,10 @@ public class PtpClient implements ClientModInitializer {
 
     public static boolean isEnabled(ProjectileData projectileData) {
         return client.hasSingleplayerServer() || serverHasMod || projectileData.bypassAntiCheat;
+    }
+
+    public static float getTickProgress(){
+        return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
     private static void registerKeyMappings() {
