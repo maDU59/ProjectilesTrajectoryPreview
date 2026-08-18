@@ -172,15 +172,15 @@ public class VanillaProjectiles {
     }
 
     public static void splashPotionsTrajectory(ItemStack itemStack, Player player, List<ProjectileData> out){
-            float tickProgress = PtpClient.getTickProgress();
-            Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);    
-            double waterDrag = 0.8;
+        float tickProgress = PtpClient.getTickProgress();
+        Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);    
+        double waterDrag = 0.8;
 
-            Vec3 dir = TrajectoryUtils.angleFromRot(TrajectoryUtils.getViewXRot(player, tickProgress), TrajectoryUtils.getViewYRot(player, tickProgress), -20.0F);
+        Vec3 dir = TrajectoryUtils.angleFromRot(TrajectoryUtils.getViewXRot(player, tickProgress), TrajectoryUtils.getViewYRot(player, tickProgress), -20.0F);
 
-            Vec3 vel = dir.scale(ThrowablePotionItem.PROJECTILE_SHOOT_POWER); //0.5
-            Vec3 offset = new Vec3(0.2, -0.06, 0.2);
+        Vec3 vel = dir.scale(ThrowablePotionItem.PROJECTILE_SHOOT_POWER); //0.5
+        Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
-            out.add(new ProjectileData(DEFAULT_GRAVITY, DEFAULT_DRAG, vel, offset, position, false, waterDrag, TrajectoryUtils.ORDER_GDP, false));
+        out.add(new ProjectileData(DEFAULT_GRAVITY, DEFAULT_DRAG, vel, offset, position, false, waterDrag, TrajectoryUtils.ORDER_GDP, false));
     }
 }

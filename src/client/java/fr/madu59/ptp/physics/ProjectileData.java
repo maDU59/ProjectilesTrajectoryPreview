@@ -5,25 +5,13 @@ import java.util.List;
 
 import fr.madu59.ptp.PtpClient;
 import fr.madu59.ptp.api.projectiles.ProjectileDataAPI;
-import fr.madu59.ptp.config.SettingsManager;
-import fr.madu59.ptp.util.ItemUtils;
 import fr.madu59.ptp.util.TrajectoryUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.references.ItemIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.EggItem;
-import net.minecraft.world.item.EnderpearlItem;
-import net.minecraft.world.item.ExperienceBottleItem;
-import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SnowballItem;
-import net.minecraft.world.item.ThrowablePotionItem;
-import net.minecraft.world.item.TridentItem;
-import net.minecraft.world.item.WindChargeItem;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 
 public class ProjectileData {

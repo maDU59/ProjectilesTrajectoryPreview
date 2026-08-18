@@ -35,6 +35,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.HumanoidArm;
@@ -57,6 +58,7 @@ public class PtpClient implements ClientModInitializer {
     private static boolean serverHasMod = false;
     private static KeyMapping itemDropKey;
     private static KeyMapping toggleKey;
+    private static InteractionHand interactionHand = InteractionHand.MAIN_HAND;
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
 
 
@@ -108,6 +110,7 @@ public class PtpClient implements ClientModInitializer {
         Player player = client.player;
         if (player == null) return;
 
+        interactionHand = InteractionHand.MAIN_HAND;
         ItemStack itemStack = player.getMainHandItem();
         int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
 
@@ -115,6 +118,7 @@ public class PtpClient implements ClientModInitializer {
             showItemTrajectory(context, player, ProjectileData.getDropTrajectory(player), handMultiplier);
         }
         else{
+            interactionHand = InteractionHand.OFF_HAND;
             List<ProjectileData> projectileDataList = ProjectileData.getItemsData(itemStack, player, true);
             if(projectileDataList.isEmpty()){
                 if(SettingsManager.ENABLE_OFFHAND.getValue() == false) return;
@@ -355,6 +359,10 @@ public class PtpClient implements ClientModInitializer {
 
     public static float getTickProgress(){
         return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+    }
+
+    public static InteractionHand getInteractionHand(){
+        return interactionHand;
     }
 
     private static void registerKeyMappings() {
