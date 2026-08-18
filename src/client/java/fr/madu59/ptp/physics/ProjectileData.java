@@ -9,6 +9,7 @@ import fr.madu59.ptp.config.SettingsManager;
 import fr.madu59.ptp.util.ItemUtils;
 import fr.madu59.ptp.util.TrajectoryUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.references.ItemIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -66,98 +67,10 @@ public class ProjectileData {
         Item item = itemStack.getItem();
         Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
 
-        if(ProjectileDataAPI.isBlacklisted(itemId)) {
-            return projectileDataList;
-        }
-
-        if(ProjectileDataAPI.hasProjectileData(itemStack) && ProjectileDataAPI.isEnabled(itemStack)){
-            ProjectileDataAPI.getProjectileData(itemStack, player, projectileDataList);
-            return projectileDataList;
-        }
-
-        float tickProgress = PtpClient.getTickProgress();
-
-        double gravity = 0.05;
-        double drag = 0.99;
-        double waterDrag = 0.6;
-        boolean bypassAntiCheat = false;
-
-        Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);
-
-        if ((item instanceof SnowballItem && SettingsManager.TOGGLE_SNOWBALL.getValue()) ||
-                (item instanceof EggItem && SettingsManager.TOGGLE_EGG.getValue()) ||
-                (item instanceof EnderpearlItem && SettingsManager.TOGGLE_ENDERPEARL.getValue())) {
-
-            bypassAntiCheat = item instanceof EnderpearlItem;
-            waterDrag = 0.8;
-            gravity = 0.03;
-
-            Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(SnowballItem.PROJECTILE_SHOOT_POWER);
-            Vec3 offset = new Vec3(0.2, -0.06, 0.2);
-
-            projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDP, bypassAntiCheat));
-            
-        } else if (item instanceof WindChargeItem && SettingsManager.TOGGLE_WINDCHARGE.getValue()) {
-
-            gravity = 0;
-            drag = 0.95;
-            waterDrag = 0.8;
-
-            Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress);
-            Vec3 offset = new Vec3(0.2, -0.06, 0.2);
-
-            projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_PDG, bypassAntiCheat));
-            
-        } else if (item instanceof ThrowablePotionItem && SettingsManager.TOGGLE_POTION.getValue()) {
-
-            waterDrag = 0.8;
-
-            Vec3 dir = angleFromRot(TrajectoryUtils.getViewXRot(player, tickProgress), TrajectoryUtils.getViewYRot(player, tickProgress), -20.0F);
-
-            Vec3 vel = dir.scale(ThrowablePotionItem.PROJECTILE_SHOOT_POWER); //0.5
-            Vec3 offset = new Vec3(0.2, -0.06, 0.2);
-
-            projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDP, bypassAntiCheat));
-            
-        }  else if (item instanceof ExperienceBottleItem && SettingsManager.TOGGLE_EXPPOTION.getValue()) {
-
-            gravity = 0.07;
-            waterDrag = 0.8;
-
-            Vec3 dir = angleFromRot(TrajectoryUtils.getViewXRot(player, tickProgress), TrajectoryUtils.getViewYRot(player, tickProgress), -20.0F);
-            dir = dir.normalize();
-
-            Vec3 vel = dir.scale(0.7);
-            Vec3 offset = new Vec3(0.2, -0.06, 0.2);
-
-            projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, false, waterDrag, ORDER_GDP, true));
-            
-        }  else if (item instanceof FishingRodItem && player.fishing == null && SettingsManager.TOGGLE_FISHINGROD.getValue()) {
-
-            float f = TrajectoryUtils.getViewXRot(player, tickProgress);
-            float g = TrajectoryUtils.getViewYRot(player, tickProgress);
-            float h = Mth.cos(-g * (float) (Math.PI / 180.0) - (float) Math.PI);
-            float i = Mth.sin(-g * (float) (Math.PI / 180.0) - (float) Math.PI);
-            float j = -Mth.cos(-f * (float) (Math.PI / 180.0));
-            float k = Mth.sin(-f * (float) (Math.PI / 180.0));
-            Vec3 p = position.add(new Vec3(0, 0.10000000149011612, 0));
-            position = new Vec3(p.x - i * 0.3,p.y,p.z - h * 0.3);
-            Vec3 vec3d = new Vec3(-i, Mth.clamp(-(k / j), -5.0F, 5.0F), -h);
-            double m = vec3d.length();
-            vec3d = vec3d.multiply(
-                0.6 / m + 0.5,
-                0.6 / m + 0.5,
-                0.6 / m + 0.5
-            );
-            Vec3 vel = vec3d;
-
-            gravity = 0.03;
-            drag = 0.92;
-
-            Vec3 offset = new Vec3(0.16, -0.06, 0.2);
-
-            projectileDataList.add(new ProjectileData(gravity, drag, vel, offset, position, true, drag, ORDER_GPD, true));
-            
+        if(!ProjectileDataAPI.isBlacklisted(itemId)) {
+            if(ProjectileDataAPI.hasProjectileData(itemStack) && ProjectileDataAPI.isEnabled(itemStack)){
+                ProjectileDataAPI.getProjectileData(itemStack, player, projectileDataList);
+            }
         }
 
         return projectileDataList;
@@ -185,13 +98,5 @@ public class ProjectileData {
         Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
 
         return new ProjectileData(gravity, drag, vel, offset, pos, true, waterDrag, gravity, ORDER_GPD, true);
-    }
-
-    private static Vec3 angleFromRot(float f, float g, float h){
-        float k = -Mth.sin((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
-        float l = -Mth.sin((double)((f + h) * 0.017453292F));
-        float m = Mth.cos((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
-
-        return new Vec3((double)k, (double)l, (double)m).normalize();
     }
 }
