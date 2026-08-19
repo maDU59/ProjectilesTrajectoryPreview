@@ -52,9 +52,10 @@ public class TrajectoryUtils {
     }
 
     public static Vec3 angleFromRot(float f, float g, float h){
-        float k = -Mth.sin((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
+        float cosF = Mth.cos((double)(f * 0.017453292F));
+        float k = -Mth.sin((double)(g * 0.017453292F)) * cosF;
         float l = -Mth.sin((double)((f + h) * 0.017453292F));
-        float m = Mth.cos((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
+        float m = Mth.cos((double)(g * 0.017453292F)) * cosF;
 
         return new Vec3((double)k, (double)l, (double)m).normalize();
     }
