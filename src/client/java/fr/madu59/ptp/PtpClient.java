@@ -32,10 +32,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -60,7 +59,7 @@ public class PtpClient implements ClientModInitializer {
     private static KeyMapping itemDropKey;
     private static KeyMapping toggleKey;
     private static InteractionHand interactionHand = InteractionHand.MAIN_HAND;
-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
+    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("ptp", "ptp"));
 
 
     @Override
@@ -209,7 +208,7 @@ public class PtpClient implements ClientModInitializer {
 
     private static void renderTrajectory(WorldRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
 
-        VertexConsumer lineConsumer = context.consumers().getBuffer(RenderTypes.lines());
+        VertexConsumer lineConsumer = context.consumers().getBuffer(RenderType.lines());
         Vec3 cam = client.gameRenderer.getMainCamera().position();
         PoseStack poseStack = context.matrices();
         poseStack.pushPose();

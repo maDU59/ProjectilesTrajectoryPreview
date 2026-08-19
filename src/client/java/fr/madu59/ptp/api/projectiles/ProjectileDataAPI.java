@@ -12,16 +12,16 @@ import java.util.function.BooleanSupplier;
 
 import fr.madu59.ptp.physics.ProjectileData;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class ProjectileDataAPI {
     
-    private static final Map<Identifier, TriConsumer<ItemStack, Player, List<ProjectileData>>> projectileDataProviderMap = new HashMap<>();
-    private static final Map<Identifier, BooleanSupplier> projectileTrajectoryStateSupplierMap = new HashMap<>();
-    private static final Set<Identifier> blacklistedProjectiles = new HashSet<>();
+    private static final Map<ResourceLocation, TriConsumer<ItemStack, Player, List<ProjectileData>>> projectileDataProviderMap = new HashMap<>();
+    private static final Map<ResourceLocation, BooleanSupplier> projectileTrajectoryStateSupplierMap = new HashMap<>();
+    private static final Set<ResourceLocation> blacklistedProjectiles = new HashSet<>();
 
     /*
      * Registers a projectile with the given ID and data provider.
@@ -29,7 +29,7 @@ public class ProjectileDataAPI {
      * @param dataProvider The ProjectileData containing physics parameters and update order.
      * @since 1.0.35
      */
-    public static void registerProjectile(Identifier id, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider) {
+    public static void registerProjectile(ResourceLocation id, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider) {
         registerProjectile(id, dataProvider, () -> true);
     }
 
@@ -42,7 +42,7 @@ public class ProjectileDataAPI {
     public static void registerProjectile(Item item, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider) {
         if(item == null) return;
 
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
         registerProjectile(itemId, dataProvider);
     }
 
@@ -53,7 +53,7 @@ public class ProjectileDataAPI {
      * @param booleanSupplier The boolean supplier used to determine whether the trajectory for this item is currently enabled.
      * @since 1.0.35
      */
-    public static void registerProjectile(Identifier id, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider, BooleanSupplier booleanSupplier) {
+    public static void registerProjectile(ResourceLocation id, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider, BooleanSupplier booleanSupplier) {
         projectileDataProviderMap.put(id, dataProvider);
         projectileTrajectoryStateSupplierMap.put(id, booleanSupplier);
     }
@@ -68,7 +68,7 @@ public class ProjectileDataAPI {
     public static void registerProjectile(Item item, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider, BooleanSupplier booleanSupplier) {
         if(item == null) return;
 
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
         registerProjectile(itemId, dataProvider, booleanSupplier);
     }
 
@@ -77,7 +77,7 @@ public class ProjectileDataAPI {
      * @param id The unique identifier for the projectile.
      * @since 1.0.35
      */
-    public static void blacklistProjectile(Identifier id) {
+    public static void blacklistProjectile(ResourceLocation id) {
         blacklistedProjectiles.add(id);
     }
 
@@ -88,7 +88,7 @@ public class ProjectileDataAPI {
      * @since 1.0.35
      */
     @ApiStatus.Internal
-    public static TriConsumer<ItemStack, Player, List<ProjectileData>> getProjectileDataProvider(Identifier id) {
+    public static TriConsumer<ItemStack, Player, List<ProjectileData>> getProjectileDataProvider(ResourceLocation id) {
         return projectileDataProviderMap.get(id);
     }
 
@@ -105,7 +105,7 @@ public class ProjectileDataAPI {
         Item item = itemStack.getItem();
         if(item == null) return;
 
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
         if(itemId == null) return;
 
         TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider = getProjectileDataProvider(itemId);
@@ -121,7 +121,7 @@ public class ProjectileDataAPI {
      * @since 1.0.35
      */
     @ApiStatus.Internal
-    public static boolean hasProjectileDataProvider(Identifier id) {
+    public static boolean hasProjectileDataProvider(ResourceLocation id) {
         return projectileDataProviderMap.containsKey(id);
     }
 
@@ -138,7 +138,7 @@ public class ProjectileDataAPI {
         Item item = itemStack.getItem();
         if(item == null) return false;
 
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
         if(itemId == null) return false;
 
         return getProjectileDataProvider(itemId) != null;
@@ -151,7 +151,7 @@ public class ProjectileDataAPI {
      * @since 1.0.35
      */
     @ApiStatus.Internal
-    public static boolean isEnabled(Identifier id) {
+    public static boolean isEnabled(ResourceLocation id) {
         return projectileTrajectoryStateSupplierMap.get(id).getAsBoolean();
     }
 
@@ -168,7 +168,7 @@ public class ProjectileDataAPI {
         Item item = itemStack.getItem();
         if(item == null) return false;
 
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
         if(itemId == null) return false;
 
         return isEnabled(itemId);
@@ -181,7 +181,7 @@ public class ProjectileDataAPI {
      * @since 1.0.35
      */
     @ApiStatus.Internal
-    public static boolean isBlacklisted(Identifier id) {
+    public static boolean isBlacklisted(ResourceLocation id) {
         return blacklistedProjectiles.contains(id);
     }
 

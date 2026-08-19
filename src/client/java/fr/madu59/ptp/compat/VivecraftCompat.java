@@ -1,6 +1,7 @@
 package fr.madu59.ptp.compat;
 
 import fr.madu59.ptp.PtpClient;
+import fr.madu59.ptp.util.TrajectoryUtils;
 
 import org.vivecraft.api.client.VRClientAPI;
 import org.vivecraft.client_vr.ClientDataHolderVR;
@@ -21,7 +22,7 @@ public class VivecraftCompat {
             LocalPlayer localPlayer = Minecraft.getInstance().player;
             if(BowTracker.isBow(player.getMainHandItem())){
                 if(ClientDataHolderVR.getInstance().bowTracker.isActive(localPlayer)){
-                    return new Vec3(ClientDataHolderVR.getInstance().bowTracker.getAimVector());
+                    return TrajectoryUtils.toVec3(ClientDataHolderVR.getInstance().bowTracker.getAimVector());
                 }
             }
             else{

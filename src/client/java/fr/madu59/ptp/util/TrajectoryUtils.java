@@ -1,5 +1,7 @@
 package fr.madu59.ptp.util;
 
+import org.joml.Vector3fc;
+
 import fr.madu59.ptp.compat.ModCompat;
 import fr.madu59.ptp.compat.VivecraftCompat;
 import fr.madu59.ptp.physics.PhysicsOrder;
@@ -52,10 +54,14 @@ public class TrajectoryUtils {
     }
 
     public static Vec3 angleFromRot(float f, float g, float h){
-        float k = -Mth.sin((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
-        float l = -Mth.sin((double)((f + h) * 0.017453292F));
-        float m = Mth.cos((double)(g * 0.017453292F)) * Mth.cos((double)(f * 0.017453292F));
+        float k = -Mth.sin(g * 0.017453292F) * Mth.cos(f * 0.017453292F);
+        float l = -Mth.sin((f + h) * 0.017453292F);
+        float m = Mth.cos(g * 0.017453292F) * Mth.cos(f * 0.017453292F);
 
         return new Vec3((double)k, (double)l, (double)m).normalize();
+    }
+
+    public static Vec3 toVec3(Vector3fc vec){
+        return new Vec3(vec.x(), vec.y(), vec.z());
     }
 }

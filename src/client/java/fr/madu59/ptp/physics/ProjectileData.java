@@ -7,7 +7,7 @@ import fr.madu59.ptp.PtpClient;
 import fr.madu59.ptp.api.projectiles.ProjectileDataAPI;
 import fr.madu59.ptp.util.TrajectoryUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -49,7 +49,7 @@ public class ProjectileData {
         List<ProjectileData> projectileDataList = new ArrayList<>();
 
         Item item = itemStack.getItem();
-        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        ResourceLocation itemId = BuiltInRegistries.ITEM.getKey(item);
 
         if(!ProjectileDataAPI.isBlacklisted(itemId)) {
             if(ProjectileDataAPI.hasProjectileData(itemStack) && ProjectileDataAPI.isEnabled(itemStack)){
@@ -73,10 +73,10 @@ public class ProjectileData {
         float xRot = TrajectoryUtils.getViewXRot(player, tickProgress);
         float yRot = TrajectoryUtils.getViewYRot(player, tickProgress);
 
-        float g = Mth.sin((double)(xRot * 0.017453292F));
-        float h = Mth.cos((double)(xRot * 0.017453292F));
-        float i = Mth.sin((double)(yRot * 0.017453292F));
-        float j = Mth.cos((double)(yRot * 0.017453292F));
+        float g = Mth.sin(xRot * 0.017453292F);
+        float h = Mth.cos(xRot * 0.017453292F);
+        float i = Mth.sin(yRot * 0.017453292F);
+        float j = Mth.cos(yRot * 0.017453292F);
         float k = 0.5F * 6.2831855F;
         float l = 0.02F * 0.5F;
         Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
