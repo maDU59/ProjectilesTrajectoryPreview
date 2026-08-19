@@ -1,10 +1,15 @@
 package fr.madu59.ptp.compat;
 
-import org.vivecraft.client.network.ClientNetworking;
+import fr.madu59.ptp.PtpClient;
+
+import org.vivecraft.api.client.VRClientAPI;
+import org.vivecraft.client_vr.ClientDataHolderVR;
+import org.vivecraft.client_vr.gameplay.trackers.BowTracker;
 import org.vivecraft.server.ServerVRPlayers;
 import org.vivecraft.server.ServerVivePlayer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -12,17 +17,25 @@ import net.minecraft.world.phys.Vec3;
 public class VivecraftCompat {
 
     public static Vec3 getViewVector(Player player, float tickProgress){
-        if(player instanceof ServerPlayer serverPlayer){
+        if(player == Minecraft.getInstance().player){
+            LocalPlayer localPlayer = Minecraft.getInstance().player;
+            if(BowTracker.isBow(player.getMainHandItem())){
+                if(ClientDataHolderVR.getInstance().bowTracker.isActive(localPlayer)){
+                    return new Vec3(ClientDataHolderVR.getInstance().bowTracker.getAimVector());
+                }
+            }
+            else{
+                return VRClientAPI.instance().getWorldRenderPose().getHand(PtpClient.getInteractionHand()).getDir();
+            }
+        }
+        else if(player instanceof ServerPlayer serverPlayer){
             ServerVivePlayer serverVivePlayer = ServerVRPlayers.getVivePlayer(serverPlayer);
             if (serverVivePlayer != null && serverVivePlayer.isVR()) {
                 return serverVivePlayer.getAimDir(true);
             }
         }
-        else if(player == Minecraft.getInstance().player){
-            return new Vec3(ClientNetworking.getActiveAimDir());
-        }
 
-        return Vec3.ZERO;
+        return player.getViewVector(tickProgress);
     }
 
     public static float getViewXRot(Player player, float tickProgress){
@@ -49,16 +62,16 @@ public class VivecraftCompat {
     }
 
     public static Vec3 getAimPos(Player player, float tickProgress){
-        if(player instanceof ServerPlayer serverPlayer){
+        if(player == Minecraft.getInstance().player){
+            return VRClientAPI.instance().getWorldRenderPose().getHand(PtpClient.getInteractionHand()).getPos();
+        }
+        else if(player instanceof ServerPlayer serverPlayer){
             ServerVivePlayer serverVivePlayer = ServerVRPlayers.getVivePlayer(serverPlayer);
             if (serverVivePlayer != null && serverVivePlayer.isVR()) {
                 return serverVivePlayer.getAimPos(true);
             }
         }
-        else if(player == Minecraft.getInstance().player){
-            return ClientNetworking.getActiveAimPos();
-        }
 
-        return Vec3.ZERO;
+        return player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
     }
 }

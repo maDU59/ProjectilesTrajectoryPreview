@@ -15,7 +15,8 @@ import fr.madu59.ptp.config.configscreen.PtpConfigScreen;
 import fr.madu59.ptp.physics.PhysicsStep;
 import fr.madu59.ptp.physics.PreviewImpact;
 import fr.madu59.ptp.physics.ProjectileData;
-import fr.madu59.ptp.rendering.RenderUtils;
+import fr.madu59.ptp.registry.ProjectileRegistry;
+import fr.madu59.ptp.util.RenderUtils;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -35,6 +36,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.HumanoidArm;
@@ -57,12 +59,14 @@ public class PtpClient implements ClientModInitializer {
     private static boolean serverHasMod = false;
     private static KeyMapping itemDropKey;
     private static KeyMapping toggleKey;
+    private static InteractionHand interactionHand = InteractionHand.MAIN_HAND;
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("ptp", "ptp"));
 
 
     @Override
     public void onInitializeClient() {
         PtpConfigScreen.registerCommand();
+        ProjectileRegistry.init();
         registerKeyMappings();
 
         // Reset handshake state on join
@@ -107,6 +111,7 @@ public class PtpClient implements ClientModInitializer {
         Player player = client.player;
         if (player == null) return;
 
+        interactionHand = InteractionHand.MAIN_HAND;
         ItemStack itemStack = player.getMainHandItem();
         int handMultiplier = client.options.mainHand().get() == HumanoidArm.RIGHT? 1:-1;
 
@@ -114,6 +119,7 @@ public class PtpClient implements ClientModInitializer {
             showItemTrajectory(context, player, ProjectileData.getDropTrajectory(player), handMultiplier);
         }
         else{
+            interactionHand = InteractionHand.OFF_HAND;
             List<ProjectileData> projectileDataList = ProjectileData.getItemsData(itemStack, player, true);
             if(projectileDataList.isEmpty()){
                 if(SettingsManager.ENABLE_OFFHAND.getValue() == false) return;
@@ -155,34 +161,33 @@ public class PtpClient implements ClientModInitializer {
 
             PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileData, true);
 
-            Option.State value = SettingsManager.SHOW_TRAJECTORY.getValue();
+            Option.State value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
+            if(value != Option.State.DISABLED){
+                if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
+                    BlockPos impactPos = blockHitResult.getBlockPos();
+                    RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
+                }
+                else if(previewImpact.entityImpact != null) {
+                    AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
+                    RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
+                }
+            }
+
+            value = SettingsManager.OUTLINE_TARGETS.getValue();
+            if(value != Option.State.DISABLED){
+                if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
+                    BlockPos impactPos = blockHitResult.getBlockPos();
+                    RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
+                }
+                else if(previewImpact.entityImpact != null) {
+                    AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
+                    RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));    
+                }
+            }
+            int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
+
+            value = SettingsManager.SHOW_TRAJECTORY.getValue();
             if ((value == Option.State.TARGET_IS_ENTITY && previewImpact.entityImpact!=null) || value == Option.State.ENABLED) {
-
-                value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
-                if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
-                    if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
-                        BlockPos impactPos = blockHitResult.getBlockPos();
-                        RenderUtils.renderFilledBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));
-                    }
-                    else if(previewImpact.entityImpact != null) {
-                        AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                        RenderUtils.renderFilledBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.HIGHLIGHT_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.HIGHLIGHT_OPACITY.getValue())));    
-                    }
-                }
-
-                value = SettingsManager.OUTLINE_TARGETS.getValue();
-                if(value == Option.State.TARGET_IS_ENTITY || value == Option.State.ENABLED){
-                    if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
-                        BlockPos impactPos = blockHitResult.getBlockPos();
-                        RenderUtils.renderBox(context, impactPos.getX(), impactPos.getY(), impactPos.getZ(), impactPos.getX()+1, impactPos.getY()+1, impactPos.getZ()+1, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue())), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));
-                    }
-                    else if(previewImpact.entityImpact != null) {
-                        AABB entityBoundingBox = previewImpact.entityImpact.getBoundingBox().inflate(previewImpact.entityImpact.getPickRadius());
-                        RenderUtils.renderBox(context, entityBoundingBox.minX, entityBoundingBox.minY, entityBoundingBox.minZ, entityBoundingBox.maxX, entityBoundingBox.maxY, entityBoundingBox.maxZ, SettingsManager.convertColorToFloat(SettingsManager.getColorFromSetting(SettingsManager.OUTLINE_COLOR.getValue(), previewImpact.entityImpact)), SettingsManager.convertAlphaToFloat(SettingsManager.getAlphaFromSetting(SettingsManager.OUTLINE_OPACITY.getValue())));    
-                    }
-                }
-                int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
-
                 renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
             }
         }
@@ -272,13 +277,14 @@ public class PtpClient implements ClientModInitializer {
 
             AABB box = new AABB(prevPos, pos).inflate(1.0);
 
-            List<Entity> entities = client.level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
-
             Entity closest = null;
             double closestDistance = 99999.0;
             Vec3 entityHitPos = null;
 
             if (canHitEntities){
+
+                List<Entity> entities = client.level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
+                
                 for (Entity entity : entities) {
                     AABB entityBox = entity.getBoundingBox().inflate(entity.getPickRadius());
                     Optional<Vec3> entityRaycastHit = entityBox.clip(prevPos, pos);
@@ -351,6 +357,14 @@ public class PtpClient implements ClientModInitializer {
 
     public static boolean isEnabled(ProjectileData projectileData) {
         return client.hasSingleplayerServer() || serverHasMod || projectileData.bypassAntiCheat;
+    }
+
+    public static float getTickProgress(){
+        return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+    }
+
+    public static InteractionHand getInteractionHand(){
+        return interactionHand;
     }
 
     private static void registerKeyMappings() {
