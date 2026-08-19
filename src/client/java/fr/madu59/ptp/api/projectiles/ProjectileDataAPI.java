@@ -1,32 +1,75 @@
 package fr.madu59.ptp.api.projectiles;
 
+import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import fr.madu59.ptp.physics.ProjectileData;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 public class ProjectileDataAPI {
     
-    public static final Map<Identifier, Function<ItemStack, ProjectileData>> projectileDataProviderMap = new HashMap<>();
-    public static final List<Identifier> blacklistedProjectiles = new ArrayList<>();
+    private static final Map<Identifier, TriConsumer<ItemStack, Player, List<ProjectileData>>> projectileDataProviderMap = new HashMap<>();
+    private static final Map<Identifier, BooleanSupplier> projectileTrajectoryStateSupplierMap = new HashMap<>();
+    private static final Set<Identifier> blacklistedProjectiles = new HashSet<>();
 
     /*
-     * Registers a projectile with the given ID and Data provider.
-     * @param id The unique identifier for the projectile (e.g., "minecraft:arrow").
-     * @param Data The ProjectileData containing physics parameters and update order.
+     * Registers a projectile with the given ID and data provider.
+     * @param id The unique identifier for the projectile or the projectile thrower (e.g. "minecraft:bow", "minecraft:snowball").
+     * @param dataProvider The ProjectileData containing physics parameters and update order.
      * @since 1.0.35
      */
-    public static void registerProjectile(Identifier id, Function<ItemStack, ProjectileData> dataProvider) {
+    public static void registerProjectile(Identifier id, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider) {
+        registerProjectile(id, dataProvider, () -> true);
+    }
+
+    /*
+     * Registers a projectile with the given ID and data provider.
+     * @param item The projectile or the projectile thrower
+     * @param dataProvider The ProjectileData containing physics parameters and update order.
+     * @since 1.0.35
+     */
+    public static void registerProjectile(Item item, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider) {
+        if(item == null) return;
+
+        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        registerProjectile(itemId, dataProvider);
+    }
+
+    /*
+     * Registers a projectile with the given ID and data provider.
+     * @param id The unique identifier for the projectile or the projectile thrower (e.g. "minecraft:bow", "minecraft:snowball").
+     * @param dataProvider The ProjectileData containing physics parameters and update order.
+     * @param booleanSupplier The boolean supplier used to determine whether the trajectory for this item is currently enabled.
+     * @since 1.0.35
+     */
+    public static void registerProjectile(Identifier id, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider, BooleanSupplier booleanSupplier) {
         projectileDataProviderMap.put(id, dataProvider);
+        projectileTrajectoryStateSupplierMap.put(id, booleanSupplier);
+    }
+
+    /*
+     * Registers a projectile with the given ID and data provider.
+     * @param item The projectile or the projectile thrower
+     * @param dataProvider The ProjectileData containing physics parameters and update order.
+     * @param booleanSupplier The boolean supplier used to determine whether the trajectory for this item is currently enabled.
+     * @since 1.0.35
+     */
+    public static void registerProjectile(Item item, TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider, BooleanSupplier booleanSupplier) {
+        if(item == null) return;
+
+        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        registerProjectile(itemId, dataProvider, booleanSupplier);
     }
 
     /*
@@ -45,7 +88,7 @@ public class ProjectileDataAPI {
      * @since 1.0.35
      */
     @ApiStatus.Internal
-    public static Function<ItemStack, ProjectileData> getProjectileDataProvider(Identifier id) {
+    public static TriConsumer<ItemStack, Player, List<ProjectileData>> getProjectileDataProvider(Identifier id) {
         return projectileDataProviderMap.get(id);
     }
 
@@ -56,19 +99,19 @@ public class ProjectileDataAPI {
      * @since 1.0.35
      */
     @ApiStatus.Internal
-    public static ProjectileData getProjectileData(ItemStack itemStack) {
-        if(itemStack == null) return null;
+    public static void getProjectileData(ItemStack itemStack, Player player, List<ProjectileData> out) {
+        if(itemStack == null) return;
 
         Item item = itemStack.getItem();
-        if(item == null) return null;
+        if(item == null) return;
 
         Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
-        if(itemId == null) return null;
+        if(itemId == null) return;
 
-        Function<ItemStack, ProjectileData> dataProvider = getProjectileDataProvider(itemId);
-        if(dataProvider == null) return null;
+        TriConsumer<ItemStack, Player, List<ProjectileData>> dataProvider = getProjectileDataProvider(itemId);
+        if(dataProvider == null) return;
 
-        return dataProvider.apply(itemStack);
+        dataProvider.accept(itemStack, player, out);
     }
 
     /*
@@ -99,6 +142,36 @@ public class ProjectileDataAPI {
         if(itemId == null) return false;
 
         return getProjectileDataProvider(itemId) != null;
+    }
+
+    /*
+     * Checks if a projectile with the given ID is currently enabled.
+     * @param id The unique identifier for the projectile.
+     * @return whether the trajectory for this item is enabled or not.
+     * @since 1.0.35
+     */
+    @ApiStatus.Internal
+    public static boolean isEnabled(Identifier id) {
+        return projectileTrajectoryStateSupplierMap.get(id).getAsBoolean();
+    }
+
+    /*
+     * Checks if a projectile with the given ID is currently enabled.
+     * @param itemStack The itemStack.
+     * @return whether the trajectory for this item is enabled or not.
+     * @since 1.0.35
+     */
+    @ApiStatus.Internal
+    public static boolean isEnabled(ItemStack itemStack) {
+        if(itemStack == null) return false;
+
+        Item item = itemStack.getItem();
+        if(item == null) return false;
+
+        Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        if(itemId == null) return false;
+
+        return isEnabled(itemId);
     }
 
     /*
