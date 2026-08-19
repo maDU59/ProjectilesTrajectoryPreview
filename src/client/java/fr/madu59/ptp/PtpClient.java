@@ -19,6 +19,8 @@ import fr.madu59.ptp.registry.ProjectileRegistry;
 import fr.madu59.ptp.util.RenderUtils;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
+import fr.madu59.ptp.compat.ModCompat;
+
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -116,11 +118,11 @@ public class PtpClient implements ClientModInitializer {
             showItemTrajectory(context, player, ProjectileData.getDropTrajectory(player), handMultiplier);
         }
         else{
-            interactionHand = InteractionHand.OFF_HAND;
             List<ProjectileData> projectileDataList = ProjectileData.getItemsData(itemStack, player, true);
             if(projectileDataList.isEmpty()){
                 if(SettingsManager.ENABLE_OFFHAND.getValue() == false) return;
 
+                interactionHand = InteractionHand.OFF_HAND;
                 itemStack = player.getOffhandItem();
                 handMultiplier = -handMultiplier;
                 projectileDataList = ProjectileData.getItemsData(itemStack, player, false);
@@ -133,7 +135,7 @@ public class PtpClient implements ClientModInitializer {
 
     private static void showItemTrajectory(WorldRenderContext context, Player player, ProjectileData projectileData, int handMultiplier) {
         if(!isEnabled(projectileData)) return;
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = getTickProgress();
         Vec3 eye = player.getEyePosition(tickProgress);
         Vec3 pos = projectileData.position == null? player.getEyePosition() : projectileData.position;
         Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileData.offset, pos, eye, handMultiplier, tickProgress);
@@ -146,7 +148,7 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void showProjectileTrajectory(WorldRenderContext context, Player player, List<ProjectileData> projectileDataList, int handMultiplier) {
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = getTickProgress();
         Vec3 eye = player.getEyePosition(tickProgress);
 
         for(ProjectileData projectileData : projectileDataList){
@@ -191,6 +193,8 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
+
+        if(ModCompat.isVivecraftLoaded()) return Vec3.ZERO;
 
         float yaw = (float) Math.toRadians(-player.getViewYRot(tickProgress));
         float pitch = (float) Math.toRadians(-player.getViewXRot(tickProgress));
