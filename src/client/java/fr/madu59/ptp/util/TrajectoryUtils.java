@@ -48,7 +48,7 @@ public class TrajectoryUtils {
 
     public static Vec3 getAimPos(Player player, float tickProgress){
         if(ModCompat.isVivecraftLoaded()) return VivecraftCompat.getAimPos(player, tickProgress);
-        return player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+        return player.getEyePosition(tickProgress).add(new Vec3(0, -0.1F,0));
     }
 
     public static Vec3 angleFromRot(float f, float g, float h){
