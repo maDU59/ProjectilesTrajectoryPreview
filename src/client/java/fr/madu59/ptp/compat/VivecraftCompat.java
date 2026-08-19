@@ -16,6 +16,11 @@ import net.minecraft.world.phys.Vec3;
 
 public class VivecraftCompat {
 
+    /* 
+     * Thanks to fayer3 for helping with this compatibility code
+     * Thanks to flameeliwood for testing the Vivecraft compatibility
+     */
+
     public static Vec3 getViewVector(Player player, float tickProgress){
         if(player == Minecraft.getInstance().player && VRClientAPI.instance().isVRActive()){
             LocalPlayer localPlayer = Minecraft.getInstance().player;
