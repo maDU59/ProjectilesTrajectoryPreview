@@ -160,9 +160,7 @@ public class PtpClient implements ClientModInitializer {
 
             PreviewImpact previewImpact = calculateTrajectory(pos, player, projectileData, true);
 
-            Option.State value = SettingsManager.SHOW_TRAJECTORY.getValue();
-
-            value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
+            Option.State value = SettingsManager.HIGHLIGHT_TARGETS.getValue();
             if(value != Option.State.DISABLED){
                 if(value != Option.State.TARGET_IS_ENTITY && previewImpact.impact != null && previewImpact.impact.getType() == HitResult.Type.BLOCK  && previewImpact.impact instanceof BlockHitResult blockHitResult) {
                     BlockPos impactPos = blockHitResult.getBlockPos();
@@ -187,6 +185,7 @@ public class PtpClient implements ClientModInitializer {
             }
             int color = SettingsManager.getARGBColorFromSetting(SettingsManager.TRAJECTORY_COLOR.getValue(), SettingsManager.TRAJECTORY_OPACITY.getValue(), previewImpact.entityImpact);
 
+            value = SettingsManager.SHOW_TRAJECTORY.getValue();
             if ((value == Option.State.TARGET_IS_ENTITY && previewImpact.entityImpact!=null) || value == Option.State.ENABLED) {
                 renderTrajectory(context, previewImpact.trajectoryPoints, handToEyeDelta, color, previewImpact.hasHit);
             }
