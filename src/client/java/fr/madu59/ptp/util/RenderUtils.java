@@ -8,8 +8,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.world.phys.Vec3;
 
 public class RenderUtils {
@@ -25,7 +25,7 @@ public class RenderUtils {
 
         VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.debugFilledBox());
 
-        ShapeRenderer.addChainedFilledBoxVertices(poseStack, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        LevelRenderer.addChainedFilledBoxVertices(poseStack, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         poseStack.popPose();
     }
@@ -39,7 +39,7 @@ public class RenderUtils {
 
         VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.lines());
 
-        ShapeRenderer.renderLineBox(poseStack, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        LevelRenderer.renderLineBox(poseStack, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         poseStack.popPose();
     }

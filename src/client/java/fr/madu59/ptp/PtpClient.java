@@ -133,7 +133,7 @@ public class PtpClient implements ClientModInitializer {
 
     private static void showItemTrajectory(WorldRenderContext context, Player player, ProjectileData projectileData, int handMultiplier) {
         if(!isEnabled(projectileData)) return;
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = getTickProgress();
         Vec3 eye = player.getEyePosition(tickProgress);
         Vec3 pos = projectileData.position == null? player.getEyePosition() : projectileData.position;
         Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileData.offset, pos, eye, handMultiplier, tickProgress);
@@ -146,7 +146,7 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void showProjectileTrajectory(WorldRenderContext context, Player player, List<ProjectileData> projectileDataList, int handMultiplier) {
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = getTickProgress();
         Vec3 eye = player.getEyePosition(tickProgress);
 
         for(ProjectileData projectileData : projectileDataList){
@@ -340,7 +340,7 @@ public class PtpClient implements ClientModInitializer {
                 break;
             }
 
-            if (pos.y < player.level().getMinY() - 20) 
+            if (pos.y < player.level().getMinBuildHeight() - 20) 
                 break;
 
             prevPos = pos;
@@ -357,7 +357,7 @@ public class PtpClient implements ClientModInitializer {
     }
 
     public static float getTickProgress(){
-        return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
     }
 
     public static InteractionHand getInteractionHand(){
