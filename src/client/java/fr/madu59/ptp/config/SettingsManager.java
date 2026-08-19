@@ -103,7 +103,7 @@ public class SettingsManager {
         "ENABLE_OFFHAND",
         "ptp.config.enable_offhand",
         "ptp.config.enable_offhand_desc",
-        false
+        true
     );
 
     public static Option<Boolean> TOGGLE_BOW = loadOptionWithDefaults(
