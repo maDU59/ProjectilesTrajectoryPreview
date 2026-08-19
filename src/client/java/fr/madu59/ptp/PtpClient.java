@@ -19,6 +19,8 @@ import fr.madu59.ptp.registry.ProjectileRegistry;
 import fr.madu59.ptp.util.RenderUtils;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_C2SPayload;
 import fr.madu59.ptp.HandshakeNetworking.HANDSHAKE_S2CPayload;
+import fr.madu59.ptp.compat.ModCompat;
+
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -193,6 +195,8 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static Vec3 GetHandToEyeDelta(Player player, Vec3 offset, Vec3 startPos, Vec3 eye, int handMultiplier, float tickProgress) {
+
+        if(ModCompat.isVivecraftLoaded()) return Vec3.ZERO;
 
         float yaw = (float) Math.toRadians(-player.getViewYRot(tickProgress));
         float pitch = (float) Math.toRadians(-player.getViewXRot(tickProgress));
