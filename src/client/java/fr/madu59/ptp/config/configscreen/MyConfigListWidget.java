@@ -16,7 +16,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -72,19 +71,19 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
             }
         }
 
-        @Override
-        public int getHeight() {
-            updateState();
-            if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return 0;
-            return super.getHeight();
-        }
+        // @Override
+        // public int getHeight() {
+        //     updateState();
+        //     if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return 0;
+        //     return super.getHeight();
+        // }
 
-        @Override
-        public int getContentHeight() {
-            updateState();
-            if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return 0;
-            return super.getContentHeight();
-        }
+        // @Override
+        // public int getContentHeight() {
+        //     updateState();
+        //     if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return 0;
+        //     return super.getContentHeight();
+        // }
     }
 
     public static class CategoryEntry extends MyConfigListWidget.Entry {
@@ -97,11 +96,11 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return;
             Font textRenderer = Minecraft.getInstance().font;
-            int textX = getContentX() + getContentWidth() / 2;
-            int textY = getContentY() + (getContentHeight() - textRenderer.lineHeight) / 2;
+            int textX = x + entryWidth / 2;
+            int textY = y + (entryHeight - textRenderer.lineHeight) / 2;
             context.drawCenteredString(textRenderer, Component.translatable(this.name).withStyle(ChatFormatting.UNDERLINE), textX, textY, 0xFFFFFFFF);
         }  
 
@@ -132,16 +131,16 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return;
-            this.button.setY(this.getContentY() + (this.getContentHeight() - this.button.getHeight()) / 2);
-            this.button.setX(this.getContentWidth() - this.button.getWidth() - 10);
+            this.button.setY(y + (entryHeight - this.button.getHeight()) / 2);
+            this.button.setX(entryWidth - this.button.getWidth() - 10);
             this.button.render(context, mouseX, mouseY, tickDelta);
 
             if(this.name == null) return;
 
             Font textRenderer = Minecraft.getInstance().font;
-            context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
+            context.drawString(textRenderer, Component.literal(indent + this.name), 10, y + (entryHeight - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override
@@ -155,8 +154,8 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent click, boolean doubleClick) {
-            if (this.button.mouseClicked(click, doubleClick)) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (this.button.mouseClicked(mouseX, mouseY, button)) {
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 if(this.option != null){
                     this.button.setMessage(Component.literal(this.option.getValueAsTranslatedString()));
@@ -185,16 +184,16 @@ public class MyConfigListWidget extends ContainerObjectSelectionList<MyConfigLis
         }
 
         @Override
-        public void renderContent(GuiGraphics context, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+        public void render(GuiGraphics context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             if(this.isEnabledSupplier != null && !this.isEnabledSupplier.getAsBoolean()) return;
-            this.slider.setY(this.getContentY() + (this.getContentHeight() - this.slider.getHeight()) / 2);
-            this.slider.setX(this.getContentWidth() - this.slider.getWidth() - 10);
+            this.slider.setY(y + (entryHeight - this.slider.getHeight()) / 2);
+            this.slider.setX(entryWidth - this.slider.getWidth() - 10);
             this.slider.render(context, mouseX, mouseY, tickDelta);
 
             if(this.name == null) return;
 
             Font textRenderer = Minecraft.getInstance().font;
-            context.drawString(textRenderer, Component.literal(indent + this.name), 10, this.getContentY() + (this.getContentHeight() - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
+            context.drawString(textRenderer, Component.literal(indent + this.name), 10, y + (entryHeight - textRenderer.lineHeight) / 2, 0xFFFFFFFF, true);
         }
 
         @Override

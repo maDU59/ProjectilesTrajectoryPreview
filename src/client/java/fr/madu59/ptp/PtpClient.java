@@ -28,13 +28,13 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -49,7 +49,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 
 public class PtpClient implements ClientModInitializer {
 
@@ -59,7 +58,6 @@ public class PtpClient implements ClientModInitializer {
     private static KeyMapping itemDropKey;
     private static KeyMapping toggleKey;
     private static InteractionHand interactionHand = InteractionHand.MAIN_HAND;
-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(ResourceLocation.fromNamespaceAndPath("ptp", "ptp"));
 
 
     @Override
@@ -210,7 +208,7 @@ public class PtpClient implements ClientModInitializer {
 
         VertexConsumer lineConsumer = context.consumers().getBuffer(RenderType.lines());
         Vec3 cam = client.gameRenderer.getMainCamera().position();
-        PoseStack poseStack = context.matrices();
+        PoseStack poseStack = context.matrixStack();
         poseStack.pushPose();
         poseStack.translate(-cam.x, -cam.y, -cam.z);
 
@@ -371,13 +369,13 @@ public class PtpClient implements ClientModInitializer {
             "ptp.key.item_drop_trajectory",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_B,
-            CATEGORY
+            "ptp:key.category.ptp.ptp"
         ));
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "ptp.key.toggle",
             InputConstants.Type.KEYSYM,
             InputConstants.UNKNOWN.getValue(),
-            CATEGORY
+            "ptp:key.category.ptp.ptp"
         ));
     }
 }

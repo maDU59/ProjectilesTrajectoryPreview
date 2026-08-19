@@ -1,13 +1,12 @@
 package fr.madu59.ptp.util;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShapeRenderer;
@@ -18,7 +17,7 @@ public class RenderUtils {
     private static final Minecraft client = Minecraft.getInstance();
 
     public static void renderFilledBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        PoseStack poseStack = context.matrices();
+        PoseStack poseStack = context.matrixStack();
         Vec3 camera = client.gameRenderer.getMainCamera().position();
 
         poseStack.pushPose();
@@ -32,7 +31,7 @@ public class RenderUtils {
     }
 
     public static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
-        PoseStack poseStack = context.matrices();
+        PoseStack poseStack = context.matrixStack();
         Vec3 camera = client.gameRenderer.getMainCamera().position();
 
         poseStack.pushPose();
@@ -40,7 +39,7 @@ public class RenderUtils {
 
         VertexConsumer quadConsumer = context.consumers().getBuffer(RenderType.lines());
 
-        ShapeRenderer.renderLineBox(poseStack.last(), quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
+        ShapeRenderer.renderLineBox(poseStack, quadConsumer, minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
 
         poseStack.popPose();
     }
