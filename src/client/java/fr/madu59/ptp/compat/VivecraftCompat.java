@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 public class VivecraftCompat {
 
     /* 
-     * Thanks to fayer3 for helping with this compatibility code
+     * Thanks to fayer3 for helping with this compatibility code and some testing
      * Thanks to flameeliwood for testing the Vivecraft compatibility
      */
 
