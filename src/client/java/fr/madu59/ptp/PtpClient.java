@@ -263,30 +263,31 @@ public class PtpClient implements ClientModInitializer {
         HitResult impact = null;
         Entity entityImpact = null;
         boolean hasHit = false;
-        List<Vec3> trajectoryPoints = new ArrayList<>();
+        List<Vec3> trajectoryPoints = new ArrayList<>(64);
         double drag =  projectileData.drag;
         double gravity = projectileData.gravity;
         Vec3 vel = projectileData.initialVelocity.add(player.getDeltaMovement());
+        PhysicsStep[] steps = projectileData.order.steps();
+        double minYThreshold = player.level().getMinY() - 120;
 
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
             
-            for (PhysicsStep order : projectileData.order.steps()){
+            for (PhysicsStep order : steps){
                 if (order == PhysicsStep.POSITION) pos = pos.add(vel);
                 else if (order == PhysicsStep.DRAG) vel = vel.scale(drag);
                 else if (order == PhysicsStep.GRAVITY) vel = vel.subtract(0, gravity, 0);
             }
-
-            AABB box = new AABB(prevPos, pos).inflate(1.0);
-
-            List<Entity> entities = client.level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
 
             Entity closest = null;
             double closestDistance = 99999.0;
             Vec3 entityHitPos = null;
 
             if (canHitEntities){
-                for (Entity entity : entities) {
+                AABB box = new AABB(prevPos, pos).inflate(1.0);
+                List<Entity> entities = client.level.getEntitiesOfClass(Entity.class, box, e -> !e.isSpectator() && e.isAlive() && !(e instanceof Projectile) && !(e instanceof ItemEntity) && !(e instanceof ExperienceOrb) && !(e instanceof EnderDragon) && !(e instanceof LocalPlayer));
+                for (int eIdx = 0; eIdx < entities.size(); eIdx++) {
+                    Entity entity = entities.get(eIdx);
                     AABB entityBox = entity.getBoundingBox().inflate(entity.getPickRadius());
                     Optional<Vec3> entityRaycastHit = entityBox.clip(prevPos, pos);
 
@@ -344,7 +345,7 @@ public class PtpClient implements ClientModInitializer {
                 break;
             }
 
-            if (pos.y < player.level().getMinY() - 120) 
+            if (pos.y < minYThreshold) 
                 break;
 
             prevPos = pos;
