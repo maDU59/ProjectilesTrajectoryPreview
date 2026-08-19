@@ -211,26 +211,33 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void renderTrajectory(LevelRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
+        int pointCount = trajectoryPoints.size();
+        if (pointCount < 2) return;
+
         Vec3 cam = client.gameRenderer.mainCamera().position();
         PoseStack matrices = context.poseStack();
         RenderType renderType = RenderTypes.LINES;
         matrices.pushPose();
         matrices.translate(-cam.x, -cam.y, -cam.z);
 
-        for (int i = 0; i < trajectoryPoints.size()-1; i++) {
-            Vec3 lerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
-            Vec3 nextLerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i+1 * 1.0))/trajectoryPoints.size());
-            Vec3 pos = trajectoryPoints.get(i).add(lerpedDelta);
-            Vec3 dir = (trajectoryPoints.get(i+1).add(nextLerpedDelta)).subtract(pos);
-            if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DASHED){
+        Option.Style style = SettingsManager.TRAJECTORY_STYLE.getValue();
+        double invSize = 1.0 / pointCount;
+        Vec3 pos = trajectoryPoints.get(0).add(handToEyeDelta);
+
+        for (int i = 0; i < pointCount - 1; i++) {
+            Vec3 nextLerpedDelta = handToEyeDelta.scale((pointCount - (i + 1)) * invSize);
+            Vec3 nextPos = trajectoryPoints.get(i + 1).add(nextLerpedDelta);
+            Vec3 dir = nextPos.subtract(pos);
+            if(style == Option.Style.DASHED){
                 dir = dir.scale(0.5);
             }
-            else if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DOTTED){
+            else if(style == Option.Style.DOTTED){
                 dir = dir.scale(0.15);
             }
             Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
 
             RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
+            pos = nextPos;
         }
 
         if (hasHit) {
