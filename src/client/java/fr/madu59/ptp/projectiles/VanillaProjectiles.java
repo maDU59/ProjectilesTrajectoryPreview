@@ -15,8 +15,6 @@ import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.EnderpearlItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SnowballItem;
-import net.minecraft.world.item.ThrowablePotionItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -88,7 +86,7 @@ public class VanillaProjectiles {
 
         Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);
 
-        Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(TridentItem.PROJECTILE_SHOOT_POWER);
+        Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(TridentItem.SHOOT_POWER);
         Vec3 offset = new Vec3(0.2, 0.1, 0.2);
 
         if(useTicks >= TridentItem.THROW_THRESHOLD_TIME && !ItemUtils.hasEnchantment(itemStack, Enchantments.RIPTIDE)){
@@ -105,7 +103,7 @@ public class VanillaProjectiles {
 
         Vec3 position = TrajectoryUtils.getAimPos(player, tickProgress);
 
-        Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(SnowballItem.PROJECTILE_SHOOT_POWER);
+        Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(1.5);
         Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
         out.add(new ProjectileData(gravity, DEFAULT_DRAG, vel, offset, position, false, waterDrag, TrajectoryUtils.ORDER_GDP, bypassAntiCheat));
@@ -177,7 +175,7 @@ public class VanillaProjectiles {
 
         Vec3 dir = TrajectoryUtils.angleFromRot(TrajectoryUtils.getViewXRot(player, tickProgress), TrajectoryUtils.getViewYRot(player, tickProgress), -20.0F);
 
-        Vec3 vel = dir.scale(ThrowablePotionItem.PROJECTILE_SHOOT_POWER); //0.5
+        Vec3 vel = dir.scale(0.5f);
         Vec3 offset = new Vec3(0.2, -0.06, 0.2);
 
         out.add(new ProjectileData(DEFAULT_GRAVITY, DEFAULT_DRAG, vel, offset, position, false, waterDrag, TrajectoryUtils.ORDER_GDP, false));
