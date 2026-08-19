@@ -369,13 +369,13 @@ public class PtpClient implements ClientModInitializer {
             "ptp.key.item_drop_trajectory",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_B,
-            "ptp:key.category.ptp.ptp"
+            "key.category.ptp.ptp"
         ));
         toggleKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
             "ptp.key.toggle",
             InputConstants.Type.KEYSYM,
             InputConstants.UNKNOWN.getValue(),
-            "ptp:key.category.ptp.ptp"
+            "key.category.ptp.ptp"
         ));
     }
 }
