@@ -135,7 +135,7 @@ public class PtpClient implements ClientModInitializer {
 
     private static void showItemTrajectory(LevelRenderContext context, Player player, ProjectileData projectileData, int handMultiplier) {
         if(!isEnabled(projectileData)) return;
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = getTickProgress();
         Vec3 eye = player.getEyePosition(tickProgress);
         Vec3 pos = projectileData.position == null? player.getEyePosition() : projectileData.position;
         Vec3 handToEyeDelta = GetHandToEyeDelta(player, projectileData.offset, pos, eye, handMultiplier, tickProgress);
@@ -148,7 +148,7 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void showProjectileTrajectory(LevelRenderContext context, Player player, List<ProjectileData> projectileDataList, int handMultiplier) {
-        float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float tickProgress = getTickProgress();
         Vec3 eye = player.getEyePosition(tickProgress);
 
         for(ProjectileData projectileData : projectileDataList){
