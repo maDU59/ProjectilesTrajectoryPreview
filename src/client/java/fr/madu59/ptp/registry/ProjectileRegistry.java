@@ -3,7 +3,6 @@ package fr.madu59.ptp.registry;
 import fr.madu59.ptp.api.projectiles.ProjectileDataAPI;
 import fr.madu59.ptp.config.SettingsManager;
 import fr.madu59.ptp.projectiles.VanillaProjectiles;
-import net.minecraft.references.ItemIds;
 import net.minecraft.world.item.Items;
 
 public class ProjectileRegistry {
