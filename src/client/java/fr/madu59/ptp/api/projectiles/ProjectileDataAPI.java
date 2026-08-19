@@ -3,10 +3,11 @@ package fr.madu59.ptp.api.projectiles;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BooleanSupplier;
 
 import fr.madu59.ptp.physics.ProjectileData;
@@ -20,7 +21,7 @@ public class ProjectileDataAPI {
     
     private static final Map<Identifier, TriConsumer<ItemStack, Player, List<ProjectileData>>> projectileDataProviderMap = new HashMap<>();
     private static final Map<Identifier, BooleanSupplier> projectileTrajectoryStateSupplierMap = new HashMap<>();
-    private static final List<Identifier> blacklistedProjectiles = new ArrayList<>();
+    private static final Set<Identifier> blacklistedProjectiles = new HashSet<>();
 
     /*
      * Registers a projectile with the given ID and data provider.

@@ -27,10 +27,6 @@ public class ProjectileData {
     public final PhysicsOrder order;
     public final boolean bypassAntiCheat;
 
-    private final static PhysicsOrder ORDER_PDG = new PhysicsOrder(new PhysicsStep[]{PhysicsStep.POSITION, PhysicsStep.DRAG, PhysicsStep.GRAVITY});
-    private final static PhysicsOrder ORDER_GPD = new PhysicsOrder(new PhysicsStep[]{PhysicsStep.GRAVITY, PhysicsStep.POSITION, PhysicsStep.DRAG});
-    private final static PhysicsOrder ORDER_GDP = new PhysicsOrder(new PhysicsStep[]{PhysicsStep.GRAVITY, PhysicsStep.DRAG, PhysicsStep.POSITION});
-
     public ProjectileData(double gravity, double drag, Vec3 initialVelocity, Vec3 offset, Vec3 position, boolean hasWaterCollision, double waterDrag, PhysicsOrder order, boolean bypassAntiCheat) {
         this(gravity, drag, initialVelocity, offset, position, hasWaterCollision, waterDrag, gravity, order, bypassAntiCheat);
     }
@@ -48,7 +44,7 @@ public class ProjectileData {
         this.bypassAntiCheat = bypassAntiCheat;
     } 
 
-    static public List<ProjectileData> getItemsData(ItemStack itemStack, Player player, boolean isMainHand) {
+    public static List<ProjectileData> getItemsData(ItemStack itemStack, Player player, boolean isMainHand) {
 
         List<ProjectileData> projectileDataList = new ArrayList<>();
 
@@ -85,6 +81,6 @@ public class ProjectileData {
         float l = 0.02F * 0.5F;
         Vec3 vel = new Vec3((double)(-i * h * 0.3F) + Math.cos((double)k) * (double)l, (double)(-g * 0.3F + 0.1F), (double)(j * h * 0.3F) + Math.sin((double)k) * (double)l);
 
-        return new ProjectileData(gravity, drag, vel, offset, pos, true, waterDrag, gravity, ORDER_GPD, true);
+        return new ProjectileData(gravity, drag, vel, offset, pos, true, waterDrag, gravity, TrajectoryUtils.ORDER_GPD, true);
     }
 }
