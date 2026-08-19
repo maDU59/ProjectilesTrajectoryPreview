@@ -51,13 +51,18 @@ public class ProjectileData {
     static public List<ProjectileData> getItemsData(ItemStack itemStack, Player player, boolean isMainHand) {
 
         List<ProjectileData> projectileDataList = new ArrayList<>();
+        if (itemStack == null) return projectileDataList;
 
         Item item = itemStack.getItem();
+        if (item == null) return projectileDataList;
+
         Identifier itemId = BuiltInRegistries.ITEM.getKey(item);
+        if (itemId == null) return projectileDataList;
 
         if(!ProjectileDataAPI.isBlacklisted(itemId)) {
-            if(ProjectileDataAPI.hasProjectileData(itemStack) && ProjectileDataAPI.isEnabled(itemStack)){
-                ProjectileDataAPI.getProjectileData(itemStack, player, projectileDataList);
+            var dataProvider = ProjectileDataAPI.getProjectileDataProvider(itemId);
+            if(dataProvider != null && ProjectileDataAPI.isEnabled(itemId)){
+                dataProvider.accept(itemStack, player, projectileDataList);
             }
         }
 
