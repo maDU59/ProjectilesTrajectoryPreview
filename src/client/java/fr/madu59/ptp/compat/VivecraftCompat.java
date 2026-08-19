@@ -72,6 +72,6 @@ public class VivecraftCompat {
             }
         }
 
-        return player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+        return player.getEyePosition(tickProgress).add(new Vec3(0, -0.1F,0));
     }
 }
