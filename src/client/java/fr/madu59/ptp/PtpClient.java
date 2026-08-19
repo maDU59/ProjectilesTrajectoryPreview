@@ -118,11 +118,11 @@ public class PtpClient implements ClientModInitializer {
             showItemTrajectory(context, player, ProjectileData.getDropTrajectory(player), handMultiplier);
         }
         else{
-            interactionHand = InteractionHand.OFF_HAND;
             List<ProjectileData> projectileDataList = ProjectileData.getItemsData(itemStack, player, true);
             if(projectileDataList.isEmpty()){
                 if(SettingsManager.ENABLE_OFFHAND.getValue() == false) return;
 
+                interactionHand = InteractionHand.OFF_HAND;
                 itemStack = player.getOffhandItem();
                 handMultiplier = -handMultiplier;
                 projectileDataList = ProjectileData.getItemsData(itemStack, player, false);
