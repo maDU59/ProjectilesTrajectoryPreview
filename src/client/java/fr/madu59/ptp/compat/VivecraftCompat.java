@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
 public class VivecraftCompat {
 
     public static Vec3 getViewVector(Player player, float tickProgress){
-        if(player == Minecraft.getInstance().player){
+        if(player == Minecraft.getInstance().player && VRClientAPI.instance().isVRActive()){
             LocalPlayer localPlayer = Minecraft.getInstance().player;
             if(BowTracker.isBow(player.getMainHandItem())){
                 if(ClientDataHolderVR.getInstance().bowTracker.isActive(localPlayer)){
@@ -63,7 +63,7 @@ public class VivecraftCompat {
     }
 
     public static Vec3 getAimPos(Player player, float tickProgress){
-        if(player == Minecraft.getInstance().player){
+        if(player == Minecraft.getInstance().player && VRClientAPI.instance().isVRActive()){
             return VRClientAPI.instance().getWorldRenderPose().getHand(PtpClient.getInteractionHand()).getPos();
         }
         else if(player instanceof ServerPlayer serverPlayer){
@@ -73,6 +73,6 @@ public class VivecraftCompat {
             }
         }
 
-        return player.getEyePosition(tickProgress).add(new Vec3(0,- 0.10000000149011612,0));
+        return player.getEyePosition(tickProgress).add(new Vec3(0, -0.1F,0));
     }
 }
