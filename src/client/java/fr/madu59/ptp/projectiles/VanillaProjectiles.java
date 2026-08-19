@@ -1,12 +1,14 @@
 package fr.madu59.ptp.projectiles;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.madu59.ptp.PtpClient;
 import fr.madu59.ptp.physics.ProjectileData;
 import fr.madu59.ptp.util.ItemUtils;
 import fr.madu59.ptp.util.TrajectoryUtils;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArrowItem;
@@ -16,7 +18,6 @@ import net.minecraft.world.item.EnderpearlItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TridentItem;
-import net.minecraft.world.item.component.ChargedProjectiles;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 
@@ -51,10 +52,19 @@ public class VanillaProjectiles {
         Vec3 vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(3.15);
         Vec3 offset = new Vec3(0, -0.06, 0.03);
 
-        ChargedProjectiles chargedProjectilesComponent = itemStack.get(DataComponents.CHARGED_PROJECTILES);
+        List<ItemStack> projectiles = new ArrayList<>();
+        CompoundTag tag = itemStack.getTag();
 
-        if(chargedProjectilesComponent != null){
-            for (ItemStack projectile : chargedProjectilesComponent.getItems()) {
+        if (tag != null && tag.contains("ChargedProjectiles", 9)) { // 9 = Tag.TAG_LIST
+            ListTag listTag = tag.getList("ChargedProjectiles", 10); // 10 = Tag.TAG_COMPOUND
+            for (int i = 0; i < listTag.size(); ++i) {
+                CompoundTag itemTag = listTag.getCompound(i);
+                projectiles.add(ItemStack.of(itemTag));
+            }
+        }
+
+        if(projectiles != null){
+            for (ItemStack projectile : projectiles) {
                 if (projectile.is(Items.FIREWORK_ROCKET)) {
                     vel = TrajectoryUtils.getViewVector(player, tickProgress).scale(1.6F);
                     gravity = 0;

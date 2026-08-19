@@ -1,9 +1,9 @@
 package fr.madu59.ptp.util;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.PoseStack.Pose;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
@@ -45,8 +45,8 @@ public class RenderUtils {
     }
 
     public static void renderVector(PoseStack poseStack, VertexConsumer vertexConsumer, Vector3f vector3f, Vec3 vec3, int i) {
-        Pose pose = poseStack.last();
-        vertexConsumer.addVertex(pose, vector3f).setColor(i).setNormal(pose, (float)vec3.x, (float)vec3.y, (float)vec3.z);
-        vertexConsumer.addVertex(pose, (float)((double)vector3f.x() + vec3.x), (float)((double)vector3f.y() + vec3.y), (float)((double)vector3f.z() + vec3.z)).setColor(i).setNormal(pose, (float)vec3.x, (float)vec3.y, (float)vec3.z);
+        Matrix4f pose = poseStack.last().pose();
+        vertexConsumer.vertex(pose, vector3f.x(), vector3f.y(), vector3f.z()).color(i).normal((float)vec3.x, (float)vec3.y, (float)vec3.z);
+        vertexConsumer.vertex(pose, (float)((double)vector3f.x() + vec3.x), (float)((double)vector3f.y() + vec3.y), (float)((double)vector3f.z() + vec3.z)).color(i).normal((float)vec3.x, (float)vec3.y, (float)vec3.z);
     }
 }

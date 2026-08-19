@@ -1,7 +1,6 @@
 package fr.madu59.ptp;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class Ptp implements ModInitializer {
 		PayloadTypeRegistry.playC2S().register(HANDSHAKE_C2SPayload.ID, HANDSHAKE_C2SPayload.CODEC);
 		PayloadTypeRegistry.playS2C().register(HANDSHAKE_S2CPayload.ID, HANDSHAKE_S2CPayload.CODEC);
 
-		ServerPlayNetworking.registerGlobalReceiver(HANDSHAKE_C2SPayload.ID,
+		ServerPlayNetworking.registerGlobalReceiver(HandshakeNetworking.HANDSHAKE_S2C.ID,
             (payload, context) -> {
                 // Send back a reply packet
                 ServerPlayNetworking.send(context.player(), new HANDSHAKE_S2CPayload("Is installed on server"));

@@ -230,7 +230,7 @@ public class PtpClient implements ClientModInitializer {
 
         if (hasHit) {
 
-            Vec3 pos = trajectoryPoints.getLast();
+            Vec3 pos = trajectoryPoints.get(trajectoryPoints.size());
 
             double r = 0.1;
             double x = pos.x;
@@ -357,7 +357,7 @@ public class PtpClient implements ClientModInitializer {
     }
 
     public static float getTickProgress(){
-        return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        return Minecraft.getInstance().getDeltaFrameTime();
     }
 
     public static InteractionHand getInteractionHand(){
