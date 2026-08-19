@@ -222,9 +222,29 @@ public class SettingsManager {
         option.setValue((T) value);
     }
 
+    private static final int[] COLOR_RED = new int[] {255, 0, 0};
+    private static final int[] COLOR_GREEN = new int[] {0, 255, 0};
+    private static final int[] COLOR_BLUE = new int[] {0, 0, 255};
+    private static final int[] COLOR_YELLOW = new int[] {255, 255, 0};
+    private static final int[] COLOR_CYAN = new int[] {0, 255, 255};
+    private static final int[] COLOR_MAGENTA = new int[] {255, 0, 255};
+    private static final int[] COLOR_WHITE = new int[] {255, 255, 255};
+    private static final int[] COLOR_BLACK = new int[] {0, 0, 0};
+    private static final int[] COLOR_PURPLE = new int[] {128, 0, 128};
+
+    private static final float[] FLOAT_COLOR_RED = new float[] {1.0f, 0.0f, 0.0f};
+    private static final float[] FLOAT_COLOR_GREEN = new float[] {0.0f, 1.0f, 0.0f};
+    private static final float[] FLOAT_COLOR_BLUE = new float[] {0.0f, 0.0f, 1.0f};
+    private static final float[] FLOAT_COLOR_YELLOW = new float[] {1.0f, 1.0f, 0.0f};
+    private static final float[] FLOAT_COLOR_CYAN = new float[] {0.0f, 1.0f, 1.0f};
+    private static final float[] FLOAT_COLOR_MAGENTA = new float[] {1.0f, 0.0f, 1.0f};
+    private static final float[] FLOAT_COLOR_WHITE = new float[] {1.0f, 1.0f, 1.0f};
+    private static final float[] FLOAT_COLOR_BLACK = new float[] {0.0f, 0.0f, 0.0f};
+    private static final float[] FLOAT_COLOR_PURPLE = new float[] {128.0f / 255.0f, 0.0f, 128.0f / 255.0f};
+
     public static int getARGBColorFromSetting(Option.Color color, Option.Opacity opacitySetting, Entity entity) {
         int[] colors = getColorFromSetting(color, entity);
-        return colors[2] + colors[1] * 256 + colors[0] * 256 * 256 + getAlphaFromSetting(opacitySetting) * 256 * 256 *256;
+        return colors[2] | (colors[1] << 8) | (colors[0] << 16) | (getAlphaFromSetting(opacitySetting) << 24);
     }
 
     public static int getAlphaFromSetting(Option.Opacity opacitySetting){
@@ -246,6 +266,16 @@ public class SettingsManager {
     }
 
     public static float[] convertColorToFloat(int[] colors){
+        if (colors == COLOR_RED) return FLOAT_COLOR_RED;
+        if (colors == COLOR_GREEN) return FLOAT_COLOR_GREEN;
+        if (colors == COLOR_BLUE) return FLOAT_COLOR_BLUE;
+        if (colors == COLOR_YELLOW) return FLOAT_COLOR_YELLOW;
+        if (colors == COLOR_CYAN) return FLOAT_COLOR_CYAN;
+        if (colors == COLOR_MAGENTA) return FLOAT_COLOR_MAGENTA;
+        if (colors == COLOR_WHITE) return FLOAT_COLOR_WHITE;
+        if (colors == COLOR_BLACK) return FLOAT_COLOR_BLACK;
+        if (colors == COLOR_PURPLE) return FLOAT_COLOR_PURPLE;
+
         float red = colors[0]/(float)255.0;
         float green = colors[1]/(float)255.0;
         float blue = colors[2]/(float)255.0;
@@ -272,49 +302,28 @@ public class SettingsManager {
             else if(entity instanceof  LivingEntity){color = Option.Color.CYAN;}
             else{color = Option.Color.MAGENTA;}
         }
-        int red = 0, green = 0, blue = 0;
         switch (color) {
             case RED:
-                red = 255;
-                break;
+                return COLOR_RED;
             case GREEN:
-                green = 255;
-                break;
+                return COLOR_GREEN;
             case BLUE:
-                blue = 255;
-                break;
+                return COLOR_BLUE;
             case YELLOW:
-                red = 255;
-                green = 255;
-                break;
+                return COLOR_YELLOW;
             case CYAN:
-                green = 255;
-                blue = 255;
-                break;
+                return COLOR_CYAN;
             case MAGENTA:
-                red = 255;
-                blue = 255;
-                break;
+                return COLOR_MAGENTA;
             case WHITE:
-                red = 255;
-                green = 255;
-                blue = 255;
-                break;
+                return COLOR_WHITE;
             case BLACK:
-                red = 0;
-                green = 0;
-                blue = 0;
-                break;
+                return COLOR_BLACK;
             case PURPLE:
-                red = 128;
-                green = 0;
-                blue = 128;
-                break;
+                return COLOR_PURPLE;
             default:
-                red = 255; // Default to red if unknown
+                return COLOR_RED; // Default to red if unknown
         }
-
-        return new int[] {red, green, blue};
     }
 
     public static void saveSettings(List<Option<?>> options) {
