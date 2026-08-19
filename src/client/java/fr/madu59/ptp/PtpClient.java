@@ -207,7 +207,7 @@ public class PtpClient implements ClientModInitializer {
     private static void renderTrajectory(WorldRenderContext context, List<Vec3> trajectoryPoints, Vec3 handToEyeDelta, int color, boolean hasHit) {
 
         VertexConsumer lineConsumer = context.consumers().getBuffer(RenderType.lines());
-        Vec3 cam = client.gameRenderer.getMainCamera().position();
+        Vec3 cam = client.gameRenderer.getMainCamera().getPosition();
         PoseStack poseStack = context.matrixStack();
         poseStack.pushPose();
         poseStack.translate(-cam.x, -cam.y, -cam.z);

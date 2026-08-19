@@ -18,7 +18,7 @@ public class RenderUtils {
 
     public static void renderFilledBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
         PoseStack poseStack = context.matrixStack();
-        Vec3 camera = client.gameRenderer.getMainCamera().position();
+        Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
 
         poseStack.pushPose();
         poseStack.translate(-camera.x, -camera.y, -camera.z);
@@ -32,7 +32,7 @@ public class RenderUtils {
 
     public static void renderBox(WorldRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
         PoseStack poseStack = context.matrixStack();
-        Vec3 camera = client.gameRenderer.getMainCamera().position();
+        Vec3 camera = client.gameRenderer.getMainCamera().getPosition();
 
         poseStack.pushPose();
         poseStack.translate(-camera.x, -camera.y, -camera.z);
