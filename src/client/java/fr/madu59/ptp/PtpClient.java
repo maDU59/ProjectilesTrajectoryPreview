@@ -267,7 +267,12 @@ public class PtpClient implements ClientModInitializer {
         List<Vec3> trajectoryPoints = new ArrayList<>();
         double drag =  projectileData.drag;
         double gravity = projectileData.gravity;
-        Vec3 vel = projectileData.initialVelocity.add(player.getDeltaMovement());
+        Vec3 vel = projectileData.initialVelocity.add(
+            new Vec3(player.getDeltaMovement().x,
+                player.onGround() ? 0.0 : player.getDeltaMovement().y,
+                player.getDeltaMovement().z
+            )
+        );
 
         for (int i = 0; i < 200; i++) {
             trajectoryPoints.add(pos);
@@ -309,25 +314,27 @@ public class PtpClient implements ClientModInitializer {
                 new ClipContext(prevPos, pos,
                     ClipContext.Block.COLLIDER,
                     ClipContext.Fluid.WATER,
-                    player));
+                    player)
+                );
             }
             else{
                 hit = player.level().clip(
                 new ClipContext(prevPos, pos,
                     ClipContext.Block.COLLIDER,
                     ClipContext.Fluid.NONE,
-                    player));
-                    if (hit.getType() == HitResult.Type.MISS && player.level().clip(new ClipContext(prevPos, pos,
-                    ClipContext.Block.COLLIDER,
-                    ClipContext.Fluid.WATER,
-                    player)).getType() != HitResult.Type.MISS) {
-                        drag = projectileData.waterDrag;
-                        gravity = projectileData.underwaterGravity;
-                    }
-                    else{
-                        drag = projectileData.drag;
-                        gravity = projectileData.gravity;
-                    }
+                    player)
+                );
+                if (hit.getType() == HitResult.Type.MISS && player.level().clip(new ClipContext(prevPos, pos,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.WATER,
+                player)).getType() != HitResult.Type.MISS) {
+                    drag = projectileData.waterDrag;
+                    gravity = projectileData.underwaterGravity;
+                }
+                else{
+                    drag = projectileData.drag;
+                    gravity = projectileData.gravity;
+                }
             }
 
             if (hit.getType() != HitResult.Type.MISS && prevPos.distanceToSqr(hit.getLocation()) < closestDistance) {
