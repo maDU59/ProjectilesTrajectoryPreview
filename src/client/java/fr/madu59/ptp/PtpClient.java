@@ -148,6 +148,9 @@ public class PtpClient implements ClientModInitializer {
     }
 
     private static void showProjectileTrajectory(LevelRenderContext context, Player player, List<ProjectileData> projectileDataList, int handMultiplier) {
+        Option.State showState = SettingsManager.SHOW_TRAJECTORY.getValue();
+        if (showState == Option.State.DISABLED) return;
+
         float tickProgress = client.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         Vec3 eye = player.getEyePosition(tickProgress);
 
