@@ -57,44 +57,42 @@ public class RenderUtils {
 
     private static void addChainedFilledBoxVertices(LevelRenderContext context, PoseStack poseStack, RenderType renderType, float f, float g, float h, float i, float j, float k, float l, float m, float n, float o) {
         context.submitNodeCollector().submitCustomGeometry(poseStack, renderType, (Pose pose, VertexConsumer vertexConsumer) -> {
-        
-            Matrix4f matrix4f = poseStack.last().pose();
 
             // X-
-            vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, g, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, g, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, j, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, j, h).setColor(l, m, n, o);
 
             // X +
-            vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, g, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, j, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, j, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, g, k).setColor(l, m, n, o);
 
             // Y-
-            vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, g, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, g, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, g, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, g, k).setColor(l, m, n, o);
 
             // Y+
-            vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, j, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, j, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, j, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, j, h).setColor(l, m, n, o);
 
             // Z-
-            vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, g, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, j, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, j, k).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, g, k).setColor(l, m, n, o);
 
             // Z+
-            vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o);
-            vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, g, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, f, j, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, j, h).setColor(l, m, n, o);
+            vertexConsumer.addVertex(pose, i, g, h).setColor(l, m, n, o);
         });
     }
 
