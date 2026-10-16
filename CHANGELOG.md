@@ -1,2 +1,2 @@
 # What's new:
-- Fixed highlight not displaying on 26.1+
+- Fixed potions having the trajectory of exp bottles (@Tanishasharma11)
