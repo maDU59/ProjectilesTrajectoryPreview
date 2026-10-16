@@ -22,24 +22,14 @@ public class RenderUtils {
         PoseStack poseStack = context.poseStack();
         Vec3 camera = client.gameRenderer.getMainCamera().position();
 
-        poseStack.pushPose();
-        poseStack.translate(-camera.x, -camera.y, -camera.z);
-
-        addChainedFilledBoxVertices(context, poseStack, RenderTypes.debugFilledBox(), minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
-
-        poseStack.popPose();
+        addChainedFilledBoxVertices(context, poseStack, RenderTypes.debugFilledBox(), minX - camera.x, minY - camera.y, minZ - camera.z, maxX - camera.x, maxY - camera.y, maxZ - camera.z, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
     }
 
     public static void renderBox(LevelRenderContext context, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float[] colorComponents, float alpha) {
         PoseStack poseStack = context.poseStack();
         Vec3 camera = client.gameRenderer.getMainCamera().position();
 
-        poseStack.pushPose();
-        poseStack.translate(-camera.x, -camera.y, -camera.z);
-
-        renderLineBox(context, poseStack, RenderTypes.lines(), minX, minY, minZ, maxX, maxY, maxZ, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
-
-        poseStack.popPose();
+        renderLineBox(context, poseStack, RenderTypes.lines(), minX - camera.x, minY - camera.y, minZ - camera.z, maxX - camera.x, maxY - camera.y, maxZ - camera.z, colorComponents[0], colorComponents[1], colorComponents[2], alpha);
     }
 
     public static void renderVector(LevelRenderContext context, PoseStack poseStack, RenderType renderType, Vector3f vector3f, Vec3 vec3, int i) {

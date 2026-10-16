@@ -214,8 +214,6 @@ public class PtpClient implements ClientModInitializer {
         Vec3 cam = client.gameRenderer.getMainCamera().position();
         PoseStack matrices = context.poseStack();
         RenderType renderType = RenderTypes.LINES;
-        matrices.pushPose();
-        matrices.translate(-cam.x, -cam.y, -cam.z);
 
         for (int i = 0; i < trajectoryPoints.size()-1; i++) {
             Vec3 lerpedDelta = handToEyeDelta.scale((trajectoryPoints.size()-(i * 1.0))/trajectoryPoints.size());
@@ -228,14 +226,14 @@ public class PtpClient implements ClientModInitializer {
             else if(SettingsManager.TRAJECTORY_STYLE.getValue() == Option.Style.DOTTED){
                 dir = dir.scale(0.15);
             }
-            Vector3f floatPos = new Vector3f((float) pos.x, (float) pos.y, (float) pos.z);
+            Vector3f floatPos = new Vector3f((float) (pos.x - cam.x), (float) (pos.y - cam.y), (float) (pos.z - cam.z));
 
             RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
         }
 
         if (hasHit) {
 
-            Vec3 pos = trajectoryPoints.getLast();
+            Vec3 pos = trajectoryPoints.getLast().subtract(cam);
 
             double r = 0.1;
             double x = pos.x;
@@ -254,8 +252,6 @@ public class PtpClient implements ClientModInitializer {
             dir = new Vec3(0,0,2 * r);
             RenderUtils.renderVector(context, matrices, renderType, floatPos, dir, color);
         }
-
-        matrices.popPose();
     }
 
     private static PreviewImpact calculateTrajectory(Vec3 pos, Player player, ProjectileData projectileData, boolean canHitEntities) {
