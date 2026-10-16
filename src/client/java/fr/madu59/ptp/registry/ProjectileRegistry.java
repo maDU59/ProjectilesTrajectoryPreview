@@ -23,7 +23,6 @@ public class ProjectileRegistry {
 
         ProjectileDataAPI.registerProjectile(Items.EXPERIENCE_BOTTLE, VanillaProjectiles::expBottleTrajectory, () -> SettingsManager.TOGGLE_EXPPOTION.getValue());
 
-        ProjectileDataAPI.registerProjectile(Items.SPLASH_POTION, VanillaProjectiles::expBottleTrajectory, () -> SettingsManager.TOGGLE_EXPPOTION.getValue());
-        ProjectileDataAPI.registerProjectile(Items.LINGERING_POTION, VanillaProjectiles::expBottleTrajectory, () -> SettingsManager.TOGGLE_EXPPOTION.getValue());
-    }
+        ProjectileDataAPI.registerProjectile(Items.SPLASH_POTION, VanillaProjectiles::splashPotionsTrajectory, () -> SettingsManager.TOGGLE_POTION.getValue());
+        ProjectileDataAPI.registerProjectile(Items.LINGERING_POTION, VanillaProjectiles::splashPotionsTrajectory, () -> SettingsManager.TOGGLE_POTION.getValue());    }
 }
